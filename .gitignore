@@ -1,0 +1,50 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Project local backup and AI completion logs
+/back/*
+!/back/.gitkeep
+/log/*
+!/log/.gitkeep
+
+# Frontend dependencies and build output
+/teacher_help_admin/node_modules/
+/teacher_help_admin/dist/
+/teacher_help_admin/dist-ssr/
+/teacher_help_admin/.vite/
+/teacher_help_admin/.cache/
+/teacher_help_admin/.eslintcache
+*.tsbuildinfo
+
+# Backend Python cache, virtualenv, and runtime output
+/teacher_help_service/.venv/
+/teacher_help_service/venv/
+/teacher_help_service/env/
+/teacher_help_service/__pycache__/
+/teacher_help_service/**/__pycache__/
+/teacher_help_service/*.py[cod]
+/teacher_help_service/.pytest_cache/
+/teacher_help_service/.ruff_cache/
+/teacher_help_service/.mypy_cache/
+/teacher_help_service/caches/
+/teacher_help_service/vf_admin/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Uploaded/generated office files
+~$*

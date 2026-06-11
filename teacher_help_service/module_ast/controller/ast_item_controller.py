@@ -1,5 +1,5 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic_validation_decorator import ValidateFields
 from config.get_db import get_db
@@ -16,6 +16,7 @@ from module_ast.entity.vo.ast_item_vo import (
     DeleteAstItemModel,
     AstItemDetailModel
 )
+from utils.common_util import bytes2file_response
 from utils.response_util import ResponseUtil
 from utils.page_util import PageResponseModel
 from utils.log_util import logger
@@ -40,6 +41,23 @@ async def get_ast_item_list(
     logger.info('获取成功')
 
     return ResponseUtil.success(model_content=item_page_query_result)
+
+
+@astItemController.post('/export', dependencies=[Depends(CheckUserInterfaceAuth(['ast:item:export', 'ast:item:list']))])
+@Log(title='物品管理', business_type=BusinessType.EXPORT)
+async def export_ast_item_list(
+    request: Request,
+    ast_item_page_query: AstItemPageQueryModel = Form(),
+    query_db: AsyncSession = Depends(get_db),
+    data_scope_sql: str = Depends(GetDataScope('AstItem')),
+):
+    item_query_result = await AstItemService.get_ast_item_list_services(
+        query_db, ast_item_page_query, data_scope_sql, is_page=False
+    )
+    item_export_result = await AstItemService.export_ast_item_list_services(item_query_result)
+    logger.info('导出成功')
+
+    return ResponseUtil.streaming(data=bytes2file_response(item_export_result))
 
 
 @astItemController.get(
@@ -114,4 +132,3 @@ async def delete_ast_item(
     logger.info(delete_ast_item_result.message)
 
     return ResponseUtil.success(msg=delete_ast_item_result.message)
-

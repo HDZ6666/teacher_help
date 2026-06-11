@@ -1,4 +1,4 @@
-from sqlalchemy import select, desc, update
+from sqlalchemy import select, desc, update, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from module_ast.entity.do.ast_item_do import AstItem
 from module_ast.entity.vo.ast_item_vo import AstItemPageQueryModel, AstItemModel
@@ -96,7 +96,7 @@ class AstItemDao:
         :param item: 物品对象
         :return: 新增校验结果
         """
-        db_item = AstItem(**item.model_dump(by_alias=True))
+        db_item = AstItem(**item.model_dump(exclude_none=True))
         db.add(db_item)
         await db.flush()
         await db.refresh(db_item)
@@ -131,4 +131,3 @@ class AstItemDao:
             .where(AstItem.id == item.id)
             .values(del_flag=1, update_by=item.update_by, update_time=item.update_time)
         )
-

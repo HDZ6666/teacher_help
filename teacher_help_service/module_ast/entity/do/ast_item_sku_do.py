@@ -22,6 +22,7 @@ class AstItemSku(Base):
     spec1_value = Column(String(50), nullable=True, comment='规格1值')
     spec2_value = Column(String(50), nullable=True, comment='规格2值')
     price = Column(DECIMAL(10, 2), nullable=False, default=0.00, comment='售卖价格')
+    cost_price = Column(DECIMAL(10, 2), nullable=True, default=0.00, comment='成本价')
     stock = Column(Integer, nullable=True, default=0, comment='库存数量')
     available_stock = Column(Integer, nullable=True, default=0, comment='可用库存')
     
@@ -35,4 +36,3 @@ class AstItemSku(Base):
     update_by = Column(String(64), nullable=True, default='', comment='更新者')
     update_time = Column(DateTime, nullable=True, default=datetime.now, onupdate=datetime.now, comment='更新时间')
     remark = Column(String(500), nullable=True, comment='备注')
-

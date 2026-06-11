@@ -31,6 +31,9 @@ class AstItem(Base):
     # 库存字段
     total_stock = Column(Integer, nullable=True, default=0, comment='总库存')
     available_stock = Column(Integer, nullable=True, default=0, comment='可用库存')
+    enable_stock = Column(SMALLINT, nullable=True, default=1, comment='是否开启库存(0=关闭 1=开启)')
+    warning_stock = Column(Integer, nullable=True, default=0, comment='库存预警数量')
+    online_sale = Column(SMALLINT, nullable=True, default=0, comment='线上售卖状态(0=关闭 1=开启)')
     
     # 状态字段
     status = Column(SMALLINT, nullable=True, default=1, comment='启用状态(0=停用 1=启用)')
@@ -42,4 +45,3 @@ class AstItem(Base):
     update_by = Column(String(64), nullable=True, default='', comment='更新者')
     update_time = Column(DateTime, nullable=True, default=datetime.now, onupdate=datetime.now, comment='更新时间')
     remark = Column(String(500), nullable=True, comment='备注')
-

@@ -43,11 +43,17 @@
 
             <!-- 物品列表 -->
             <el-table v-loading="itemLoading" :data="itemList">
-              <el-table-column label="物品名称" align="center" prop="itemName" width="200" />
+              <el-table-column label="物品名称" align="center" prop="itemName" width="180" />
+              <el-table-column label="物品图片" align="center" prop="imageUrl" width="90">
+                <template #default="scope">
+                  <image-preview v-if="scope.row.imageUrl" :src="scope.row.imageUrl" :width="36" :height="36" />
+                  <span v-else style="color: #909399;">-</span>
+                </template>
+              </el-table-column>
               <el-table-column label="物品编码" align="center" prop="itemCode" width="150" />
               <el-table-column label="物品类型" align="center" prop="itemType" width="120">
                 <template #default="scope">
-                  <el-tag v-if="scope.row.itemType === '1'">实物</el-tag>
+                  <el-tag v-if="String(scope.row.itemType) === '1'">实物</el-tag>
                   <el-tag v-else type="info">虚拟</el-tag>
                 </template>
               </el-table-column>
@@ -56,16 +62,54 @@
                   <span style="color: #409EFF;">{{ scope.row.skuCount }}种</span>
                 </template>
               </el-table-column>
-              <el-table-column label="总库存" align="center" prop="totalStock" width="100" />
+              <el-table-column label="总库存" align="center" prop="totalStock" width="100">
+                <template #default="scope">
+                  <span :style="{ color: scope.row.isWarning ? '#F56C6C' : '#303133', fontWeight: scope.row.isWarning ? 'bold' : 'normal' }">
+                    {{ scope.row.totalStock }}
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="库存预警" align="center" prop="warningStock" width="110">
+                <template #default="scope">
+                  <el-tag v-if="scope.row.isWarning" type="danger">≤ {{ scope.row.warningStock }}</el-tag>
+                  <span v-else>{{ scope.row.warningStock || '-' }}</span>
+                </template>
+              </el-table-column>
               <el-table-column label="单价范围" align="center" prop="priceRange" width="150" />
+              <el-table-column label="绑定课程" align="center" prop="courseName" min-width="180">
+                <template #default="scope">
+                  <span v-if="scope.row.courseName" style="color: #409EFF;">{{ scope.row.courseName }}</span>
+                  <span v-else style="color: #909399;">未绑定</span>
+                </template>
+              </el-table-column>
               <el-table-column label="开启库存" align="center" prop="enableStock" width="100">
                 <template #default="scope">
-                  <el-switch v-model="scope.row.enableStock" :active-value="1" :inactive-value="0" />
+                  <el-switch
+                    v-model="scope.row.enableStock"
+                    :active-value="1"
+                    :inactive-value="0"
+                    @change="handleItemEnableStockChange(scope.row)"
+                  />
+                </template>
+              </el-table-column>
+              <el-table-column label="线上售卖" align="center" prop="onlineSale" width="100">
+                <template #default="scope">
+                  <el-switch
+                    v-model="scope.row.onlineSale"
+                    :active-value="1"
+                    :inactive-value="0"
+                    @change="handleItemOnlineSaleChange(scope.row)"
+                  />
                 </template>
               </el-table-column>
               <el-table-column label="启用状态" align="center" prop="status" width="100">
                 <template #default="scope">
-                  <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
+                  <el-switch
+                    v-model="scope.row.status"
+                    :active-value="1"
+                    :inactive-value="0"
+                    @change="handleItemStatusChange(scope.row)"
+                  />
                 </template>
               </el-table-column>
               <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
@@ -115,6 +159,7 @@
                   <el-option label="采购" value="purchase" />
                   <el-option label="领用" value="receive" />
                   <el-option label="退领" value="return" />
+                  <el-option label="盘点" value="inventory" />
                 </el-select>
               </el-form-item>
               <el-form-item>
@@ -152,6 +197,7 @@
                   <el-tag v-if="scope.row.businessType === 'purchase'" type="success">采购</el-tag>
                   <el-tag v-else-if="scope.row.businessType === 'receive'" type="warning">领用</el-tag>
                   <el-tag v-else-if="scope.row.businessType === 'return'" type="info">退领</el-tag>
+                  <el-tag v-else-if="scope.row.businessType === 'inventory'" type="danger">盘点</el-tag>
                   <el-tag v-else>-</el-tag>
                 </template>
               </el-table-column>
@@ -243,6 +289,16 @@
               <span v-else style="color: #909399;">未绑定</span>
             </template>
           </el-table-column>
+          <el-table-column label="线上售卖" align="center" width="120">
+            <template #default="scope">
+              <el-switch
+                v-model="scope.row.onlineSale"
+                :active-value="1"
+                :inactive-value="0"
+                @change="handleFeeOnlineSaleChange(scope.row)"
+              />
+            </template>
+          </el-table-column>
           <el-table-column label="启用状态" align="center" width="120">
             <template #default="scope">
               <el-switch
@@ -294,32 +350,57 @@
 
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-form-item label="物品图片" prop="itemImages">
-              <el-upload
-                class="upload-demo"
-                action="#"
-                list-type="picture-card"
-                :auto-upload="false"
-                :limit="5"
-              >
-                <el-icon><Plus /></el-icon>
-                <template #tip>
-                  <div class="el-upload__tip">
-                    图片大小不超过5M，最多上传5张，支持jpg、png、jpeg格式
-                  </div>
-                </template>
-              </el-upload>
+            <el-form-item label="物品图片" prop="imageUrl">
+              <image-upload v-model="itemForm.imageUrl" :limit="5" :file-size="5" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="开启库存">
+              <el-switch v-model="itemForm.enableStock" :active-value="1" :inactive-value="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="库存预警">
+              <el-input-number
+                v-model="itemForm.warningStock"
+                :min="0"
+                :precision="0"
+                :controls="false"
+                style="width: 100%;"
+                placeholder="请输入预警数量"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="线上售卖">
+              <el-switch v-model="itemForm.onlineSale" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-form-item label="开启库存">
-              <el-switch v-model="itemForm.enableStock" :active-value="1" :inactive-value="0" />
-              <span style="margin-left: 10px; color: #909399; font-size: 12px;">
-                开启后可进行库存管理
-              </span>
+            <el-form-item label="绑定课程">
+              <div style="width: 100%;">
+                <div v-if="itemForm.courseIds && itemForm.courseIds.length > 0" style="margin-bottom: 10px;">
+                  <el-tag
+                    v-for="(courseName, index) in itemForm.courseNames"
+                    :key="itemForm.courseIds[index]"
+                    closable
+                    @close="removeItemCourse(index)"
+                    style="margin-right: 8px; margin-bottom: 8px;"
+                    type="primary"
+                  >
+                    {{ courseName }}
+                  </el-tag>
+                </div>
+                <el-button icon="Plus" @click="openSelectCourseDialog('item')">
+                  {{ itemForm.courseIds && itemForm.courseIds.length > 0 ? '继续添加课程' : '选择课程' }}
+                </el-button>
+              </div>
             </el-form-item>
           </el-col>
         </el-row>
@@ -407,7 +488,7 @@
           <div style="margin-top: 10px;">
             <el-button type="primary" plain icon="Plus" @click="addSpec">添加规格</el-button>
             <span style="color: #909399; font-size: 12px; margin-left: 10px;">
-              +添加（{{ itemForm.specs.length }}/3）
+              +添加（{{ itemForm.specs.length }}/2）
             </span>
           </div>
         </el-form-item>
@@ -668,7 +749,6 @@
               <el-input-number
                 v-model="scope.row.quantity"
                 :min="1"
-                :max="scope.row.stock"
                 :controls="false"
                 style="width: 100%;"
               />
@@ -941,12 +1021,16 @@
             <!-- 选择课程按钮 -->
             <el-button
               icon="Plus"
-              @click="openSelectCourseDialog"
+              @click="openSelectCourseDialog('fee')"
               style="width: 100%;"
             >
               {{ feeForm.courseIds && feeForm.courseIds.length > 0 ? '继续添加课程' : '选择课程' }}
             </el-button>
           </div>
+        </el-form-item>
+
+        <el-form-item label="线上售卖">
+          <el-switch v-model="feeForm.onlineSale" :active-value="1" :inactive-value="0" />
         </el-form-item>
       </el-form>
 
@@ -1005,6 +1089,26 @@
 
 <script setup name="AssistantInventory">
 import { nextTick } from 'vue';
+import {
+  addFee,
+  addItem,
+  changeFeeStatus,
+  createInventory,
+  createPurchase,
+  createReceive,
+  createReturn,
+  delFee,
+  delItem,
+  getFee,
+  getItem,
+  getStockRecord,
+  listAvailableItems,
+  listFee,
+  listItem,
+  listStockRecord,
+  updateFee,
+  updateItem
+} from '@/api/assistant/inventory';
 
 const { proxy } = getCurrentInstance();
 
@@ -1048,10 +1152,15 @@ const itemForm = ref({
   itemName: '',
   itemType: '1',
   itemImages: [],
+  imageUrl: '',
   enableStock: 1,
+  warningStock: 0,
+  onlineSale: 0,
   specs: [],
   skus: [],
   singlePrice: '',
+  courseIds: [],
+  courseNames: [],
   remark: ''
 });
 const itemRules = ref({
@@ -1168,6 +1277,8 @@ const feeForm = ref({
   id: null,
   feeName: '',
   price: null,
+  onlineSale: 0,
+  status: 1,
   courseIds: [],
   courseNames: []
 });
@@ -1186,6 +1297,7 @@ const courseSearchKeyword = ref('');
 const courseList = ref([]);
 const selectedCourses = ref([]);
 const courseTableRef = ref(null);
+const courseSelectTarget = ref('fee');
 
 // 过滤后的课程列表
 const filteredCourseList = computed(() => {
@@ -1202,13 +1314,150 @@ const selectedCourseCount = computed(() => {
   return selectedCourses.value.length;
 });
 
-// 已选择课程文本
-const selectedCoursesText = computed(() => {
-  if (!feeForm.value.courseNames || feeForm.value.courseNames.length === 0) {
-    return '';
+function cleanQuery(query) {
+  const result = {};
+  Object.keys(query || {}).forEach(key => {
+    const value = query[key];
+    if (value !== '' && value !== undefined && value !== null) {
+      result[key] = value;
+    }
+  });
+  return result;
+}
+
+function formatDate(value) {
+  if (!value) {
+    return undefined;
   }
-  return feeForm.value.courseNames.join('、');
-});
+  if (typeof value === 'string') {
+    return value.slice(0, 10);
+  }
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function normalizeNumber(value, fallback = 0) {
+  if (value === '' || value === undefined || value === null) {
+    return fallback;
+  }
+  return Number(value);
+}
+
+function getValidSpecs() {
+  return (itemForm.value.specs || []).filter(spec => spec.name && spec.tags && spec.tags.length > 0).slice(0, 2);
+}
+
+function buildSkuPayloads(validSpecs) {
+  const fallbackPrice = normalizeNumber(itemForm.value.singlePrice, 0);
+  return (itemForm.value.skus || []).map(sku => {
+    const skuSpecs = sku.specs || [];
+    const spec1Value = sku.spec1Value || sku.spec1_value || skuSpecs[0]?.value || null;
+    const spec2Value = sku.spec2Value || sku.spec2_value || skuSpecs[1]?.value || null;
+    return {
+      skuName: sku.skuName || sku.specText || [spec1Value, spec2Value].filter(Boolean).join(', ') || '默认',
+      specText: sku.specText || [spec1Value, spec2Value].filter(Boolean).join(', ') || '默认',
+      spec1Value,
+      spec2Value,
+      price: normalizeNumber(sku.price, fallbackPrice),
+      costPrice: normalizeNumber(sku.costPrice, 0),
+      stock: normalizeNumber(sku.stock, 0),
+      status: normalizeNumber(sku.status, 1),
+      specs: skuSpecs.length ? skuSpecs : validSpecs.map((spec, index) => ({
+        name: spec.name,
+        value: index === 0 ? spec1Value : spec2Value
+      })).filter(spec => spec.value)
+    };
+  });
+}
+
+function buildItemPayload() {
+  const validSpecs = getValidSpecs();
+  return {
+    id: itemForm.value.id,
+    itemNo: itemForm.value.itemNo || itemForm.value.itemCode,
+    itemName: itemForm.value.itemName,
+    itemType: normalizeNumber(itemForm.value.itemType, 1),
+    defaultPrice: normalizeNumber(itemForm.value.singlePrice || itemForm.value.defaultPrice, 0),
+    imageUrl: itemForm.value.imageUrl,
+    spec1Name: validSpecs[0]?.name,
+    spec1Values: validSpecs[0]?.tags?.join(','),
+    spec2Name: validSpecs[1]?.name,
+    spec2Values: validSpecs[1]?.tags?.join(','),
+    enableStock: itemForm.value.enableStock,
+    warningStock: normalizeNumber(itemForm.value.warningStock, 0),
+    onlineSale: normalizeNumber(itemForm.value.onlineSale, 0),
+    specs: validSpecs,
+    skus: buildSkuPayloads(validSpecs),
+    courseIds: itemForm.value.courseIds || [],
+    courseNames: itemForm.value.courseNames || [],
+    status: normalizeNumber(itemForm.value.status, 1),
+    remark: itemForm.value.remark
+  };
+}
+
+function buildItemPayloadFromDetail(detail) {
+  const oldForm = itemForm.value;
+  itemForm.value = detail;
+  const payload = buildItemPayload();
+  itemForm.value = oldForm;
+  return payload;
+}
+
+function normalizeItemForm(data) {
+  const specs = data.specs && data.specs.length ? data.specs : [{
+    name: '',
+    tags: [],
+    inputVisible: false,
+    inputValue: ''
+  }];
+  return {
+    ...data,
+    itemType: String(data.itemType || '1'),
+    itemCode: data.itemCode || data.itemNo,
+    enableStock: data.enableStock ?? 1,
+    warningStock: data.warningStock ?? 0,
+    onlineSale: data.onlineSale ?? 0,
+    singlePrice: data.singlePrice ?? data.defaultPrice ?? '',
+    imageUrl: data.imageUrl || '',
+    courseIds: data.courseIds || [],
+    courseNames: data.courseNames || (data.courseName ? data.courseName.split('、') : []),
+    specs: specs.map(spec => ({
+      name: spec.name || '',
+      tags: spec.tags || [],
+      inputVisible: false,
+      inputValue: ''
+    })),
+    skus: (data.skus || []).map(sku => ({
+      ...sku,
+      specText: sku.specText || sku.skuName || '默认',
+      specs: [
+        data.spec1Name && sku.spec1Value ? { name: data.spec1Name, value: sku.spec1Value } : null,
+        data.spec2Name && sku.spec2Value ? { name: data.spec2Name, value: sku.spec2Value } : null
+      ].filter(Boolean),
+      price: normalizeNumber(sku.price, data.defaultPrice || 0),
+      stock: normalizeNumber(sku.stock, 0),
+      status: normalizeNumber(sku.status, 1)
+    }))
+  };
+}
+
+function buildStockItems(items) {
+  return (items || []).map(item => ({
+    itemId: item.parentItemId,
+    itemName: item.itemName,
+    skuId: item.skuId,
+    skuName: item.skuName || item.specText,
+    specText: item.specText,
+    quantity: normalizeNumber(item.quantity, 0),
+    price: normalizeNumber(item.price, 0),
+    currentStock: item.currentStock,
+    actualStock: item.currentStock,
+    remark: item.remark
+  }));
+}
 
 /** Tab切换 */
 function handleTabClick(tab) {
@@ -1237,46 +1486,15 @@ function handleItemSubTabClick(tab) {
 /** 查询物品列表 */
 function getItemList() {
   itemLoading.value = true;
-  // 模拟数据
-  setTimeout(() => {
-    itemList.value = [
-      {
-        id: 1,
-        itemName: '加拿大鹅羽绒',
-        itemCode: 'ITEM001',
-        itemType: '1',
-        skuCount: 6,
-        totalStock: 56,
-        priceRange: '¥ 150.00',
-        enableStock: 1,
-        status: 1
-      },
-      {
-        id: 2,
-        itemName: '毛包',
-        itemCode: 'ITEM002',
-        itemType: '1',
-        skuCount: 3,
-        totalStock: 2,
-        priceRange: '¥ 100.00',
-        enableStock: 1,
-        status: 1
-      },
-      {
-        id: 3,
-        itemName: '古筝耳朵校区',
-        itemCode: 'ITEM003',
-        itemType: '1',
-        skuCount: 3,
-        totalStock: 215,
-        priceRange: '¥ 1,999.00',
-        enableStock: 1,
-        status: 1
-      }
-    ];
-    itemTotal.value = 3;
+  listItem(cleanQuery({
+    ...itemQueryParams.value,
+    status: itemQueryParams.value.status === '' ? undefined : Number(itemQueryParams.value.status)
+  })).then(response => {
+    itemList.value = response.rows || [];
+    itemTotal.value = response.total || 0;
+  }).finally(() => {
     itemLoading.value = false;
-  }, 500);
+  });
 }
 
 /** 搜索物品 */
@@ -1306,16 +1524,47 @@ function handleAddItem() {
 /** 修改物品 */
 function handleUpdateItem(row) {
   resetItemForm();
-  itemForm.value = { ...row };
-  itemOpen.value = true;
-  itemTitle.value = '修改物品';
+  getItem(row.id).then(response => {
+    itemForm.value = normalizeItemForm(response.data || row);
+    itemOpen.value = true;
+    itemTitle.value = '修改物品';
+  });
 }
 
 /** 删除物品 */
 function handleDeleteItem(row) {
   proxy.$modal.confirm('是否确认删除物品名称为"' + row.itemName + '"的数据项？').then(() => {
+    return delItem(row.id);
+  }).then(() => {
     proxy.$modal.msgSuccess('删除成功');
     getItemList();
+  });
+}
+
+/** 物品状态变化 */
+function handleItemStatusChange(row) {
+  updateItemRowField(row, 'status', row.status, '状态修改成功');
+}
+
+/** 物品库存开关变化 */
+function handleItemEnableStockChange(row) {
+  updateItemRowField(row, 'enableStock', row.enableStock, '库存开关修改成功');
+}
+
+/** 物品线上售卖变化 */
+function handleItemOnlineSaleChange(row) {
+  updateItemRowField(row, 'onlineSale', row.onlineSale, '线上售卖状态修改成功');
+}
+
+function updateItemRowField(row, field, value, successMessage) {
+  getItem(row.id).then(response => {
+    const detail = normalizeItemForm(response.data || row);
+    detail[field] = value;
+    return updateItem(buildItemPayloadFromDetail(detail));
+  }).then(() => {
+    proxy.$modal.msgSuccess(successMessage);
+  }).catch(() => {
+    row[field] = row[field] === 1 ? 0 : 1;
   });
 }
 
@@ -1329,19 +1578,31 @@ function handleViewItem(row) {
 
 /** 导出物品 */
 function handleExport() {
-  proxy.$modal.msgSuccess('导出成功');
+  proxy.download('ast/item/export', cleanQuery({
+    ...itemQueryParams.value,
+    status: itemQueryParams.value.status === '' ? undefined : Number(itemQueryParams.value.status)
+  }), `item_${new Date().getTime()}.xlsx`);
 }
 
 /** 重置物品表单 */
 function resetItemForm() {
   itemForm.value = {
+    id: null,
+    itemNo: '',
+    itemCode: '',
     itemName: '',
     itemType: '1',
     itemImages: [],
+    imageUrl: '',
     enableStock: 1,
+    warningStock: 0,
+    onlineSale: 0,
     specs: [],
     skus: [],
     singlePrice: '',
+    courseIds: [],
+    courseNames: [],
+    status: 1,
     remark: ''
   };
   // 添加一个默认规格
@@ -1363,21 +1624,21 @@ function cancelItem() {
 function submitItemForm() {
   proxy.$refs.itemFormRef.validate(valid => {
     if (valid) {
-      if (itemForm.value.id) {
-        proxy.$modal.msgSuccess('修改成功');
-      } else {
-        proxy.$modal.msgSuccess('新增成功');
-      }
-      itemOpen.value = false;
-      getItemList();
+      const payload = buildItemPayload();
+      const request = payload.id ? updateItem(payload) : addItem(payload);
+      request.then(() => {
+        proxy.$modal.msgSuccess(payload.id ? '修改成功' : '新增成功');
+        itemOpen.value = false;
+        getItemList();
+      });
     }
   });
 }
 
 /** 添加规格 */
 function addSpec() {
-  if (itemForm.value.specs.length >= 3) {
-    proxy.$modal.msgWarning('最多只能添加3个规格');
+  if (itemForm.value.specs.length >= 2) {
+    proxy.$modal.msgWarning('最多只能添加2个规格');
     return;
   }
   itemForm.value.specs.push({
@@ -1527,73 +1788,19 @@ function autoGenerateSKU() {
 /** 查询出入库列表 */
 function getStockList() {
   stockLoading.value = true;
-  // 模拟数据 - 每个物品SKU是一条记录
-  setTimeout(() => {
-    stockList.value = [
-      {
-        id: 1,
-        stockDate: '2025-11-03 15:42:00',
-        itemName: '加拿大鹅羽绒 (xl: 白色)',
-        businessType: 'purchase', // 业务类型：采购
-        quantity: 10, // 入库数量为正数
-        roleType: 'admin', // 角色类型
-        roleName: '系统管理员', // 角色名称
-        businessNo: '202511031542000001',
-        operator: '张三',
-        remark: '采购入库'
-      },
-      {
-        id: 2,
-        stockDate: '2025-11-02 10:30:00',
-        itemName: '加拿大鹅羽绒 (xl: 黑色)',
-        businessType: 'receive', // 业务类型：领用
-        quantity: -5, // 出库数量为负数
-        roleType: 'teacher', // 角色类型
-        roleName: '李老师', // 角色名称
-        businessNo: 'LY202511020001',
-        operator: '王五',
-        remark: '教学领用'
-      },
-      {
-        id: 3,
-        stockDate: '2025-10-19 14:20:00',
-        itemName: '毛包 (小号)',
-        businessType: 'purchase', // 业务类型：采购
-        quantity: 20, // 入库数量为正数
-        roleType: 'admin', // 角色类型
-        roleName: '采购员', // 角色名称
-        businessNo: '202510109482100001',
-        operator: '甘耀',
-        remark: '批量采购'
-      },
-      {
-        id: 4,
-        stockDate: '2025-10-18 09:15:00',
-        itemName: '古筝耳朵校区 (标准版)',
-        businessType: 'return', // 业务类型：退领
-        quantity: 3, // 退领入库为正数
-        roleType: 'student', // 角色类型
-        roleName: '小明', // 角色名称
-        businessNo: 'TL202510180001',
-        operator: '赵六',
-        remark: '学生退领'
-      },
-      {
-        id: 5,
-        stockDate: '2025-10-15 16:45:00',
-        itemName: '加拿大鹅羽绒 (m: 白色)',
-        businessType: 'receive', // 业务类型：领用
-        quantity: -8, // 出库数量为负数
-        roleType: 'teacher', // 角色类型
-        roleName: '王老师', // 角色名称
-        businessNo: 'LY202510150002',
-        operator: '李四',
-        remark: '课程使用'
-      }
-    ];
-    stockTotal.value = 5;
+  const dateRange = stockQueryParams.value.dateRange || [];
+  listStockRecord(cleanQuery({
+    ...stockQueryParams.value,
+    beginTime: dateRange[0] ? formatDate(dateRange[0]) : undefined,
+    endTime: dateRange[1] ? formatDate(dateRange[1]) : undefined,
+    dateRange: undefined,
+    businessType: stockQueryParams.value.businessType || undefined
+  })).then(response => {
+    stockList.value = response.rows || [];
+    stockTotal.value = response.total || 0;
+  }).finally(() => {
     stockLoading.value = false;
-  }, 500);
+  });
 }
 
 /** 搜索出入库 */
@@ -1653,11 +1860,6 @@ function handleReturn() {
   returnRoleNameOptions.value = [];
 }
 
-/** 报损 */
-function handleDiscard() {
-  proxy.$modal.msgInfo('报损功能开发中');
-}
-
 /** 盘点 */
 function handleInventory() {
   inventoryDialogVisible.value = true;
@@ -1670,12 +1872,30 @@ function handleInventory() {
 
 /** 导出出入库 */
 function handleStockExport() {
-  proxy.$modal.msgSuccess('导出成功');
+  const dateRange = stockQueryParams.value.dateRange || [];
+  proxy.download('ast/inventory/stock/export', cleanQuery({
+    ...stockQueryParams.value,
+    beginTime: dateRange[0] ? formatDate(dateRange[0]) : undefined,
+    endTime: dateRange[1] ? formatDate(dateRange[1]) : undefined,
+    dateRange: undefined,
+    businessType: stockQueryParams.value.businessType || undefined
+  }), `stock_record_${new Date().getTime()}.xlsx`);
 }
 
 /** 查看出入库详情 */
 function handleViewStock(row) {
-  proxy.$modal.msgInfo('查看详情功能开发中');
+  getStockRecord(row.id).then(response => {
+    const detail = response.data || {};
+    const message = [
+      `流水号：${detail.recordNo || '-'}`,
+      `物品：${detail.itemName || '-'} ${detail.skuName ? '(' + detail.skuName + ')' : ''}`,
+      `数量：${detail.quantity}`,
+      `库存：${detail.stockBefore} -> ${detail.stockAfter}`,
+      `经办人：${detail.operator || detail.operatorName || '-'}`,
+      `备注：${detail.remark || '-'}`
+    ].join('\n');
+    proxy.$modal.alert(message);
+  });
 }
 
 /** 打开选择物品对话框（采购） */
@@ -1712,40 +1932,14 @@ function openSelectItemDialogForInventory() {
 
 /** 加载可选物品列表 */
 function loadAvailableItems() {
-  availableItemList.value = [
-    {
-      id: 1,
-      itemName: '加拿大鹅羽绒',
-      totalStock: 56,
-      skus: [
-        { id: 1, specText: 'xl: 白色', price: 150.00, stock: 10 },
-        { id: 2, specText: 'xl: 黑色', price: 150.00, stock: 10 },
-        { id: 3, specText: 'm: 白色', price: 150.00, stock: 10 },
-        { id: 4, specText: 'm: 黑色', price: 150.00, stock: 10 },
-        { id: 5, specText: 'l: 白色', price: 150.00, stock: 8 },
-        { id: 6, specText: 'l: 黑色', price: 150.00, stock: 8 }
-      ]
-    },
-    {
-      id: 2,
-      itemName: '毛包',
-      totalStock: 2,
-      skus: [
-        { id: 7, specText: '小号', price: 100.00, stock: 1 },
-        { id: 8, specText: '中号', price: 100.00, stock: 1 }
-      ]
-    }
-  ];
+  return listAvailableItems(cleanQuery({ keyword: itemSearchKeyword.value })).then(response => {
+    availableItemList.value = response.data || [];
+  });
 }
 
 /** 搜索可选物品 */
 function searchAvailableItems() {
   loadAvailableItems();
-  if (itemSearchKeyword.value) {
-    availableItemList.value = availableItemList.value.filter(item =>
-      item.itemName.includes(itemSearchKeyword.value)
-    );
-  }
 }
 
 /** 物品展开变化 */
@@ -1765,6 +1959,7 @@ function handleSkuSelectionChange(selection, parentItem) {
     parentItemId: parentItem.id,
     itemName: parentItem.itemName,
     specText: sku.specText,
+    skuName: sku.skuName,
     price: sku.price,
     quantity: 1, // 默认数量为1
     stock: sku.stock,
@@ -1816,9 +2011,18 @@ function submitPurchase() {
     return;
   }
 
-  proxy.$modal.msgSuccess('采购成功');
-  purchaseDialogVisible.value = false;
-  getStockList();
+  createPurchase({
+    purchaseDate: formatDate(purchaseForm.value.purchaseDate),
+    paymentMethod: purchaseForm.value.paymentMethod,
+    accountName: purchaseForm.value.account,
+    yearBook: purchaseForm.value.yearBook,
+    items: buildStockItems(purchaseForm.value.items)
+  }).then(() => {
+    proxy.$modal.msgSuccess('采购成功');
+    purchaseDialogVisible.value = false;
+    getStockList();
+    getItemList();
+  });
 }
 
 /** 角色类型变化（领用） */
@@ -1898,16 +2102,18 @@ function submitReceive() {
     return;
   }
 
-  // 验证库存是否充足
-  const insufficientStock = receiveForm.value.items.find(item => item.quantity > item.stock);
-  if (insufficientStock) {
-    proxy.$modal.msgWarning(`${insufficientStock.itemName} (${insufficientStock.specText}) 库存不足`);
-    return;
-  }
-
-  proxy.$modal.msgSuccess('领用成功');
-  receiveDialogVisible.value = false;
-  getStockList();
+  createReceive({
+    receiveTime: receiveForm.value.receiveTime,
+    roleType: receiveForm.value.roleType,
+    roleName: receiveForm.value.roleName,
+    operator: receiveForm.value.operator,
+    items: buildStockItems(receiveForm.value.items)
+  }).then(() => {
+    proxy.$modal.msgSuccess('领用成功');
+    receiveDialogVisible.value = false;
+    getStockList();
+    getItemList();
+  });
 }
 
 /** 删除退领物品 */
@@ -1939,9 +2145,18 @@ function submitReturn() {
     return;
   }
 
-  proxy.$modal.msgSuccess('退领成功');
-  returnDialogVisible.value = false;
-  getStockList();
+  createReturn({
+    returnTime: returnForm.value.returnTime,
+    roleType: returnForm.value.roleType,
+    roleName: returnForm.value.roleName,
+    operator: returnForm.value.operator,
+    items: buildStockItems(returnForm.value.items)
+  }).then(() => {
+    proxy.$modal.msgSuccess('退领成功');
+    returnDialogVisible.value = false;
+    getStockList();
+    getItemList();
+  });
 }
 
 /** 计算库存变动 */
@@ -1991,9 +2206,16 @@ function submitInventory() {
   message += `正常：${normalItems.length} 项`;
 
   proxy.$modal.confirm(message).then(() => {
+    return createInventory({
+      inventoryDate: formatDate(inventoryForm.value.inventoryDate),
+      operator: inventoryForm.value.operator,
+      items: buildStockItems(inventoryForm.value.items)
+    });
+  }).then(() => {
     proxy.$modal.msgSuccess('盘点成功，库存已更新');
     inventoryDialogVisible.value = false;
     getStockList();
+    getItemList();
   }).catch(() => {});
 }
 
@@ -2002,269 +2224,15 @@ function submitInventory() {
 /** 获取费用列表 */
 function getFeeList() {
   feeLoading.value = true;
-
-  // 模拟数据
-  setTimeout(() => {
-    const mockData = [
-      {
-        id: 1,
-        feeName: '考试费',
-        price: 22.00,
-        courseIds: [8],
-        courseName: '厨士舞',
-        status: 1
-      },
-      {
-        id: 2,
-        feeName: '教材费',
-        price: 50.00,
-        courseIds: [],
-        courseName: '',
-        status: 1
-      },
-      {
-        id: 3,
-        feeName: '报名费',
-        price: 100.00,
-        courseIds: [1],
-        courseName: '早教一对一课程',
-        status: 0
-      },
-      {
-        id: 4,
-        feeName: '证书费',
-        price: 80.00,
-        courseIds: [4, 5, 6],
-        courseName: '钢琴二级课程、钢琴一级课程、钢琴一对一课程',
-        status: 1
-      },
-      {
-        id: 5,
-        feeName: '活动费',
-        price: 150.00,
-        courseIds: [2, 3],
-        courseName: '早教半年卡、早教年卡',
-        status: 1
-      },
-      {
-        id: 6,
-        feeName: '保险费',
-        price: 200.00,
-        courseIds: [],
-        courseName: '',
-        status: 0
-      },
-      {
-        id: 7,
-        feeName: '服装费',
-        price: 120.00,
-        courseIds: [8, 9],
-        courseName: '厨士舞、拉丁舞',
-        status: 1
-      },
-      {
-        id: 8,
-        feeName: '器材费',
-        price: 300.00,
-        courseIds: [6],
-        courseName: '钢琴一对一课程',
-        status: 1
-      },
-      {
-        id: 9,
-        feeName: '场地费',
-        price: 500.00,
-        courseIds: [],
-        courseName: '',
-        status: 0
-      },
-      {
-        id: 10,
-        feeName: '托管餐费',
-        price: 25.00,
-        courseIds: [7],
-        courseName: '按月托管',
-        status: 1
-      },
-      {
-        id: 11,
-        feeName: '体检费',
-        price: 180.00,
-        courseIds: [1, 2, 3],
-        courseName: '早教一对一课程、早教半年卡、早教年卡',
-        status: 1
-      },
-      {
-        id: 12,
-        feeName: '演出服装费',
-        price: 280.00,
-        courseIds: [8, 9],
-        courseName: '厨士舞、拉丁舞',
-        status: 1
-      },
-      {
-        id: 13,
-        feeName: '比赛报名费',
-        price: 350.00,
-        courseIds: [4, 5, 6],
-        courseName: '钢琴二级课程、钢琴一级课程、钢琴一对一课程',
-        status: 0
-      },
-      {
-        id: 14,
-        feeName: '乐器租赁费',
-        price: 150.00,
-        courseIds: [6],
-        courseName: '钢琴一对一课程',
-        status: 1
-      },
-      {
-        id: 15,
-        feeName: '夏令营费用',
-        price: 1200.00,
-        courseIds: [],
-        courseName: '',
-        status: 1
-      },
-      {
-        id: 16,
-        feeName: '冬令营费用',
-        price: 1500.00,
-        courseIds: [],
-        courseName: '',
-        status: 0
-      },
-      {
-        id: 17,
-        feeName: '舞蹈鞋费',
-        price: 88.00,
-        courseIds: [8, 9],
-        courseName: '厨士舞、拉丁舞',
-        status: 1
-      },
-      {
-        id: 18,
-        feeName: '练习册费',
-        price: 35.00,
-        courseIds: [1, 4, 5],
-        courseName: '早教一对一课程、钢琴二级课程、钢琴一级课程',
-        status: 1
-      },
-      {
-        id: 19,
-        feeName: '音乐会门票',
-        price: 120.00,
-        courseIds: [4, 5, 6],
-        courseName: '钢琴二级课程、钢琴一级课程、钢琴一对一课程',
-        status: 1
-      },
-      {
-        id: 20,
-        feeName: '托管加餐费',
-        price: 15.00,
-        courseIds: [7],
-        courseName: '按月托管',
-        status: 1
-      },
-      {
-        id: 21,
-        feeName: '户外活动费',
-        price: 200.00,
-        courseIds: [1, 2, 3, 7],
-        courseName: '早教一对一课程、早教半年卡、早教年卡、按月托管',
-        status: 0
-      },
-      {
-        id: 22,
-        feeName: '节日礼物费',
-        price: 68.00,
-        courseIds: [],
-        courseName: '',
-        status: 1
-      },
-      {
-        id: 23,
-        feeName: '摄影费',
-        price: 180.00,
-        courseIds: [8, 9],
-        courseName: '厨士舞、拉丁舞',
-        status: 1
-      },
-      {
-        id: 24,
-        feeName: '化妆费',
-        price: 100.00,
-        courseIds: [8, 9],
-        courseName: '厨士舞、拉丁舞',
-        status: 0
-      },
-      {
-        id: 25,
-        feeName: '钢琴调音费',
-        price: 200.00,
-        courseIds: [4, 5, 6],
-        courseName: '钢琴二级课程、钢琴一级课程、钢琴一对一课程',
-        status: 1
-      },
-      {
-        id: 26,
-        feeName: '乐理考试费',
-        price: 150.00,
-        courseIds: [4, 5, 6],
-        courseName: '钢琴二级课程、钢琴一级课程、钢琴一对一课程',
-        status: 1
-      },
-      {
-        id: 27,
-        feeName: '舞台表演费',
-        price: 300.00,
-        courseIds: [8, 9],
-        courseName: '厨士舞、拉丁舞',
-        status: 1
-      },
-      {
-        id: 28,
-        feeName: '托管延时费',
-        price: 30.00,
-        courseIds: [7],
-        courseName: '按月托管',
-        status: 1
-      },
-      {
-        id: 29,
-        feeName: '亲子活动费',
-        price: 250.00,
-        courseIds: [1, 2, 3],
-        courseName: '早教一对一课程、早教半年卡、早教年卡',
-        status: 0
-      },
-      {
-        id: 30,
-        feeName: '毕业典礼费',
-        price: 400.00,
-        courseIds: [],
-        courseName: '',
-        status: 1
-      }
-    ];
-
-    // 根据搜索条件过滤
-    let filteredData = mockData;
-    if (feeQueryParams.value.feeName) {
-      filteredData = filteredData.filter(item =>
-        item.feeName.includes(feeQueryParams.value.feeName)
-      );
-    }
-    if (feeQueryParams.value.status !== '') {
-      filteredData = filteredData.filter(item =>
-        item.status === parseInt(feeQueryParams.value.status)
-      );
-    }
-
-    feeList.value = filteredData;
-    feeTotal.value = filteredData.length;
+  listFee(cleanQuery({
+    ...feeQueryParams.value,
+    status: feeQueryParams.value.status === '' ? undefined : Number(feeQueryParams.value.status)
+  })).then(response => {
+    feeList.value = response.rows || [];
+    feeTotal.value = response.total || 0;
+  }).finally(() => {
     feeLoading.value = false;
-  }, 300);
+  });
 }
 
 /** 重置费用查询 */
@@ -2286,6 +2254,8 @@ function handleAddFee() {
     id: null,
     feeName: '',
     price: null,
+    onlineSale: 0,
+    status: 1,
     courseIds: [],
     courseNames: []
   };
@@ -2293,20 +2263,27 @@ function handleAddFee() {
 
 /** 编辑费用 */
 function handleEditFee(row) {
-  feeTitle.value = '编辑费用';
-  feeDialogVisible.value = true;
-  feeForm.value = {
-    id: row.id,
-    feeName: row.feeName,
-    price: row.price,
-    courseIds: row.courseIds || [],
-    courseNames: row.courseName ? row.courseName.split('、') : []
-  };
+  getFee(row.id).then(response => {
+    const detail = response.data || row;
+    feeTitle.value = '编辑费用';
+    feeDialogVisible.value = true;
+    feeForm.value = {
+      id: detail.id,
+      feeName: detail.feeName,
+      price: detail.price ?? detail.amount,
+      onlineSale: detail.onlineSale ?? 0,
+      status: detail.status,
+      courseIds: detail.courseIds || [],
+      courseNames: detail.courseNames || (detail.courseName ? detail.courseName.split('、') : [])
+    };
+  });
 }
 
 /** 删除费用 */
 function handleDeleteFee(row) {
   proxy.$modal.confirm('确定要删除费用"' + row.feeName + '"吗？').then(() => {
+    return delFee(row.id);
+  }).then(() => {
     proxy.$modal.msgSuccess('删除成功');
     getFeeList();
   }).catch(() => {});
@@ -2316,9 +2293,32 @@ function handleDeleteFee(row) {
 function handleFeeStatusChange(row) {
   const statusText = row.status === 1 ? '启用' : '停用';
   proxy.$modal.confirm('确定要' + statusText + '费用"' + row.feeName + '"吗？').then(() => {
+    return changeFeeStatus({ id: row.id, status: row.status });
+  }).then(() => {
     proxy.$modal.msgSuccess(statusText + '成功');
   }).catch(() => {
     row.status = row.status === 1 ? 0 : 1;
+  });
+}
+
+/** 费用线上售卖变化 */
+function handleFeeOnlineSaleChange(row) {
+  getFee(row.id).then(response => {
+    const detail = response.data || row;
+    return updateFee({
+      id: detail.id,
+      feeName: detail.feeName,
+      price: normalizeNumber(detail.price ?? detail.amount, 0),
+      amount: normalizeNumber(detail.price ?? detail.amount, 0),
+      onlineSale: row.onlineSale,
+      status: detail.status,
+      courseIds: detail.courseIds || [],
+      courseNames: detail.courseNames || []
+    });
+  }).then(() => {
+    proxy.$modal.msgSuccess('线上售卖状态修改成功');
+  }).catch(() => {
+    row.onlineSale = row.onlineSale === 1 ? 0 : 1;
   });
 }
 
@@ -2327,15 +2327,34 @@ function submitFee() {
   proxy.$refs.feeFormRef.validate(valid => {
     if (valid) {
       const action = feeForm.value.id ? '修改' : '新增';
-      proxy.$modal.msgSuccess(action + '成功');
-      feeDialogVisible.value = false;
-      getFeeList();
+      const payload = {
+        id: feeForm.value.id,
+        feeName: feeForm.value.feeName,
+        price: normalizeNumber(feeForm.value.price, 0),
+        amount: normalizeNumber(feeForm.value.price, 0),
+        onlineSale: normalizeNumber(feeForm.value.onlineSale, 0),
+        status: feeForm.value.status ?? 1,
+        courseIds: feeForm.value.courseIds || [],
+        courseNames: feeForm.value.courseNames || []
+      };
+      const request = payload.id ? updateFee(payload) : addFee(payload);
+      request.then(() => {
+        proxy.$modal.msgSuccess(action + '成功');
+        feeDialogVisible.value = false;
+        getFeeList();
+      });
     }
   });
 }
 
 /** 打开选择课程对话框 */
-function openSelectCourseDialog() {
+function getTargetCourseIds() {
+  return courseSelectTarget.value === 'item' ? itemForm.value.courseIds : feeForm.value.courseIds;
+}
+
+/** 打开选择课程对话框 */
+function openSelectCourseDialog(target = 'fee') {
+  courseSelectTarget.value = target;
   selectCourseDialogVisible.value = true;
   courseSearchKeyword.value = '';
   selectedCourses.value = [];
@@ -2343,9 +2362,10 @@ function openSelectCourseDialog() {
 
   // 延迟设置已选中的课程
   nextTick(() => {
-    if (courseTableRef.value && feeForm.value.courseIds && feeForm.value.courseIds.length > 0) {
+    const targetCourseIds = getTargetCourseIds() || [];
+    if (courseTableRef.value && targetCourseIds.length > 0) {
       const selectedRows = courseList.value.filter(course =>
-        feeForm.value.courseIds.includes(course.id)
+        targetCourseIds.includes(course.id)
       );
       selectedRows.forEach(row => {
         courseTableRef.value.toggleRowSelection(row, true);
@@ -2427,8 +2447,15 @@ function confirmCourseSelection() {
     return;
   }
 
-  feeForm.value.courseIds = selectedCourses.value.map(course => course.id);
-  feeForm.value.courseNames = selectedCourses.value.map(course => course.courseName);
+  const courseIds = selectedCourses.value.map(course => course.id);
+  const courseNames = selectedCourses.value.map(course => course.courseName);
+  if (courseSelectTarget.value === 'item') {
+    itemForm.value.courseIds = courseIds;
+    itemForm.value.courseNames = courseNames;
+  } else {
+    feeForm.value.courseIds = courseIds;
+    feeForm.value.courseNames = courseNames;
+  }
   selectCourseDialogVisible.value = false;
 }
 
@@ -2436,6 +2463,12 @@ function confirmCourseSelection() {
 function removeCourse(index) {
   feeForm.value.courseIds.splice(index, 1);
   feeForm.value.courseNames.splice(index, 1);
+}
+
+/** 移除物品绑定课程 */
+function removeItemCourse(index) {
+  itemForm.value.courseIds.splice(index, 1);
+  itemForm.value.courseNames.splice(index, 1);
 }
 
 /** 清除所有课程 */
@@ -2453,4 +2486,3 @@ getItemList();
   padding: 20px;
 }
 </style>
-
