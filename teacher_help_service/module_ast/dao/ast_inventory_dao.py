@@ -1,4 +1,4 @@
-from sqlalchemy import delete, desc, func, or_, select, update
+from sqlalchemy import case, delete, desc, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from module_ast.entity.do.ast_fee_course_do import AstFeeCourse
 from module_ast.entity.do.ast_fee_item_do import AstFeeItem
@@ -9,6 +9,8 @@ from module_ast.entity.do.ast_item_stock_record_do import AstItemStockRecord
 from module_ast.entity.do.ast_purchase_order_do import AstPurchaseOrder
 from module_ast.entity.do.ast_purchase_order_item_do import AstPurchaseOrderItem
 from module_ast.entity.vo.ast_inventory_vo import AstFeeItemPageQueryModel, AstStockRecordPageQueryModel
+from module_teach.entity.do.teach_student_do import TeachStudent
+from module_teach.entity.do.teach_teacher_do import TeachTeacher
 from utils.page_util import PageUtil
 
 
@@ -118,36 +120,80 @@ class AstInventoryDao:
         return result.scalars().all()
 
     @classmethod
+    async def get_student_role_options(cls, db: AsyncSession, keyword: str | None = None):
+        query = select(TeachStudent).where(TeachStudent.del_flag == '0')
+        if keyword:
+            query = query.where(TeachStudent.student_name.like(f'%{keyword}%'))
+        result = await db.execute(query.order_by(desc(TeachStudent.create_time)).limit(50))
+        return result.scalars().all()
+
+    @classmethod
+    async def get_teacher_role_options(cls, db: AsyncSession, keyword: str | None = None):
+        query = select(TeachTeacher).where(TeachTeacher.del_flag == '0', TeachTeacher.status == '0')
+        if keyword:
+            query = query.where(TeachTeacher.teacher_name.like(f'%{keyword}%'))
+        result = await db.execute(query.order_by(desc(TeachTeacher.create_time)).limit(50))
+        return result.scalars().all()
+
+    @classmethod
     async def get_stock_record_list(
         cls, db: AsyncSession, query_object: AstStockRecordPageQueryModel, is_page: bool = False
     ):
-        keyword = query_object.keyword or query_object.item_name
-        query = (
-            select(AstItemStockRecord)
-            .where(
-                AstItemStockRecord.del_flag == 0,
-                AstItemStockRecord.item_name.like(f'%{keyword}%') if keyword else True,
-                AstItemStockRecord.business_type == query_object.business_type
-                if query_object.business_type
-                else True,
-                AstItemStockRecord.related_type == query_object.related_type
-                if query_object.related_type
-                else True,
-                AstItemStockRecord.related_name.like(f'%{query_object.related_name}%')
-                if query_object.related_name
-                else True,
-                AstItemStockRecord.record_date >= query_object.begin_time if query_object.begin_time else True,
-                AstItemStockRecord.record_date <= query_object.end_time if query_object.end_time else True,
-            )
-            .order_by(desc(AstItemStockRecord.create_time), desc(AstItemStockRecord.id))
+        query = cls.build_stock_record_query(query_object).order_by(
+            desc(AstItemStockRecord.create_time), desc(AstItemStockRecord.id)
         )
         return await PageUtil.paginate(db, query, query_object.page_num, query_object.page_size, is_page)
 
     @classmethod
-    async def get_stock_record_by_id(cls, db: AsyncSession, record_id: int):
+    def build_stock_record_query(cls, query_object: AstStockRecordPageQueryModel):
+        keyword = query_object.keyword or query_object.item_name
+        conditions = []
+        if query_object.exclude_voided is not False:
+            conditions.append(AstItemStockRecord.del_flag == 0)
+        if keyword:
+            conditions.append(AstItemStockRecord.item_name.like(f'%{keyword}%'))
+        if query_object.item_names:
+            item_names = [item.strip() for item in query_object.item_names.split(',') if item.strip()]
+            if item_names:
+                conditions.append(or_(*[AstItemStockRecord.item_name.like(f'%{item_name}%') for item_name in item_names]))
+        if query_object.business_type:
+            conditions.append(AstItemStockRecord.business_type == query_object.business_type)
+        if query_object.stock_type == 'in':
+            conditions.append(AstItemStockRecord.quantity > 0)
+        elif query_object.stock_type == 'out':
+            conditions.append(AstItemStockRecord.quantity < 0)
+        if query_object.related_type:
+            role_type_map = {
+                'student': ['student', 'learner'],
+                'staff': ['staff', 'teacher', 'employee'],
+                'other': ['other', 'admin'],
+            }
+            related_types = role_type_map.get(query_object.related_type, [query_object.related_type])
+            conditions.append(AstItemStockRecord.related_type.in_(related_types))
+        if query_object.related_name:
+            conditions.append(AstItemStockRecord.related_name.like(f'%{query_object.related_name}%'))
+        if query_object.begin_time:
+            conditions.append(AstItemStockRecord.record_date >= str(query_object.begin_time)[:10])
+        if query_object.end_time:
+            conditions.append(AstItemStockRecord.record_date <= str(query_object.end_time)[:10])
+        return select(AstItemStockRecord).where(*conditions)
+
+    @classmethod
+    async def get_stock_record_summary(cls, db: AsyncSession, query_object: AstStockRecordPageQueryModel):
+        query = cls.build_stock_record_query(query_object).subquery()
         result = await db.execute(
-            select(AstItemStockRecord).where(AstItemStockRecord.id == record_id, AstItemStockRecord.del_flag == 0)
+            select(
+                func.count(query.c.id),
+                func.coalesce(func.sum(case((query.c.quantity > 0, query.c.quantity), else_=0)), 0),
+                func.coalesce(func.sum(case((query.c.quantity < 0, func.abs(query.c.quantity)), else_=0)), 0),
+                func.coalesce(func.sum(query.c.quantity), 0),
+            )
         )
+        return result.first()
+
+    @classmethod
+    async def get_stock_record_by_id(cls, db: AsyncSession, record_id: int):
+        result = await db.execute(select(AstItemStockRecord).where(AstItemStockRecord.id == record_id))
         return result.scalars().first()
 
     @classmethod
@@ -156,6 +202,10 @@ class AstInventoryDao:
         await db.flush()
         await db.refresh(record)
         return record
+
+    @classmethod
+    async def update_stock_record_dao(cls, db: AsyncSession, record_id: int, values: dict):
+        await db.execute(update(AstItemStockRecord).where(AstItemStockRecord.id == record_id).values(**values))
 
     @classmethod
     async def add_purchase_order_dao(cls, db: AsyncSession, order: AstPurchaseOrder):
@@ -179,6 +229,15 @@ class AstInventoryDao:
         return result.scalars().first()
 
     @classmethod
+    async def get_purchase_orders_by_ids(cls, db: AsyncSession, order_ids: list[int]):
+        if not order_ids:
+            return []
+        result = await db.execute(
+            select(AstPurchaseOrder).where(AstPurchaseOrder.id.in_(order_ids)).order_by(desc(AstPurchaseOrder.id))
+        )
+        return result.scalars().all()
+
+    @classmethod
     async def get_purchase_order_items_by_order_id(cls, db: AsyncSession, order_id: int):
         result = await db.execute(
             select(AstPurchaseOrderItem)
@@ -186,6 +245,19 @@ class AstInventoryDao:
             .order_by(AstPurchaseOrderItem.id)
         )
         return result.scalars().all()
+
+    @classmethod
+    async def get_sku_by_item_name_and_sku_name(cls, db: AsyncSession, item_name: str, sku_name: str | None = None):
+        query = (
+            select(AstItemSku, AstItem)
+            .join(AstItem, AstItemSku.item_id == AstItem.id)
+            .where(AstItem.item_name == item_name, AstItemSku.del_flag == 0, AstItem.del_flag == 0)
+            .order_by(AstItemSku.id)
+        )
+        if sku_name:
+            query = query.where(AstItemSku.sku_name == sku_name)
+        result = await db.execute(query)
+        return result.first()
 
     @classmethod
     async def get_fee_list(cls, db: AsyncSession, query_object: AstFeeItemPageQueryModel, is_page: bool = False):

@@ -61,8 +61,11 @@ class AstStockRecordPageQueryModel(BaseModel):
     keyword: Optional[str] = Field(default=None, description='物品名称关键字')
     item_name: Optional[str] = Field(default=None, description='物品名称')
     business_type: Optional[str] = Field(default=None, description='业务类型')
+    stock_type: Optional[str] = Field(default=None, description='出入库类型(in/out)')
     related_type: Optional[str] = Field(default=None, description='关联角色类型')
     related_name: Optional[str] = Field(default=None, description='关联角色名称')
+    item_names: Optional[str] = Field(default=None, description='物品名称，多个用逗号分隔')
+    exclude_voided: Optional[bool] = Field(default=True, description='是否过滤已作废记录')
     begin_time: Optional[str] = Field(default=None, description='开始日期')
     end_time: Optional[str] = Field(default=None, description='结束日期')
 

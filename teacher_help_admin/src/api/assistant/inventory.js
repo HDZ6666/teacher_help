@@ -54,6 +54,14 @@ export function listAvailableItems(query) {
   })
 }
 
+export function listRoleOptions(query) {
+  return request({
+    url: '/ast/inventory/role-options',
+    method: 'get',
+    params: query
+  })
+}
+
 // 出入库管理
 export function listStockRecord(query) {
   return request({
@@ -70,11 +78,30 @@ export function getStockRecord(recordId) {
   })
 }
 
+export function voidStockRecord(recordId) {
+  return request({
+    url: '/ast/inventory/stock/' + recordId + '/void',
+    method: 'put'
+  })
+}
+
 export function createPurchase(data) {
   return request({
     url: '/ast/inventory/purchase',
     method: 'post',
     data
+  })
+}
+
+export function importPurchase(data) {
+  return request({
+    url: '/ast/inventory/purchase/import',
+    method: 'post',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      repeatSubmit: false
+    }
   })
 }
 

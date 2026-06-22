@@ -1,10 +1,17 @@
+import multiprocessing
+import sys
+
+if hasattr(sys, '_base_executable'):
+    sys._base_executable = sys.executable
+multiprocessing.set_executable(sys.executable)
+
 import uvicorn
 from server import app, AppConfig  # noqa: F401
 
 
 if __name__ == '__main__':
     uvicorn.run(
-        app='app:app',
+        app='app:app' if AppConfig.app_reload else app,
         host=AppConfig.app_host,
         port=AppConfig.app_port,
         # root_path=AppConfig.app_root_path,

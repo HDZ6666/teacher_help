@@ -1,155 +1,136 @@
 <template>
   <div class="app-container">
-    <!-- Tab切换 -->
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
-      <!-- 课程Tab -->
       <el-tab-pane label="课程" name="course">
-        <!-- 搜索栏 -->
-        <el-form :model="courseQueryParams" ref="courseQueryRef" :inline="true" v-show="showSearch" label-width="68px">
-          <el-form-item label="课程名称" prop="courseName">
+        <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="80px">
+          <el-form-item label="搜索课程" prop="courseName">
             <el-input
-              v-model="courseQueryParams.courseName"
+              v-model="queryParams.courseName"
               placeholder="请输入课程名称"
               clearable
-              @keyup.enter="handleCourseQuery"
+              style="width: 260px"
+              @keyup.enter="handleQuery"
             />
           </el-form-item>
           <el-form-item label="课程类型" prop="courseType">
-            <el-select v-model="courseQueryParams.courseType" placeholder="请选择课程类型" clearable>
-              <el-option label="一对多" value="1" />
-              <el-option label="一对一" value="2" />
-            </el-select>
+            <el-checkbox-group v-model="courseTypeFilter" @change="handleTypeFilterChange">
+              <el-checkbox label="one_to_many">一对多</el-checkbox>
+              <el-checkbox label="one_to_one">一对一</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="年级" prop="grade">
-            <el-select v-model="courseQueryParams.grade" placeholder="请选择年级" clearable>
-              <el-option label="一年级" value="1" />
-              <el-option label="二年级" value="2" />
-              <el-option label="三年级" value="3" />
-              <el-option label="四年级" value="4" />
-              <el-option label="五年级" value="5" />
-              <el-option label="六年级" value="6" />
-              <el-option label="初一" value="7" />
-              <el-option label="初二" value="8" />
-              <el-option label="初三" value="9" />
-              <el-option label="高一" value="10" />
-              <el-option label="高二" value="11" />
-              <el-option label="高三" value="12" />
-            </el-select>
+          <el-form-item label="课程状态" prop="status">
+            <el-checkbox-group v-model="statusFilter" @change="handleStatusFilterChange">
+              <el-checkbox :label="1">启用</el-checkbox>
+              <el-checkbox :label="0">停用</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleCourseQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetCourseQuery">重置</el-button>
+            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
 
-        <!-- 操作按钮 -->
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button
-              type="primary"
-              plain
-              icon="Plus"
-              @click="handleAddCourse"
-            >新增课程</el-button>
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['teach:course:add']">
+              新建课程
+            </el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button
-              type="success"
-              plain
-              icon="Edit"
-              :disabled="courseSingle"
-              @click="handleUpdateCourse"
-            >修改</el-button>
+            <el-button type="primary" plain icon="Plus" @click="handleBatchAdd" v-hasPermi="['teach:course:add']">
+              批量新建课程
+            </el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button
               type="danger"
               plain
               icon="Delete"
-              :disabled="courseMultiple"
-              @click="handleDeleteCourse"
-            >删除</el-button>
+              :disabled="multiple"
+              @click="handleDelete"
+              v-hasPermi="['teach:course:remove']"
+            >
+              批量删除
+            </el-button>
           </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="warning"
-              plain
-              icon="Download"
-              @click="handleExportCourse"
-            >导出</el-button>
-          </el-col>
-          <right-toolbar v-model:showSearch="showSearch" @queryTable="getCourseList"></right-toolbar>
+          <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <!-- 课程列表 -->
-        <el-table v-loading="courseLoading" :data="courseList" @selection-change="handleCourseSelectionChange">
+        <el-table v-loading="loading" :data="courseList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column label="课程名称" align="center" prop="courseName" width="150" />
-          <el-table-column label="类型" align="center" prop="courseType" width="100">
+          <el-table-column label="课程名称" prop="courseName" min-width="180">
             <template #default="scope">
-              {{ scope.row.courseType === '1' ? '一对多' : '一对一' }}
-            </template>
-          </el-table-column>
-          <el-table-column label="收费方式" align="center" prop="chargeType" width="200">
-            <template #default="scope">
-              <div v-if="scope.row.chargeByClass">
-                <div>按课时({{ scope.row.classPrices[0]?.totalPrice }}元/课时)</div>
-              </div>
-              <div v-if="scope.row.chargeByMonth">
-                <div v-for="(item, index) in scope.row.monthPrices" :key="index">
-                  {{ item.name }}({{ item.totalPrice }}元/{{ item.quantity }}个月)
-                </div>
-              </div>
-              <div v-if="scope.row.chargeByDay">
-                <div v-for="(item, index) in scope.row.dayPrices" :key="index">
-                  {{ item.name }}({{ item.totalPrice }}元/{{ item.quantity }}天)
-                </div>
+              <div class="course-name-cell">
+                <span class="course-color-dot" :style="{ backgroundColor: scope.row.scheduleColor || '#409EFF' }"></span>
+                <span>{{ scope.row.courseName }}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="年级标签" align="center" prop="gradeLabel" width="100" />
-          <el-table-column label="在读学员数" align="center" prop="studentCount" width="100" />
-          <el-table-column label="启用状态" align="center" prop="status" width="100">
+          <el-table-column label="类型" prop="courseTypeName" width="120" align="center" />
+          <el-table-column label="收费方式" prop="chargeTypeText" width="150" align="center" />
+          <el-table-column label="定价标准" prop="priceStandard" min-width="260">
             <template #default="scope">
-              <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
+              <div v-if="scope.row.priceLines && scope.row.priceLines.length" class="price-lines">
+                <span v-for="line in scope.row.priceLines" :key="line">{{ line }}</span>
+              </div>
+              <span v-else class="muted">未设置</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
+          <el-table-column label="在读学员数" prop="studentCount" width="120" align="center" />
+          <el-table-column label="启用状态" prop="status" width="120" align="center">
             <template #default="scope">
-              <el-button link type="primary" icon="Edit" @click="handleUpdateCourse(scope.row)">编辑</el-button>
-              <el-button link type="primary" icon="Delete" @click="handleDeleteCourse(scope.row)">删除</el-button>
+              <el-switch
+                v-model="scope.row.status"
+                :active-value="1"
+                :inactive-value="0"
+                @change="value => handleStatusChange(scope.row, value)"
+                v-hasPermi="['teach:course:edit']"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="线上售卖" prop="onlineSale" width="120" align="center">
+            <template #default="scope">
+              <el-tag v-if="scope.row.onlineSale === 1" type="success">已售卖</el-tag>
+              <span v-else class="muted">未售卖</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="150" align="center" fixed="right">
+            <template #default="scope">
+              <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['teach:course:edit']">
+                编辑
+              </el-button>
+              <el-button link type="danger" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['teach:course:remove']">
+                删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
 
-        <!-- 分页 -->
         <pagination
-          v-show="courseTotal > 0"
-          :total="courseTotal"
-          v-model:page="courseQueryParams.pageNum"
-          v-model:limit="courseQueryParams.pageSize"
-          @pagination="getCourseList"
+          v-show="total > 0"
+          :total="total"
+          v-model:page="queryParams.pageNum"
+          v-model:limit="queryParams.pageSize"
+          @pagination="getList"
         />
       </el-tab-pane>
 
-      <!-- 套餐Tab -->
       <el-tab-pane label="套餐" name="package">
-        <!-- 搜索栏 -->
-        <el-form :model="packageQueryParams" ref="packageQueryRef" :inline="true" v-show="showSearch" label-width="68px">
-          <el-form-item label="套餐名称" prop="packageName">
+        <el-form :model="packageQueryParams" ref="packageQueryRef" :inline="true" v-show="showSearch" label-width="80px">
+          <el-form-item label="搜索套餐" prop="packageName">
             <el-input
               v-model="packageQueryParams.packageName"
               placeholder="请输入套餐名称"
               clearable
+              style="width: 260px"
               @keyup.enter="handlePackageQuery"
             />
           </el-form-item>
           <el-form-item label="启用状态" prop="status">
-            <el-radio-group v-model="packageQueryParams.status">
-              <el-radio-button label="">全部</el-radio-button>
-              <el-radio-button label="1">启用</el-radio-button>
-              <el-radio-button label="0">停用</el-radio-button>
-            </el-radio-group>
+            <el-checkbox-group v-model="packageStatusFilter" @change="handlePackageStatusFilterChange">
+              <el-checkbox :label="1">启用</el-checkbox>
+              <el-checkbox :label="0">停用</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="Search" @click="handlePackageQuery">搜索</el-button>
@@ -157,44 +138,84 @@
           </el-form-item>
         </el-form>
 
-        <!-- 操作按钮 -->
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button
-              type="primary"
-              plain
-              icon="Plus"
-              @click="handleAddPackage"
-            >添加套餐</el-button>
+            <el-button type="primary" plain icon="Plus" @click="handlePackageAdd" v-hasPermi="['teach:course:add']">
+              添加套餐
+            </el-button>
           </el-col>
-          <right-toolbar v-model:showSearch="showSearch" @queryTable="getPackageList"></right-toolbar>
+          <el-col :span="1.5">
+            <el-button
+              type="danger"
+              plain
+              icon="Delete"
+              :disabled="packageMultiple"
+              @click="handlePackageDelete"
+              v-hasPermi="['teach:course:remove']"
+            >
+              批量删除
+            </el-button>
+          </el-col>
+          <right-toolbar v-model:showSearch="showSearch" @queryTable="getActiveList"></right-toolbar>
         </el-row>
 
-        <!-- 套餐列表 -->
-        <el-table v-loading="packageLoading" :data="packageList">
-          <el-table-column label="套餐名称" align="center" prop="packageName" width="200" />
-          <el-table-column label="套价" align="center" prop="totalPrice" width="150">
+        <el-table v-loading="packageLoading" :data="packageList" @selection-change="handlePackageSelectionChange">
+          <el-table-column type="selection" width="55" align="center" />
+          <el-table-column label="套餐名称" prop="packageName" min-width="180" />
+          <el-table-column label="套餐价" prop="totalPrice" width="140" align="center">
+            <template #default="scope">¥ {{ formatMoney(scope.row.totalPrice) }}</template>
+          </el-table-column>
+          <el-table-column label="套餐内容" prop="itemSummary" min-width="260" show-overflow-tooltip>
             <template #default="scope">
-              ¥ {{ scope.row.totalPrice }}
+              <span v-if="scope.row.itemSummary">{{ scope.row.itemSummary }}</span>
+              <span v-else class="muted">未设置</span>
             </template>
           </el-table-column>
-          <el-table-column label="启用状态" align="center" prop="status" width="100">
+          <el-table-column label="明细数量" prop="itemCount" width="100" align="center" />
+          <el-table-column label="启用状态" prop="status" width="120" align="center">
             <template #default="scope">
-              <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
+              <el-switch
+                v-model="scope.row.status"
+                :active-value="1"
+                :inactive-value="0"
+                @change="value => handlePackageStatusChange(scope.row, value)"
+                v-hasPermi="['teach:course:edit']"
+              />
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
+          <el-table-column label="线上售卖" prop="onlineSale" width="120" align="center">
             <template #default="scope">
-              <el-button link type="primary" icon="Edit" @click="handleUpdatePackage(scope.row)">编辑</el-button>
-              <el-button link type="primary" icon="Delete" @click="handleDeletePackage(scope.row)">删除</el-button>
+              <el-tag v-if="scope.row.onlineSale === 1" type="success">已售卖</el-tag>
+              <span v-else class="muted">未售卖</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="150" align="center" fixed="right">
+            <template #default="scope">
+              <el-button
+                link
+                type="primary"
+                icon="Edit"
+                @click="handlePackageUpdate(scope.row)"
+                v-hasPermi="['teach:course:edit']"
+              >
+                编辑
+              </el-button>
+              <el-button
+                link
+                type="danger"
+                icon="Delete"
+                @click="handlePackageDelete(scope.row)"
+                v-hasPermi="['teach:course:remove']"
+              >
+                删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
 
-        <!-- 分页 -->
         <pagination
-          v-show="packageTotal > 0"
-          :total="packageTotal"
+          v-show="packageTableTotal > 0"
+          :total="packageTableTotal"
           v-model:page="packageQueryParams.pageNum"
           v-model:limit="packageQueryParams.pageSize"
           @pagination="getPackageList"
@@ -202,450 +223,452 @@
       </el-tab-pane>
     </el-tabs>
 
-    <!-- 新增/修改课程对话框 -->
-    <el-dialog :title="courseTitle" v-model="courseOpen" width="800px" append-to-body destroy-on-close>
-      <el-form ref="courseFormRef" :model="courseForm" :rules="courseRules" label-width="100px">
-        <!-- 基本信息 -->
+    <el-dialog :title="title" v-model="open" width="980px" append-to-body destroy-on-close>
+      <el-form ref="courseFormRef" :model="form" :rules="rules" label-width="104px">
         <el-divider content-position="left">基本信息</el-divider>
-        
-        <el-form-item label="课程名称" prop="courseName">
-          <el-input v-model="courseForm.courseName" placeholder="请输入课程名称" maxlength="50" />
-        </el-form-item>
+        <el-row :gutter="18">
+          <el-col :span="12">
+            <el-form-item label="课程名称" prop="courseName">
+              <el-input v-model="form.courseName" placeholder="请输入" maxlength="100" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="课程类型" prop="courseType">
+              <el-radio-group v-model="form.courseType">
+                <el-radio label="one_to_many">一对多</el-radio>
+                <el-radio label="one_to_one">一对一</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="18">
+          <el-col :span="8">
+            <el-form-item label="年级" prop="grade">
+              <el-select v-model="form.grade" placeholder="请选择" clearable>
+                <el-option v-for="item in gradeOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="科目" prop="subject">
+              <el-select v-model="form.subject" placeholder="请选择" clearable>
+                <el-option v-for="item in subjectOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="学期" prop="semester">
+              <el-select v-model="form.semester" placeholder="请选择" clearable>
+                <el-option v-for="item in semesterOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="18">
+          <el-col :span="12">
+            <el-form-item label="课表颜色">
+              <div class="color-swatches">
+                <button
+                  v-for="color in colorOptions"
+                  :key="color"
+                  class="color-swatch"
+                  type="button"
+                  :class="{ active: form.scheduleColor === color }"
+                  :style="{ backgroundColor: color }"
+                  @click="form.scheduleColor = color"
+                ></button>
+              </div>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="启用状态">
+              <el-switch v-model="form.status" :active-value="1" :inactive-value="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="线上售卖">
+              <el-switch v-model="form.onlineSale" :active-value="1" :inactive-value="0" />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-        <el-form-item label="课程类型" prop="courseType">
-          <el-radio-group v-model="courseForm.courseType">
-            <el-radio label="1">一对多</el-radio>
-            <el-radio label="2">一对一</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item label="年级" prop="grade">
-          <el-select v-model="courseForm.grade" placeholder="请选择年级" style="width: 200px;">
-            <el-option label="一年级" value="1" />
-            <el-option label="二年级" value="2" />
-            <el-option label="三年级" value="3" />
-            <el-option label="四年级" value="4" />
-            <el-option label="五年级" value="5" />
-            <el-option label="六年级" value="6" />
-            <el-option label="初一" value="7" />
-            <el-option label="初二" value="8" />
-            <el-option label="初三" value="9" />
-            <el-option label="高一" value="10" />
-            <el-option label="高二" value="11" />
-            <el-option label="高三" value="12" />
-          </el-select>
-          <el-link type="primary" style="margin-left: 10px;">选择设置</el-link>
-        </el-form-item>
-
-        <el-form-item label="科目" prop="subject">
-          <el-select v-model="courseForm.subject" placeholder="请选择科目" style="width: 200px;">
-            <el-option label="语文" value="1" />
-            <el-option label="数学" value="2" />
-            <el-option label="英语" value="3" />
-            <el-option label="物理" value="4" />
-            <el-option label="化学" value="5" />
-            <el-option label="生物" value="6" />
-            <el-option label="政治" value="7" />
-            <el-option label="历史" value="8" />
-            <el-option label="地理" value="9" />
-          </el-select>
-          <el-link type="primary" style="margin-left: 10px;">选择设置</el-link>
-        </el-form-item>
-
-        <el-form-item label="学期" prop="semester">
-          <el-select v-model="courseForm.semester" placeholder="请选择学期" style="width: 200px;">
-            <el-option label="春季" value="1" />
-            <el-option label="夏季" value="2" />
-            <el-option label="秋季" value="3" />
-            <el-option label="冬季" value="4" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="课表颜色" prop="scheduleColor">
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <div 
-              v-for="color in colorOptions" 
-              :key="color"
-              @click="courseForm.scheduleColor = color"
-              :style="{
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                backgroundColor: color,
-                cursor: 'pointer',
-                border: courseForm.scheduleColor === color ? '2px solid #409EFF' : '2px solid transparent'
-              }"
-            ></div>
-            <span style="color: #999;">...</span>
-          </div>
-        </el-form-item>
-
-        <!-- 收费方式 -->
         <el-divider content-position="left">收费方式</el-divider>
-
-        <!-- 按课时收费 -->
-        <el-form-item label="按课时收费">
-          <el-switch v-model="courseForm.chargeByClass" />
-        </el-form-item>
-
-        <div v-if="courseForm.chargeByClass" style="margin-left: 100px; margin-bottom: 20px;">
-          <el-alert
-            title="【温馨提示】为方便您设定更灵活的价格体系，建议您在在标准中添加/或编辑数量为1的单价价目表~"
-            type="warning"
-            :closable="false"
-            show-icon
-            style="margin-bottom: 15px;"
-          />
-          
-          <div style="margin-bottom: 10px;">
-            <span style="font-weight: bold;">扣课时规则：</span>
-            <el-radio-group v-model="courseForm.classDeductRule" style="margin-left: 10px;">
-              <el-radio label="1">满课最多扣除时</el-radio>
-              <el-radio label="2">扣1</el-radio>
-              <el-radio label="3">不扣</el-radio>
-              <el-radio label="4">部分免扣</el-radio>
-            </el-radio-group>
+        <div v-for="section in chargeSections" :key="section.type" class="charge-section">
+          <div class="charge-title">
+            <span>{{ section.label }}</span>
+            <el-switch
+              v-model="form[section.enabledKey]"
+              :active-value="true"
+              :inactive-value="false"
+              @change="value => handleChargeToggle(section, value)"
+            />
           </div>
-
-          <div style="margin-bottom: 10px;">
-            <span style="font-weight: bold;">未到差异扣除时：</span>
-            <el-radio-group v-model="courseForm.classAbsenceRule" style="margin-left: 10px;">
-              <el-radio label="1">扣1</el-radio>
-              <el-radio label="2">不扣</el-radio>
-            </el-radio-group>
+          <div v-if="form[section.enabledKey]" class="charge-body">
+            <template v-if="section.type === 'class'">
+              <el-form-item label="扣课时规则">
+                <el-radio-group v-model="form.classDeductRule">
+                  <el-radio label="deduct">扣</el-radio>
+                  <el-radio label="none">不扣</el-radio>
+                  <el-radio label="part_free">部分免扣</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="未到是否扣课时">
+                <el-radio-group v-model="form.classAbsenceRule">
+                  <el-radio label="deduct">扣</el-radio>
+                  <el-radio label="none">不扣</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </template>
+            <el-alert
+              title="为方便报名时灵活选择购买数量，建议保留一条数量为 1 的单价价目。"
+              type="warning"
+              show-icon
+              :closable="false"
+              class="price-alert"
+            />
+            <el-table :data="form[section.listKey]" border>
+              <el-table-column label="名称" min-width="160">
+                <template #default="scope">
+                  <el-input v-model="scope.row.priceName" placeholder="单价" maxlength="100" />
+                </template>
+              </el-table-column>
+              <el-table-column :label="section.quantityLabel" width="160">
+                <template #default="scope">
+                  <el-input-number v-model="scope.row.quantity" :min="1" :max="999" controls-position="right" />
+                </template>
+              </el-table-column>
+              <el-table-column label="总价(元)" width="170">
+                <template #default="scope">
+                  <el-input-number
+                    v-model="scope.row.totalPrice"
+                    :min="0"
+                    :precision="2"
+                    controls-position="right"
+                    placeholder="请输入"
+                  />
+                </template>
+              </el-table-column>
+              <el-table-column :label="section.unitPriceLabel" width="170" align="center">
+                <template #default="scope">
+                  {{ calcUnitPrice(scope.row) }}
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="90" align="center">
+                <template #default="scope">
+                  <el-button link type="danger" @click="removePriceRow(section, scope.$index)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div class="add-price">
+              <el-button
+                link
+                type="primary"
+                icon="Plus"
+                :disabled="form[section.listKey].length >= 10"
+                @click="addPriceRow(section)"
+              >
+                添加({{ form[section.listKey].length }}/10)
+              </el-button>
+            </div>
           </div>
-
-          <el-alert
-            title="【温馨提示】为方便您设定更灵活的价格体系，建议您在在标准中添加/或编辑数量为1的单价价目表~"
-            type="warning"
-            :closable="false"
-            show-icon
-            style="margin-bottom: 15px;"
-          />
-
-          <div style="margin-bottom: 10px; font-weight: bold;">定价标准：</div>
-          <el-table :data="courseForm.classPrices" border style="width: 100%;">
-            <el-table-column label="名称" width="150">
-              <template #default="scope">
-                <el-input v-model="scope.row.name" placeholder="单价" />
-              </template>
-            </el-table-column>
-            <el-table-column label="数量(课时)" width="150">
-              <template #default="scope">
-                <el-input-number v-model="scope.row.quantity" :min="1" controls-position="right" style="width: 100%;" />
-              </template>
-            </el-table-column>
-            <el-table-column label="总价(元)" width="150">
-              <template #default="scope">
-                <el-input v-model="scope.row.totalPrice" placeholder="请输入" />
-              </template>
-            </el-table-column>
-            <el-table-column label="单价(元/课时)" width="150">
-              <template #default="scope">
-                <span>{{ scope.row.quantity > 0 ? (scope.row.totalPrice / scope.row.quantity).toFixed(2) : '自动计算' }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="100">
-              <template #default="scope">
-                <el-button link type="danger" @click="removeClassPrice(scope.$index)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-button link type="primary" icon="Plus" @click="addClassPrice" style="margin-top: 10px;">添加(1/10)</el-button>
         </div>
 
-        <!-- 按月收费 -->
-        <el-form-item label="按月收费">
-          <el-switch v-model="courseForm.chargeByMonth" />
-        </el-form-item>
-
-        <div v-if="courseForm.chargeByMonth" style="margin-left: 100px; margin-bottom: 20px;">
-          <el-alert
-            title="【温馨提示】为方便您设定更灵活的价格体系，建议您在在标准中添加/或编辑数量为1的单价价目表~"
-            type="warning"
-            :closable="false"
-            show-icon
-            style="margin-bottom: 15px;"
-          />
-
-          <div style="margin-bottom: 10px; font-weight: bold;">定价标准：</div>
-          <el-table :data="courseForm.monthPrices" border style="width: 100%;">
-            <el-table-column label="名称" width="150">
-              <template #default="scope">
-                <el-input v-model="scope.row.name" placeholder="单价" />
-              </template>
-            </el-table-column>
-            <el-table-column label="数量(月)" width="150">
-              <template #default="scope">
-                <el-input-number v-model="scope.row.quantity" :min="1" controls-position="right" style="width: 100%;" />
-              </template>
-            </el-table-column>
-            <el-table-column label="总价(元)" width="150">
-              <template #default="scope">
-                <el-input v-model="scope.row.totalPrice" placeholder="请输入" />
-              </template>
-            </el-table-column>
-            <el-table-column label="单价(元/月)" width="150">
-              <template #default="scope">
-                <span>{{ scope.row.quantity > 0 ? (scope.row.totalPrice / scope.row.quantity).toFixed(2) : '自动计算' }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="100">
-              <template #default="scope">
-                <el-button link type="danger" @click="removeMonthPrice(scope.$index)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-button link type="primary" icon="Plus" @click="addMonthPrice" style="margin-top: 10px;">添加(1/10)</el-button>
-        </div>
-
-        <!-- 按天收费 -->
-        <el-form-item label="按天收费">
-          <el-switch v-model="courseForm.chargeByDay" />
-        </el-form-item>
-
-        <div v-if="courseForm.chargeByDay" style="margin-left: 100px; margin-bottom: 20px;">
-          <el-alert
-            title="【温馨提示】为方便您设定更灵活的价格体系，建议您在在标准中添加/或编辑数量为1的单价价目表~"
-            type="warning"
-            :closable="false"
-            show-icon
-            style="margin-bottom: 15px;"
-          />
-
-          <div style="margin-bottom: 10px; font-weight: bold;">定价标准：</div>
-          <el-table :data="courseForm.dayPrices" border style="width: 100%;">
-            <el-table-column label="名称" width="150">
-              <template #default="scope">
-                <el-input v-model="scope.row.name" placeholder="单价" />
-              </template>
-            </el-table-column>
-            <el-table-column label="数量(天)" width="150">
-              <template #default="scope">
-                <el-input-number v-model="scope.row.quantity" :min="1" controls-position="right" style="width: 100%;" />
-              </template>
-            </el-table-column>
-            <el-table-column label="总价(元)" width="150">
-              <template #default="scope">
-                <el-input v-model="scope.row.totalPrice" placeholder="请输入" />
-              </template>
-            </el-table-column>
-            <el-table-column label="单价(元/天)" width="150">
-              <template #default="scope">
-                <span>{{ scope.row.quantity > 0 ? (scope.row.totalPrice / scope.row.quantity).toFixed(2) : '自动计算' }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="100">
-              <template #default="scope">
-                <el-button link type="danger" @click="removeDayPrice(scope.$index)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-button link type="primary" icon="Plus" @click="addDayPrice" style="margin-top: 10px;">添加(1/10)</el-button>
-        </div>
-
-        <!-- 其他信息 -->
         <el-divider content-position="left">其他信息</el-divider>
-        
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="courseForm.remark" type="textarea" :rows="3" placeholder="请输入备注" maxlength="200" show-word-limit />
+        <el-form-item label="备注">
+          <el-input v-model="form.remark" type="textarea" :rows="3" maxlength="500" show-word-limit />
         </el-form-item>
       </el-form>
-
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="cancelCourse">取 消</el-button>
-          <el-button type="primary" @click="submitCourseForm">确 定</el-button>
+          <el-button @click="cancel">取消</el-button>
+          <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
         </div>
       </template>
     </el-dialog>
 
-    <!-- 添加/修改套餐对话框 -->
-    <el-dialog :title="packageTitle" v-model="packageOpen" width="900px" append-to-body>
-      <el-form ref="packageFormRef" :model="packageForm" :rules="packageRules" label-width="100px">
-        <el-row :gutter="20">
+    <el-dialog title="批量新建课程" v-model="batchOpen" width="1100px" append-to-body destroy-on-close>
+      <el-table :data="batchForm.courses" border>
+        <el-table-column label="课程名称" min-width="170">
+          <template #default="scope">
+            <el-input v-model="scope.row.courseName" placeholder="请输入课程名称" maxlength="100" />
+          </template>
+        </el-table-column>
+        <el-table-column label="课程类型" width="140">
+          <template #default="scope">
+            <el-select v-model="scope.row.courseType" placeholder="请选择">
+              <el-option label="一对多" value="one_to_many" />
+              <el-option label="一对一" value="one_to_one" />
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="收费方式" width="130">
+          <template #default="scope">
+            <el-select v-model="scope.row.chargeType" placeholder="请选择">
+              <el-option label="按课时" value="class" />
+              <el-option label="按月" value="month" />
+              <el-option label="按天" value="day" />
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="定价名称" min-width="140">
+          <template #default="scope">
+            <el-input v-model="scope.row.priceName" placeholder="单价" maxlength="100" />
+          </template>
+        </el-table-column>
+        <el-table-column label="数量" width="130">
+          <template #default="scope">
+            <el-input-number v-model="scope.row.quantity" :min="1" :max="999" controls-position="right" />
+          </template>
+        </el-table-column>
+        <el-table-column label="总价(元)" width="150">
+          <template #default="scope">
+            <el-input-number
+              v-model="scope.row.totalPrice"
+              :min="0"
+              :precision="2"
+              controls-position="right"
+              placeholder="请输入"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="颜色" width="110">
+          <template #default="scope">
+            <el-color-picker v-model="scope.row.scheduleColor" :predefine="colorOptions" />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="90" align="center">
+          <template #default="scope">
+            <el-button
+              link
+              type="danger"
+              :disabled="batchForm.courses.length <= 1"
+              @click="removeBatchCourseRow(scope.$index)"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="batch-actions">
+        <el-button link type="primary" icon="Plus" :disabled="batchForm.courses.length >= 20" @click="addBatchCourseRow">
+          添加课程({{ batchForm.courses.length }}/20)
+        </el-button>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="batchOpen = false">取消</el-button>
+          <el-button type="primary" :loading="batchSubmitLoading" @click="submitBatchForm">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog :title="packageTitle" v-model="packageOpen" width="1180px" append-to-body destroy-on-close>
+      <el-form ref="packageFormRef" :model="packageForm" :rules="packageRules" label-width="96px">
+        <el-divider content-position="left">基本信息</el-divider>
+        <el-row :gutter="18">
           <el-col :span="12">
             <el-form-item label="套餐名称" prop="packageName">
-              <el-input v-model="packageForm.packageName" placeholder="请输入套餐名称" maxlength="50" />
+              <el-input v-model="packageForm.packageName" placeholder="请输入套餐名称" maxlength="100" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="备注" prop="remark">
-              <el-input v-model="packageForm.remark" placeholder="请输入备注" maxlength="200" />
+          <el-col :span="6">
+            <el-form-item label="启用状态">
+              <el-switch v-model="packageForm.status" :active-value="1" :inactive-value="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="线上售卖">
+              <el-switch v-model="packageForm.onlineSale" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <!-- 选择课程 -->
-        <el-divider content-position="left">
-          <span style="font-size: 14px; font-weight: bold;">选择课程</span>
-        </el-divider>
-        <el-form-item>
-          <el-button type="primary" plain icon="Plus" @click="openCourseDialog">选择课程</el-button>
-          <el-table :data="packageForm.courses" style="margin-top: 10px;" max-height="200">
-            <el-table-column label="课程名称" prop="courseName" />
-            <el-table-column label="课程类型" prop="courseType" width="100">
-              <template #default="scope">
-                {{ scope.row.courseType === '1' ? '一对多' : '一对一' }}
-              </template>
-            </el-table-column>
-            <el-table-column label="定价标准" prop="pricingName" width="150" />
-            <el-table-column label="操作" width="80">
-              <template #default="scope">
-                <el-button link type="danger" icon="Delete" @click="removeCourse(scope.$index)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+        <el-divider content-position="left">套餐明细</el-divider>
+        <div class="package-toolbar">
+          <el-button type="primary" plain icon="Plus" @click="openSelector('course')">选择课程</el-button>
+          <el-button type="primary" plain icon="Plus" @click="openSelector('item')">选择物品</el-button>
+          <el-button type="primary" plain icon="Plus" @click="openSelector('fee')">选择费用</el-button>
+        </div>
+        <el-table :data="packageForm.items" border class="package-item-table">
+          <el-table-column label="购买项目" prop="itemName" min-width="150">
+            <template #default="scope">
+              <el-tag class="mr5" size="small" :type="packageTypeTag(scope.row.itemType)">
+                {{ packageTypeName(scope.row.itemType) }}
+              </el-tag>
+              <span>{{ scope.row.itemName }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="定价标准" min-width="190">
+            <template #default="scope">
+              <el-select
+                v-if="scope.row.itemType === 'course'"
+                v-model="scope.row.specId"
+                placeholder="请选择"
+                @change="value => handlePackageSpecChange(scope.row, value)"
+              >
+                <el-option
+                  v-for="price in scope.row.priceOptions"
+                  :key="price.id"
+                  :label="price.displayText"
+                  :value="price.id"
+                />
+              </el-select>
+              <span v-else>{{ scope.row.specName || '-' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="购买数量" width="150">
+            <template #default="scope">
+              <div class="quantity-cell">
+                <el-input-number
+                  v-model="scope.row.quantity"
+                  :min="1"
+                  :max="999"
+                  controls-position="right"
+                  @change="refreshPackageItem(scope.row)"
+                />
+                <span>{{ scope.row.unit }}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="总价" width="120" align="center">
+            <template #default="scope">¥ {{ formatMoney(scope.row.totalPrice) }}</template>
+          </el-table-column>
+          <el-table-column label="请假免扣次数" width="150">
+            <template #default="scope">
+              <el-input-number
+                v-if="scope.row.itemType === 'course'"
+                v-model="scope.row.leaveFreeQuantity"
+                :min="0"
+                :max="999"
+                controls-position="right"
+              />
+              <span v-else class="muted">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="赠送数量" width="150">
+            <template #default="scope">
+              <div class="quantity-cell">
+                <el-input-number
+                  v-model="scope.row.giftQuantity"
+                  :min="0"
+                  :max="999"
+                  controls-position="right"
+                />
+                <span>{{ scope.row.unit }}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="直减/折扣" width="210">
+            <template #default="scope">
+              <div class="discount-cell">
+                <el-select
+                  v-model="scope.row.discountType"
+                  @change="refreshPackageItem(scope.row)"
+                >
+                  <el-option label="直减" value="reduce" />
+                  <el-option label="折扣" value="discount" />
+                </el-select>
+                <el-input-number
+                  v-model="scope.row.discountValue"
+                  :min="0"
+                  :precision="2"
+                  controls-position="right"
+                  @change="refreshPackageItem(scope.row)"
+                />
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="小计" width="150">
+            <template #default="scope">
+              <el-input-number
+                v-model="scope.row.subtotalPrice"
+                :min="0"
+                :precision="2"
+                controls-position="right"
+                @change="refreshPackageTotal"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="90" align="center">
+            <template #default="scope">
+              <el-button link type="danger" @click="removePackageItem(scope.$index)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="package-total">
+          套餐价：
+          <span>¥ {{ formatMoney(packageTotalPrice) }}</span>
+        </div>
+        <el-divider content-position="left">其他信息</el-divider>
+        <el-form-item label="备注">
+          <el-input v-model="packageForm.remark" type="textarea" :rows="3" maxlength="500" show-word-limit />
         </el-form-item>
-
-        <!-- 选择物品 -->
-        <el-divider content-position="left">
-          <span style="font-size: 14px; font-weight: bold;">选择物品</span>
-        </el-divider>
-        <el-form-item>
-          <el-button type="primary" plain icon="Plus" @click="openItemDialog">选择物品</el-button>
-          <el-table :data="packageForm.items" style="margin-top: 10px;" max-height="200">
-            <el-table-column label="物品名称" prop="itemName" />
-            <el-table-column label="单价" prop="price" width="120">
-              <template #default="scope">
-                ¥ {{ scope.row.price }}
-              </template>
-            </el-table-column>
-            <el-table-column label="库存" prop="stock" width="100" />
-            <el-table-column label="操作" width="80">
-              <template #default="scope">
-                <el-button link type="danger" icon="Delete" @click="removeItem(scope.$index)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-form-item>
-
-        <!-- 选择费用 -->
-        <el-divider content-position="left">
-          <span style="font-size: 14px; font-weight: bold;">选择费用</span>
-        </el-divider>
-        <el-form-item>
-          <el-button type="primary" plain icon="Plus" @click="openFeeDialog">选择费用</el-button>
-          <el-table :data="packageForm.fees" style="margin-top: 10px;" max-height="200">
-            <el-table-column label="费用名称" prop="feeName" />
-            <el-table-column label="单价" prop="price" width="120">
-              <template #default="scope">
-                ¥ {{ scope.row.price }}
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="80">
-              <template #default="scope">
-                <el-button link type="danger" icon="Delete" @click="removeFee(scope.$index)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-form-item>
-
-        <!-- 套餐总价 -->
-        <el-row :gutter="20">
-          <el-col :span="24" style="text-align: right; padding-right: 20px;">
-            <span style="font-size: 16px; font-weight: bold; color: #ff6700;">
-              套餐价：¥ {{ calculatePackageTotal }}
-            </span>
-          </el-col>
-        </el-row>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="cancelPackage">取 消</el-button>
-          <el-button type="primary" @click="submitPackageForm">确 定</el-button>
+          <el-button @click="packageOpen = false">取消</el-button>
+          <el-button type="primary" :loading="packageSubmitLoading" @click="submitPackageForm">确定</el-button>
         </div>
       </template>
     </el-dialog>
 
-    <!-- 选择课程对话框 -->
-    <el-dialog title="选择课程" v-model="courseDialogVisible" width="800px" append-to-body>
-      <el-form :inline="true">
-        <el-form-item label="课程名称">
-          <el-input v-model="courseSearchName" placeholder="请输入课程名称" clearable style="width: 200px;" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="Search" @click="searchCourseList">搜索</el-button>
-        </el-form-item>
-      </el-form>
-      <el-table :data="availableCourseList" @selection-change="handleDialogCourseSelectionChange" max-height="400">
-        <el-table-column type="selection" width="55" />
-        <el-table-column label="课程名称" prop="courseName" />
-        <el-table-column label="课程类型" prop="courseType" width="100">
-          <template #default="scope">
-            {{ scope.row.courseType === '1' ? '一对多' : '一对一' }}
+    <el-dialog :title="selectorTitle" v-model="selectorOpen" width="860px" append-to-body destroy-on-close>
+      <div class="selector-header">
+        <el-input
+          v-model="selectorKeyword"
+          :placeholder="selectorPlaceholder"
+          clearable
+          style="width: 280px"
+          @keyup.enter="loadSelectorOptions"
+        >
+          <template #suffix>
+            <el-icon><Search /></el-icon>
           </template>
-        </el-table-column>
-        <el-table-column label="定价标准" prop="pricingName" width="200" />
-      </el-table>
-      <div style="margin-top: 10px; color: #909399;">
-        已选择：{{ selectedCourses.length }} 项
+        </el-input>
+        <el-button type="primary" icon="Search" @click="loadSelectorOptions">搜索</el-button>
+        <span class="selected-count">已选：{{ selectorSelection.length }} 项</span>
       </div>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="courseDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmCourseSelection">确定了</el-button>
-        </div>
-      </template>
-    </el-dialog>
 
-    <!-- 选择物品对话框 -->
-    <el-dialog title="选择物品" v-model="itemDialogVisible" width="700px" append-to-body>
-      <el-form :inline="true">
-        <el-form-item label="物品名称">
-          <el-input v-model="itemSearchName" placeholder="请输入物品名称" clearable style="width: 200px;" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="Search" @click="searchItemList">搜索</el-button>
-        </el-form-item>
-      </el-form>
-      <el-table :data="availableItemList" @selection-change="handleItemSelectionChange" max-height="400">
-        <el-table-column type="selection" width="55" />
-        <el-table-column label="物品名称" prop="itemName" />
-        <el-table-column label="单价" prop="price" width="120">
-          <template #default="scope">
-            ¥ {{ scope.row.price }}
-          </template>
-        </el-table-column>
-        <el-table-column label="库存" prop="stock" width="100" />
+      <el-table
+        ref="selectorTableRef"
+        v-loading="selectorLoading"
+        :data="selectorOptions"
+        row-key="selectorKey"
+        @selection-change="handleSelectorSelectionChange"
+      >
+        <el-table-column type="selection" width="55" align="center" />
+        <template v-if="selectorType === 'course'">
+          <el-table-column label="课程名称" prop="courseName" min-width="180" />
+          <el-table-column label="课程类型" prop="courseType" width="120" align="center" />
+          <el-table-column label="定价标准" prop="priceStandard" min-width="240" show-overflow-tooltip />
+        </template>
+        <template v-else-if="selectorType === 'item'">
+          <el-table-column label="物品名称" prop="itemName" min-width="180" />
+          <el-table-column label="单价" prop="priceRange" width="160" align="center" />
+          <el-table-column label="库存" prop="availableStock" width="120" align="center">
+            <template #default="scope">
+              <span :class="{ 'danger-text': Number(scope.row.availableStock || 0) < 0 }">
+                {{ scope.row.availableStock || 0 }}
+              </span>
+            </template>
+          </el-table-column>
+        </template>
+        <template v-else>
+          <el-table-column label="费用名称" prop="feeName" min-width="220" />
+          <el-table-column label="单价" prop="amount" width="160" align="center">
+            <template #default="scope">¥ {{ formatMoney(scope.row.amount) }}</template>
+          </el-table-column>
+          <el-table-column label="绑定课程" prop="courseName" min-width="220" show-overflow-tooltip />
+        </template>
       </el-table>
-      <div style="margin-top: 10px; color: #909399;">
-        已选择：{{ selectedItems.length }} 项
-      </div>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="itemDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmItemSelection">确定了</el-button>
-        </div>
-      </template>
-    </el-dialog>
 
-    <!-- 选择费用对话框 -->
-    <el-dialog title="选择费用" v-model="feeDialogVisible" width="700px" append-to-body>
-      <el-form :inline="true">
-        <el-form-item label="费用名称">
-          <el-input v-model="feeSearchName" placeholder="请输入费用名称" clearable style="width: 200px;" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="Search" @click="searchFeeList">搜索</el-button>
-        </el-form-item>
-      </el-form>
-      <el-table :data="availableFeeList" @selection-change="handleFeeSelectionChange" max-height="400">
-        <el-table-column type="selection" width="55" />
-        <el-table-column label="费用名称" prop="feeName" />
-        <el-table-column label="单价" prop="price" width="120">
-          <template #default="scope">
-            ¥ {{ scope.row.price }}
-          </template>
-        </el-table-column>
-      </el-table>
-      <div style="margin-top: 10px; color: #909399;">
-        已选择：{{ selectedFees.length }} 项
-      </div>
       <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="feeDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmFeeSelection">确定了</el-button>
+        <div class="dialog-footer selector-footer">
+          <span>已选择：{{ selectorSelection.length }} 项</span>
+          <div>
+            <el-button @click="selectorOpen = false">取消</el-button>
+            <el-button type="primary" @click="confirmSelector">选好了</el-button>
+          </div>
         </div>
       </template>
     </el-dialog>
@@ -653,674 +676,1168 @@
 </template>
 
 <script setup name="AssistantCourse">
-import { Plus } from '@element-plus/icons-vue';
+import { computed, getCurrentInstance, ref } from 'vue'
+import { Search } from '@element-plus/icons-vue'
+import {
+  addCourse,
+  addCoursePackage,
+  batchAddCourse,
+  changeCoursePackageStatus,
+  changeCourseStatus,
+  delCoursePackage,
+  delCourse,
+  getCourse,
+  getCoursePackage,
+  listCourse,
+  listCourseOptions,
+  listCoursePackage,
+  updateCoursePackage,
+  updateCourse
+} from '@/api/assistant/course'
+import { listAvailableItems, listFee } from '@/api/assistant/inventory'
 
-const { proxy } = getCurrentInstance();
+const { proxy } = getCurrentInstance()
 
-// Tab相关
-const activeTab = ref('course');
+const activeTab = ref('course')
+const showSearch = ref(true)
+const loading = ref(false)
+const submitLoading = ref(false)
+const batchSubmitLoading = ref(false)
+const open = ref(false)
+const batchOpen = ref(false)
+const title = ref('')
+const courseList = ref([])
+const packageList = ref([])
+const ids = ref([])
+const single = ref(true)
+const multiple = ref(true)
+const total = ref(0)
+const courseTypeFilter = ref([])
+const statusFilter = ref([1])
+const courseFormRef = ref(null)
+const packageLoading = ref(false)
+const packageSubmitLoading = ref(false)
+const packageOpen = ref(false)
+const packageTitle = ref('')
+const packageTableTotal = ref(0)
+const packageIds = ref([])
+const packageMultiple = ref(true)
+const packageStatusFilter = ref([1])
+const packageFormRef = ref(null)
+const selectorOpen = ref(false)
+const selectorType = ref('course')
+const selectorKeyword = ref('')
+const selectorLoading = ref(false)
+const selectorOptions = ref([])
+const selectorSelection = ref([])
+const selectorTableRef = ref(null)
 
-// 课程列表相关
-const courseList = ref([]);
-const courseLoading = ref(false);
-const courseTotal = ref(0);
-const showSearch = ref(true);
-const courseSingle = ref(true);
-const courseMultiple = ref(true);
-const courseIds = ref([]);
-
-// 课程查询参数
-const courseQueryParams = ref({
+const queryParams = ref({
   pageNum: 1,
   pageSize: 10,
-  courseName: undefined,
-  courseType: undefined,
-  grade: undefined
-});
+  courseName: '',
+  courseType: '',
+  status: 1
+})
 
-// 课程表单相关
-const courseOpen = ref(false);
-const courseTitle = ref('');
-const courseForm = ref({});
-const courseRules = ref({
-  courseName: [
-    { required: true, message: '课程名称不能为空', trigger: 'blur' }
-  ],
-  courseType: [
-    { required: true, message: '请选择课程类型', trigger: 'change' }
-  ],
-  grade: [
-    { required: true, message: '请选择年级', trigger: 'change' }
-  ],
-  subject: [
-    { required: true, message: '请选择科目', trigger: 'change' }
-  ]
-});
-
-// 课表颜色选项
-const colorOptions = ref([
-  '#409EFF',
-  '#FFA500',
-  '#67C23A',
-  '#E6A23C',
-  '#F56C6C',
-  '#9C27B0'
-]);
-
-// 套餐列表相关
-const packageList = ref([]);
-const packageLoading = ref(false);
-const packageTotal = ref(0);
-
-// 套餐查询参数
 const packageQueryParams = ref({
   pageNum: 1,
   pageSize: 10,
-  packageName: undefined,
-  status: ''
-});
-
-// 套餐表单相关
-const packageOpen = ref(false);
-const packageTitle = ref('');
-const packageForm = ref({
   packageName: '',
-  remark: '',
-  courses: [],
-  items: [],
-  fees: []
-});
-const packageRules = ref({
-  packageName: [
-    { required: true, message: '套餐名称不能为空', trigger: 'blur' }
-  ]
-});
+  status: 1
+})
 
-// 选择课程对话框
-const courseDialogVisible = ref(false);
-const courseSearchName = ref('');
-const availableCourseList = ref([]);
-const selectedCourses = ref([]);
+const gradeOptions = [
+  { label: '一年级', value: '1' },
+  { label: '二年级', value: '2' },
+  { label: '三年级', value: '3' },
+  { label: '四年级', value: '4' },
+  { label: '五年级', value: '5' },
+  { label: '六年级', value: '6' },
+  { label: '初一', value: '7' },
+  { label: '初二', value: '8' },
+  { label: '初三', value: '9' },
+  { label: '高一', value: '10' },
+  { label: '高二', value: '11' },
+  { label: '高三', value: '12' }
+]
+const subjectOptions = [
+  { label: '语文', value: '1' },
+  { label: '数学', value: '2' },
+  { label: '英语', value: '3' },
+  { label: '物理', value: '4' },
+  { label: '化学', value: '5' },
+  { label: '生物', value: '6' },
+  { label: '政治', value: '7' },
+  { label: '历史', value: '8' },
+  { label: '地理', value: '9' }
+]
+const semesterOptions = [
+  { label: '春季', value: '1' },
+  { label: '暑假', value: '2' },
+  { label: '秋季', value: '3' },
+  { label: '寒假', value: '4' }
+]
+const colorOptions = ['#409EFF', '#F59A23', '#67C23A', '#36CFC9', '#F56C6C', '#9254DE', '#909399']
+const chargeSections = [
+  {
+    type: 'class',
+    label: '按课时收费',
+    enabledKey: 'chargeByClass',
+    listKey: 'classPrices',
+    quantityLabel: '数量(课时)',
+    unitPriceLabel: '单价(元/课时)'
+  },
+  {
+    type: 'month',
+    label: '按月收费',
+    enabledKey: 'chargeByMonth',
+    listKey: 'monthPrices',
+    quantityLabel: '数量(月)',
+    unitPriceLabel: '单价(元/月)'
+  },
+  {
+    type: 'day',
+    label: '按天收费',
+    enabledKey: 'chargeByDay',
+    listKey: 'dayPrices',
+    quantityLabel: '数量(天)',
+    unitPriceLabel: '单价(元/天)'
+  }
+]
 
-// 选择物品对话框
-const itemDialogVisible = ref(false);
-const itemSearchName = ref('');
-const availableItemList = ref([]);
-const selectedItems = ref([]);
-
-// 选择费用对话框
-const feeDialogVisible = ref(false);
-const feeSearchName = ref('');
-const availableFeeList = ref([]);
-const selectedFees = ref([]);
-
-/** 查询课程列表 */
-function getCourseList() {
-  courseLoading.value = true;
-  // 模拟数据
-  setTimeout(() => {
-    courseList.value = [
-      {
-        id: 1,
-        courseName: '小学数学999',
-        courseType: '1',
-        gradeLabel: '一对多',
-        studentCount: 1,
-        status: 1,
-        chargeByClass: true,
-        classPrices: [{ name: '单价', quantity: 1, totalPrice: 200 }]
-      },
-      {
-        id: 2,
-        courseName: '托管0322',
-        courseType: '2',
-        gradeLabel: '一对多',
-        studentCount: 1,
-        status: 1,
-        chargeByMonth: true,
-        monthPrices: [
-          { name: '单价', quantity: 1, totalPrice: 1500 },
-          { name: '套餐', quantity: 3, totalPrice: 1666 },
-          { name: '半年', quantity: 6, totalPrice: 4500 },
-          { name: '套餐', quantity: 12, totalPrice: 8000 }
-        ]
-      }
-    ];
-    courseTotal.value = 2;
-    courseLoading.value = false;
-  }, 500);
+const rules = {
+  courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
+  courseType: [{ required: true, message: '请选择课程类型', trigger: 'change' }]
+}
+const packageRules = {
+  packageName: [{ required: true, message: '请输入套餐名称', trigger: 'blur' }]
 }
 
-/** Tab切换 */
-function handleTabClick(tab) {
-  if (tab.props.name === 'course') {
-    getCourseList();
-  } else if (tab.props.name === 'package') {
-    getPackageList();
+const selectorMeta = {
+  course: {
+    title: '选择课程',
+    placeholder: '请输入课程名称'
+  },
+  item: {
+    title: '选择物品',
+    placeholder: '请输入物品名称'
+  },
+  fee: {
+    title: '选择费用',
+    placeholder: '请输入费用名称'
   }
 }
 
-/** 搜索按钮操作 */
-function handleCourseQuery() {
-  courseQueryParams.value.pageNum = 1;
-  getCourseList();
+const selectorTitle = computed(() => selectorMeta[selectorType.value].title)
+const selectorPlaceholder = computed(() => selectorMeta[selectorType.value].placeholder)
+const packageTotalPrice = computed(() => {
+  return packageForm.value.items.reduce((totalPrice, item) => totalPrice + Number(item.subtotalPrice || 0), 0)
+})
+
+function defaultPrice(chargeType) {
+  return {
+    chargeType,
+    priceName: '单价',
+    quantity: 1,
+    totalPrice: null,
+    unitPrice: null,
+    status: 1
+  }
 }
 
-/** 重置按钮操作 */
-function resetCourseQuery() {
-  proxy.$refs.courseQueryRef.resetFields();
-  handleCourseQuery();
-}
-
-/** 多选框选中数据 */
-function handleCourseSelectionChange(selection) {
-  courseIds.value = selection.map(item => item.id);
-  courseSingle.value = selection.length !== 1;
-  courseMultiple.value = !selection.length;
-}
-
-/** 新增按钮操作 */
-function handleAddCourse() {
-  resetCourseForm();
-  courseOpen.value = true;
-  courseTitle.value = '新增课程';
-}
-
-/** 修改按钮操作 */
-function handleUpdateCourse(row) {
-  resetCourseForm();
-  const id = row.id || courseIds.value[0];
-  // 模拟获取详情
-  courseForm.value = {
-    id: id,
-    courseName: row.courseName,
-    courseType: row.courseType,
-    grade: '1',
-    subject: '2',
-    semester: '1',
-    scheduleColor: '#409EFF',
-    chargeByClass: row.chargeByClass || false,
-    chargeByMonth: row.chargeByMonth || false,
-    chargeByDay: row.chargeByDay || false,
-    classDeductRule: '1',
-    classAbsenceRule: '1',
-    classPrices: row.classPrices || [],
-    monthPrices: row.monthPrices || [],
-    dayPrices: row.dayPrices || [],
-    remark: ''
-  };
-  courseOpen.value = true;
-  courseTitle.value = '修改课程';
-}
-
-/** 删除按钮操作 */
-function handleDeleteCourse(row) {
-  const ids = row.id || courseIds.value;
-  proxy.$modal.confirm('是否确认删除选中的课程？').then(() => {
-    proxy.$modal.msgSuccess('删除成功');
-    getCourseList();
-  });
-}
-
-/** 导出按钮操作 */
-function handleExportCourse() {
-  proxy.$modal.msgSuccess('导出功能开发中...');
-}
-
-/** 表单重置 */
-function resetCourseForm() {
-  courseForm.value = {
-    id: undefined,
+function defaultForm() {
+  return {
+    id: null,
+    courseNo: '',
     courseName: '',
-    courseType: '1',
-    grade: undefined,
-    subject: undefined,
-    semester: undefined,
+    courseType: 'one_to_many',
     scheduleColor: '#409EFF',
-    chargeByClass: false,
+    grade: '',
+    gradeLabel: '',
+    subject: '',
+    subjectLabel: '',
+    semester: '',
+    semesterLabel: '',
+    studentCount: 0,
+    onlineSale: 0,
+    status: 1,
+    chargeByClass: true,
     chargeByMonth: false,
     chargeByDay: false,
-    classDeductRule: '1',
-    classAbsenceRule: '1',
-    classPrices: [{ name: '单价', quantity: 1, totalPrice: '' }],
-    monthPrices: [{ name: '单价', quantity: 1, totalPrice: '' }],
-    dayPrices: [{ name: '单价', quantity: 1, totalPrice: '' }],
+    classDeductRule: 'none',
+    classAbsenceRule: 'deduct',
+    classPrices: [defaultPrice('class')],
+    monthPrices: [],
+    dayPrices: [],
     remark: ''
-  };
-  proxy.$refs.courseFormRef?.resetFields();
+  }
 }
 
-/** 取消按钮 */
-function cancelCourse() {
-  courseOpen.value = false;
-  resetCourseForm();
+const form = ref(defaultForm())
+
+function defaultPackageForm() {
+  return {
+    id: null,
+    packageNo: '',
+    packageName: '',
+    totalPrice: 0,
+    onlineSale: 0,
+    status: 1,
+    items: [],
+    remark: ''
+  }
 }
 
-/** 提交按钮 */
-function submitCourseForm() {
-  proxy.$refs.courseFormRef.validate(valid => {
-    if (valid) {
-      if (courseForm.value.id) {
-        proxy.$modal.msgSuccess('修改成功');
-      } else {
-        proxy.$modal.msgSuccess('新增成功');
-      }
-      courseOpen.value = false;
-      getCourseList();
+const packageForm = ref(defaultPackageForm())
+
+function defaultBatchCourseRow() {
+  return {
+    courseName: '',
+    courseType: 'one_to_many',
+    chargeType: 'class',
+    priceName: '单价',
+    quantity: 1,
+    totalPrice: null,
+    scheduleColor: '#409EFF',
+    status: 1,
+    onlineSale: 0
+  }
+}
+
+function defaultBatchForm() {
+  return {
+    courses: [defaultBatchCourseRow(), defaultBatchCourseRow(), defaultBatchCourseRow()]
+  }
+}
+
+const batchForm = ref(defaultBatchForm())
+
+function cleanQuery(query) {
+  const result = {}
+  Object.keys(query || {}).forEach(key => {
+    const value = query[key]
+    if (value !== '' && value !== undefined && value !== null) {
+      result[key] = value
     }
-  });
+  })
+  return result
 }
 
-/** 添加课时价格 */
-function addClassPrice() {
-  if (courseForm.value.classPrices.length >= 10) {
-    proxy.$modal.msgWarning('最多只能添加10条定价标准');
-    return;
-  }
-  courseForm.value.classPrices.push({ name: '', quantity: 1, totalPrice: '' });
+function optionLabel(options, value) {
+  return options.find(item => item.value === value)?.label || ''
 }
 
-/** 删除课时价格 */
-function removeClassPrice(index) {
-  courseForm.value.classPrices.splice(index, 1);
+function getList() {
+  loading.value = true
+  const query = cleanQuery({
+    ...queryParams.value,
+    courseType: courseTypeFilter.value.length === 1 ? courseTypeFilter.value[0] : '',
+    status: statusFilter.value.length === 1 ? statusFilter.value[0] : ''
+  })
+  listCourse(query).then(response => {
+    courseList.value = response.rows || []
+    total.value = response.total || 0
+  }).finally(() => {
+    loading.value = false
+  })
 }
 
-/** 添加月价格 */
-function addMonthPrice() {
-  if (courseForm.value.monthPrices.length >= 10) {
-    proxy.$modal.msgWarning('最多只能添加10条定价标准');
-    return;
-  }
-  courseForm.value.monthPrices.push({ name: '', quantity: 1, totalPrice: '' });
-}
-
-/** 删除月价格 */
-function removeMonthPrice(index) {
-  courseForm.value.monthPrices.splice(index, 1);
-}
-
-/** 添加天价格 */
-function addDayPrice() {
-  if (courseForm.value.dayPrices.length >= 10) {
-    proxy.$modal.msgWarning('最多只能添加10条定价标准');
-    return;
-  }
-  courseForm.value.dayPrices.push({ name: '', quantity: 1, totalPrice: '' });
-}
-
-/** 删除天价格 */
-function removeDayPrice(index) {
-  courseForm.value.dayPrices.splice(index, 1);
-}
-
-// ==================== 套餐管理相关方法 ====================
-
-/** 查询套餐列表 */
 function getPackageList() {
-  packageLoading.value = true;
-  // 模拟数据
-  setTimeout(() => {
-    packageList.value = [
-      {
-        id: 1,
-        packageName: '钢琴全套',
-        totalPrice: 1900.00,
-        status: 1
-      },
-      {
-        id: 2,
-        packageName: '全天',
-        totalPrice: 4800.00,
-        status: 1
-      },
-      {
-        id: 3,
-        packageName: '4节课2套',
-        totalPrice: 4900.00,
-        status: 1
-      },
-      {
-        id: 4,
-        packageName: '4节包',
-        totalPrice: 4000.00,
-        status: 1
-      },
-      {
-        id: 5,
-        packageName: '开学送出套餐',
-        totalPrice: 6800.00,
-        status: 1
-      },
-      {
-        id: 6,
-        packageName: 'PWMA钢琴入门套餐PWMA钢琴出证班',
-        totalPrice: 42600.00,
-        status: 1
-      }
-    ];
-    packageTotal.value = 6;
-    packageLoading.value = false;
-  }, 500);
+  packageLoading.value = true
+  const query = cleanQuery({
+    ...packageQueryParams.value,
+    status: packageStatusFilter.value.length === 1 ? packageStatusFilter.value[0] : ''
+  })
+  listCoursePackage(query).then(response => {
+    packageList.value = response.rows || []
+    packageTableTotal.value = response.total || 0
+  }).finally(() => {
+    packageLoading.value = false
+  })
 }
 
-/** 搜索套餐 */
+function getActiveList() {
+  if (activeTab.value === 'package') {
+    getPackageList()
+  } else {
+    getList()
+  }
+}
+
+function handleTabClick(tab) {
+  if (tab.props.name === 'course') {
+    getList()
+  } else if (tab.props.name === 'package') {
+    getPackageList()
+  }
+}
+
+function handleQuery() {
+  queryParams.value.pageNum = 1
+  getList()
+}
+
+function resetQuery() {
+  queryParams.value = {
+    pageNum: 1,
+    pageSize: queryParams.value.pageSize,
+    courseName: '',
+    courseType: '',
+    status: 1
+  }
+  courseTypeFilter.value = []
+  statusFilter.value = [1]
+  handleQuery()
+}
+
+function handleTypeFilterChange() {
+  handleQuery()
+}
+
+function handleStatusFilterChange() {
+  handleQuery()
+}
+
 function handlePackageQuery() {
-  packageQueryParams.value.pageNum = 1;
-  getPackageList();
+  packageQueryParams.value.pageNum = 1
+  getPackageList()
 }
 
-/** 重置套餐搜索 */
 function resetPackageQuery() {
   packageQueryParams.value = {
     pageNum: 1,
-    pageSize: 10,
-    packageName: undefined,
-    status: ''
-  };
-  handlePackageQuery();
-}
-
-/** 添加套餐 */
-function handleAddPackage() {
-  resetPackageForm();
-  packageOpen.value = true;
-  packageTitle.value = '添加套餐';
-}
-
-/** 修改套餐 */
-function handleUpdatePackage(row) {
-  resetPackageForm();
-  packageForm.value = { ...row };
-  packageOpen.value = true;
-  packageTitle.value = '修改套餐';
-}
-
-/** 删除套餐 */
-function handleDeletePackage(row) {
-  proxy.$modal.confirm('是否确认删除套餐名称为"' + row.packageName + '"的数据项？').then(() => {
-    proxy.$modal.msgSuccess('删除成功');
-    getPackageList();
-  });
-}
-
-/** 重置套餐表单 */
-function resetPackageForm() {
-  packageForm.value = {
+    pageSize: packageQueryParams.value.pageSize,
     packageName: '',
-    remark: '',
-    courses: [],
-    items: [],
-    fees: []
-  };
+    status: 1
+  }
+  packageStatusFilter.value = [1]
+  handlePackageQuery()
 }
 
-/** 取消套餐 */
-function cancelPackage() {
-  packageOpen.value = false;
-  resetPackageForm();
+function handlePackageStatusFilterChange() {
+  handlePackageQuery()
 }
 
-/** 提交套餐表单 */
+function handleSelectionChange(selection) {
+  ids.value = selection.map(item => item.id)
+  single.value = selection.length !== 1
+  multiple.value = !selection.length
+}
+
+function handlePackageSelectionChange(selection) {
+  packageIds.value = selection.map(item => item.id)
+  packageMultiple.value = !selection.length
+}
+
+function handleAdd() {
+  form.value = defaultForm()
+  title.value = '新增课程'
+  open.value = true
+}
+
+function handleBatchAdd() {
+  batchForm.value = defaultBatchForm()
+  batchOpen.value = true
+}
+
+function addBatchCourseRow() {
+  if (batchForm.value.courses.length >= 20) {
+    return
+  }
+  batchForm.value.courses.push(defaultBatchCourseRow())
+}
+
+function removeBatchCourseRow(index) {
+  batchForm.value.courses.splice(index, 1)
+}
+
+function normalizePriceRow(row, chargeType) {
+  return {
+    chargeType,
+    priceName: row.priceName || row.name || '单价',
+    quantity: Number(row.quantity || 1),
+    totalPrice: row.totalPrice === undefined || row.totalPrice === null ? null : Number(row.totalPrice),
+    unitPrice: row.unitPrice === undefined || row.unitPrice === null ? null : Number(row.unitPrice),
+    status: row.status ?? 1
+  }
+}
+
+function normalizeDetail(data) {
+  const result = {
+    ...defaultForm(),
+    ...data,
+    courseType: data.courseType || 'one_to_many',
+    grade: data.grade || '',
+    subject: data.subject || '',
+    semester: data.semester || '',
+    scheduleColor: data.scheduleColor || '#409EFF',
+    status: data.status ?? 1,
+    onlineSale: data.onlineSale ?? 0,
+    classDeductRule: data.classDeductRule || data.classPrices?.[0]?.deductRule || 'none',
+    classAbsenceRule: data.classAbsenceRule || data.classPrices?.[0]?.absenceRule || 'deduct',
+    classPrices: (data.classPrices || []).map(row => normalizePriceRow(row, 'class')),
+    monthPrices: (data.monthPrices || []).map(row => normalizePriceRow(row, 'month')),
+    dayPrices: (data.dayPrices || []).map(row => normalizePriceRow(row, 'day'))
+  }
+  result.chargeByClass = result.classPrices.length > 0
+  result.chargeByMonth = result.monthPrices.length > 0
+  result.chargeByDay = result.dayPrices.length > 0
+  if (result.chargeByClass && result.classPrices.length === 0) {
+    result.classPrices = [defaultPrice('class')]
+  }
+  return result
+}
+
+function formatMoney(value) {
+  return Number(value || 0).toFixed(2)
+}
+
+function packageTypeName(type) {
+  const typeMap = {
+    course: '课程',
+    item: '物品',
+    fee: '费用'
+  }
+  return typeMap[type] || type
+}
+
+function packageTypeTag(type) {
+  const tagMap = {
+    course: 'success',
+    item: 'warning',
+    fee: 'info'
+  }
+  return tagMap[type] || ''
+}
+
+function chargeUnit(chargeType) {
+  const unitMap = {
+    class: '课时',
+    month: '月',
+    day: '天'
+  }
+  return unitMap[chargeType] || ''
+}
+
+function calcPackageSubtotal(row) {
+  const totalPrice = Number(row.totalPrice || 0)
+  const discountValue = Number(row.discountValue || 0)
+  if (row.discountType === 'discount' && discountValue > 0) {
+    if (discountValue <= 10) {
+      return Math.max(0, totalPrice * discountValue / 10)
+    }
+    if (discountValue <= 100) {
+      return Math.max(0, totalPrice * discountValue / 100)
+    }
+    return totalPrice
+  }
+  return Math.max(0, totalPrice - discountValue)
+}
+
+function refreshPackageItem(row) {
+  row.quantity = Number(row.quantity || 1)
+  row.unitPrice = Number(row.unitPrice || 0)
+  row.totalPrice = Number((row.quantity * row.unitPrice).toFixed(2))
+  row.subtotalPrice = Number(calcPackageSubtotal(row).toFixed(2))
+}
+
+function fillPackageItemAmount(row) {
+  row.quantity = Number(row.quantity || 1)
+  row.unitPrice = Number(row.unitPrice || 0)
+  row.totalPrice = Number(row.totalPrice || (row.quantity * row.unitPrice).toFixed(2))
+  if (row.subtotalPrice === undefined || row.subtotalPrice === null || row.subtotalPrice === '') {
+    row.subtotalPrice = Number(calcPackageSubtotal(row).toFixed(2))
+  } else {
+    row.subtotalPrice = Number(row.subtotalPrice || 0)
+  }
+}
+
+function refreshPackageTotal() {
+  packageForm.value.totalPrice = Number(packageTotalPrice.value.toFixed(2))
+}
+
+function normalizePackageItem(row) {
+  const item = {
+    id: row.id,
+    itemType: row.itemType,
+    itemId: row.itemId,
+    itemName: row.itemName,
+    specId: row.specId,
+    specName: row.specName,
+    unit: row.unit || '',
+    quantity: Number(row.quantity || 1),
+    giftQuantity: Number(row.giftQuantity || 0),
+    leaveFreeQuantity: Number(row.leaveFreeQuantity || 0),
+    unitPrice: Number(row.unitPrice || 0),
+    totalPrice: Number(row.totalPrice || 0),
+    discountType: row.discountType || 'reduce',
+    discountValue: Number(row.discountValue || 0),
+    subtotalPrice: Number(row.subtotalPrice || 0),
+    sort: Number(row.sort || 0),
+    priceOptions: row.priceOptions || row.prices || []
+  }
+  fillPackageItemAmount(item)
+  return item
+}
+
+function normalizePackageDetail(data) {
+  const result = {
+    ...defaultPackageForm(),
+    ...data,
+    status: data.status ?? 1,
+    onlineSale: data.onlineSale ?? 0,
+    items: (data.items || []).map(normalizePackageItem)
+  }
+  result.totalPrice = Number(result.totalPrice || packageTotalPrice.value || 0)
+  return result
+}
+
+function getDefaultPrice(row) {
+  const prices = row.prices || []
+  const firstPrice = prices[0] || {}
+  return {
+    specId: firstPrice.id || null,
+    specName: firstPrice.displayText || firstPrice.priceName || row.priceStandard || '',
+    unit: chargeUnit(firstPrice.chargeType) || '',
+    quantity: Number(firstPrice.quantity || 1),
+    unitPrice: Number(firstPrice.unitPrice || firstPrice.totalPrice || 0),
+    priceOptions: prices
+  }
+}
+
+function makeCoursePackageItem(row) {
+  const price = getDefaultPrice(row)
+  return normalizePackageItem({
+    itemType: 'course',
+    itemId: row.id,
+    itemName: row.courseName,
+    ...price,
+    giftQuantity: 0,
+    leaveFreeQuantity: 0,
+    discountType: 'reduce',
+    discountValue: 0,
+    sort: packageForm.value.items.length
+  })
+}
+
+function getFirstSku(row) {
+  return (row.skus || [])[0] || {}
+}
+
+function makeItemPackageItem(row) {
+  const sku = getFirstSku(row)
+  return normalizePackageItem({
+    itemType: 'item',
+    itemId: row.id,
+    itemName: row.itemName,
+    specId: sku.id || null,
+    specName: sku.specText || sku.skuName || '',
+    unit: row.unit || '件',
+    quantity: 1,
+    giftQuantity: 0,
+    leaveFreeQuantity: 0,
+    unitPrice: Number(sku.price || row.defaultPrice || row.singlePrice || 0),
+    discountType: 'reduce',
+    discountValue: 0,
+    sort: packageForm.value.items.length
+  })
+}
+
+function makeFeePackageItem(row) {
+  return normalizePackageItem({
+    itemType: 'fee',
+    itemId: row.id,
+    itemName: row.feeName,
+    specId: null,
+    specName: '',
+    unit: '项',
+    quantity: 1,
+    giftQuantity: 0,
+    leaveFreeQuantity: 0,
+    unitPrice: Number(row.amount || row.price || 0),
+    discountType: 'reduce',
+    discountValue: 0,
+    sort: packageForm.value.items.length
+  })
+}
+
+function packageItemKey(row) {
+  return `${row.itemType}_${row.itemId}_${row.specId || ''}`
+}
+
+function appendPackageItems(items) {
+  const exists = new Set(packageForm.value.items.map(packageItemKey))
+  items.forEach(item => {
+    if (exists.has(packageItemKey(item))) {
+      return
+    }
+    item.sort = packageForm.value.items.length
+    packageForm.value.items.push(item)
+    exists.add(packageItemKey(item))
+  })
+  refreshPackageTotal()
+}
+
+function handleUpdate(row) {
+  const courseId = row.id || ids.value[0]
+  getCourse(courseId).then(response => {
+    form.value = normalizeDetail(response.data || {})
+    title.value = '编辑课程'
+    open.value = true
+  })
+}
+
+function handleDelete(row) {
+  const courseIds = row.id ? row.id : ids.value.join(',')
+  proxy.$modal.confirm('确认删除选中的课程吗？').then(() => {
+    return delCourse(courseIds)
+  }).then(() => {
+    proxy.$modal.msgSuccess('删除成功')
+    getList()
+  })
+}
+
+function handleStatusChange(row, value) {
+  changeCourseStatus({ id: row.id, status: value }).then(() => {
+    proxy.$modal.msgSuccess('状态修改成功')
+  }).catch(() => {
+    row.status = value === 1 ? 0 : 1
+  })
+}
+
+function handlePackageAdd() {
+  packageForm.value = defaultPackageForm()
+  packageTitle.value = '添加套餐'
+  packageOpen.value = true
+}
+
+function handlePackageUpdate(row) {
+  const packageId = row.id || packageIds.value[0]
+  getCoursePackage(packageId).then(response => {
+    packageForm.value = normalizePackageDetail(response.data || {})
+    packageTitle.value = '编辑套餐'
+    packageOpen.value = true
+  })
+}
+
+function handlePackageDelete(row) {
+  const deleteIds = row.id ? row.id : packageIds.value.join(',')
+  proxy.$modal.confirm('确认删除选中的套餐吗？').then(() => {
+    return delCoursePackage(deleteIds)
+  }).then(() => {
+    proxy.$modal.msgSuccess('删除成功')
+    getPackageList()
+  })
+}
+
+function handlePackageStatusChange(row, value) {
+  changeCoursePackageStatus({ id: row.id, status: value }).then(() => {
+    proxy.$modal.msgSuccess('状态修改成功')
+  }).catch(() => {
+    row.status = value === 1 ? 0 : 1
+  })
+}
+
+function removePackageItem(index) {
+  packageForm.value.items.splice(index, 1)
+  packageForm.value.items.forEach((item, itemIndex) => {
+    item.sort = itemIndex
+  })
+  refreshPackageTotal()
+}
+
+function handlePackageSpecChange(row, value) {
+  const price = row.priceOptions.find(item => item.id === value)
+  if (!price) {
+    return
+  }
+  row.specName = price.displayText || price.priceName
+  row.unit = chargeUnit(price.chargeType)
+  row.quantity = Number(price.quantity || 1)
+  row.unitPrice = Number(price.unitPrice || price.totalPrice || 0)
+  refreshPackageItem(row)
+}
+
+function openSelector(type) {
+  selectorType.value = type
+  selectorKeyword.value = ''
+  selectorSelection.value = []
+  selectorOptions.value = []
+  selectorOpen.value = true
+  loadSelectorOptions()
+}
+
+function normalizeSelectorRows(rows) {
+  return (rows || []).map(row => ({
+    ...row,
+    selectorKey: `${selectorType.value}_${row.id}`
+  }))
+}
+
+function loadSelectorOptions() {
+  selectorLoading.value = true
+  const query = cleanQuery({
+    keyword: selectorKeyword.value,
+    feeName: selectorKeyword.value,
+    pageNum: 1,
+    pageSize: 50,
+    status: 1
+  })
+  let request
+  if (selectorType.value === 'course') {
+    request = listCourseOptions({ keyword: selectorKeyword.value })
+  } else if (selectorType.value === 'item') {
+    request = listAvailableItems({ keyword: selectorKeyword.value })
+  } else {
+    request = listFee(query)
+  }
+  request.then(response => {
+    selectorOptions.value = normalizeSelectorRows(response.data || response.rows || [])
+  }).finally(() => {
+    selectorLoading.value = false
+  })
+}
+
+function handleSelectorSelectionChange(selection) {
+  selectorSelection.value = selection
+}
+
+function confirmSelector() {
+  if (!selectorSelection.value.length) {
+    proxy.$modal.msgWarning('请选择项目')
+    return
+  }
+  const builders = {
+    course: makeCoursePackageItem,
+    item: makeItemPackageItem,
+    fee: makeFeePackageItem
+  }
+  appendPackageItems(selectorSelection.value.map(row => builders[selectorType.value](row)))
+  selectorOpen.value = false
+}
+
+function handleChargeToggle(section, value) {
+  if (value && form.value[section.listKey].length === 0) {
+    form.value[section.listKey].push(defaultPrice(section.type))
+  }
+}
+
+function addPriceRow(section) {
+  if (form.value[section.listKey].length >= 10) {
+    return
+  }
+  form.value[section.listKey].push(defaultPrice(section.type))
+}
+
+function removePriceRow(section, index) {
+  form.value[section.listKey].splice(index, 1)
+}
+
+function calcUnitPrice(row) {
+  const totalPrice = Number(row.totalPrice || 0)
+  const quantity = Number(row.quantity || 0)
+  if (!totalPrice || !quantity) {
+    return '自动计算'
+  }
+  return (totalPrice / quantity).toFixed(2)
+}
+
+function validatePrices() {
+  const enabledSections = chargeSections.filter(section => form.value[section.enabledKey])
+  if (!enabledSections.length) {
+    proxy.$modal.msgWarning('请至少开启一种收费方式')
+    return false
+  }
+  for (const section of enabledSections) {
+    const rows = form.value[section.listKey] || []
+    if (!rows.length) {
+      proxy.$modal.msgWarning(`${section.label}至少添加一条定价标准`)
+      return false
+    }
+    const invalidRow = rows.find(row => !row.priceName || !row.quantity || Number(row.totalPrice || 0) <= 0)
+    if (invalidRow) {
+      proxy.$modal.msgWarning(`${section.label}的名称、数量和总价不能为空`)
+      return false
+    }
+  }
+  return true
+}
+
+function buildPricePayload(section) {
+  if (!form.value[section.enabledKey]) {
+    return []
+  }
+  return form.value[section.listKey].map((row, index) => ({
+    chargeType: section.type,
+    priceName: row.priceName,
+    quantity: Number(row.quantity || 1),
+    totalPrice: Number(row.totalPrice || 0),
+    unitPrice: Number(row.totalPrice || 0) / Number(row.quantity || 1),
+    deductRule: section.type === 'class' ? form.value.classDeductRule : undefined,
+    absenceRule: section.type === 'class' ? form.value.classAbsenceRule : undefined,
+    sort: index,
+    status: 1
+  }))
+}
+
+function buildPayload() {
+  const gradeLabel = optionLabel(gradeOptions, form.value.grade)
+  const subjectLabel = optionLabel(subjectOptions, form.value.subject)
+  const semesterLabel = optionLabel(semesterOptions, form.value.semester)
+  return {
+    id: form.value.id,
+    courseNo: form.value.courseNo,
+    courseName: form.value.courseName,
+    courseType: form.value.courseType,
+    scheduleColor: form.value.scheduleColor,
+    grade: form.value.grade,
+    gradeLabel,
+    subject: form.value.subject,
+    subjectLabel,
+    semester: form.value.semester,
+    semesterLabel,
+    studentCount: Number(form.value.studentCount || 0),
+    onlineSale: form.value.onlineSale,
+    status: form.value.status,
+    chargeByClass: form.value.chargeByClass,
+    chargeByMonth: form.value.chargeByMonth,
+    chargeByDay: form.value.chargeByDay,
+    classDeductRule: form.value.classDeductRule,
+    classAbsenceRule: form.value.classAbsenceRule,
+    classPrices: buildPricePayload(chargeSections[0]),
+    monthPrices: buildPricePayload(chargeSections[1]),
+    dayPrices: buildPricePayload(chargeSections[2]),
+    remark: form.value.remark
+  }
+}
+
+function buildBatchPricePayload(row) {
+  return {
+    chargeType: row.chargeType,
+    priceName: row.priceName || '单价',
+    quantity: Number(row.quantity || 1),
+    totalPrice: Number(row.totalPrice || 0),
+    unitPrice: Number(row.totalPrice || 0) / Number(row.quantity || 1),
+    deductRule: row.chargeType === 'class' ? 'none' : undefined,
+    absenceRule: row.chargeType === 'class' ? 'deduct' : undefined,
+    sort: 0,
+    status: 1
+  }
+}
+
+function buildBatchCoursePayload(row) {
+  const price = buildBatchPricePayload(row)
+  const payload = {
+    courseName: row.courseName,
+    courseType: row.courseType,
+    scheduleColor: row.scheduleColor,
+    studentCount: 0,
+    onlineSale: row.onlineSale,
+    status: row.status,
+    chargeByClass: row.chargeType === 'class',
+    chargeByMonth: row.chargeType === 'month',
+    chargeByDay: row.chargeType === 'day',
+    classDeductRule: 'none',
+    classAbsenceRule: 'deduct',
+    classPrices: [],
+    monthPrices: [],
+    dayPrices: [],
+    remark: ''
+  }
+  if (row.chargeType === 'class') {
+    payload.classPrices = [price]
+  } else if (row.chargeType === 'month') {
+    payload.monthPrices = [price]
+  } else {
+    payload.dayPrices = [price]
+  }
+  return payload
+}
+
+function validateBatchCourses() {
+  const rows = batchForm.value.courses || []
+  if (!rows.length) {
+    proxy.$modal.msgWarning('请至少添加一门课程')
+    return false
+  }
+  const invalidRowIndex = rows.findIndex(row => {
+    return !row.courseName || !row.chargeType || !row.quantity || Number(row.totalPrice || 0) <= 0
+  })
+  if (invalidRowIndex > -1) {
+    proxy.$modal.msgWarning(`请完善第 ${invalidRowIndex + 1} 行课程名称、收费方式、数量和总价`)
+    return false
+  }
+  return true
+}
+
+function validatePackageItems() {
+  if (!packageForm.value.items.length) {
+    proxy.$modal.msgWarning('请至少选择一个套餐项目')
+    return false
+  }
+  const invalidItem = packageForm.value.items.find(item => {
+    return !item.itemName || !item.quantity || Number(item.unitPrice || 0) < 0 || Number(item.subtotalPrice || 0) < 0
+  })
+  if (invalidItem) {
+    proxy.$modal.msgWarning('请检查套餐明细的项目、数量和金额')
+    return false
+  }
+  const invalidCourse = packageForm.value.items.find(item => item.itemType === 'course' && !item.specId)
+  if (invalidCourse) {
+    proxy.$modal.msgWarning('请选择课程明细的定价标准')
+    return false
+  }
+  return true
+}
+
+function buildPackagePayload() {
+  refreshPackageTotal()
+  return {
+    id: packageForm.value.id,
+    packageNo: packageForm.value.packageNo,
+    packageName: packageForm.value.packageName,
+    totalPrice: packageForm.value.totalPrice,
+    onlineSale: packageForm.value.onlineSale,
+    status: packageForm.value.status,
+    remark: packageForm.value.remark,
+    items: packageForm.value.items.map((item, index) => ({
+      itemType: item.itemType,
+      itemId: item.itemId,
+      itemName: item.itemName,
+      specId: item.specId,
+      specName: item.specName,
+      unit: item.unit,
+      quantity: Number(item.quantity || 1),
+      giftQuantity: Number(item.giftQuantity || 0),
+      leaveFreeQuantity: Number(item.leaveFreeQuantity || 0),
+      unitPrice: Number(item.unitPrice || 0),
+      totalPrice: Number(item.totalPrice || 0),
+      discountType: item.discountType || 'reduce',
+      discountValue: Number(item.discountValue || 0),
+      subtotalPrice: Number(item.subtotalPrice || 0),
+      sort: index
+    }))
+  }
+}
+
+function submitForm() {
+  courseFormRef.value.validate(valid => {
+    if (!valid || !validatePrices()) {
+      return
+    }
+    submitLoading.value = true
+    const payload = buildPayload()
+    const request = payload.id ? updateCourse(payload) : addCourse(payload)
+    request.then(() => {
+      proxy.$modal.msgSuccess(payload.id ? '修改成功' : '新增成功')
+      open.value = false
+      getList()
+    }).finally(() => {
+      submitLoading.value = false
+    })
+  })
+}
+
+function submitBatchForm() {
+  if (!validateBatchCourses()) {
+    return
+  }
+  batchSubmitLoading.value = true
+  const payload = {
+    courses: batchForm.value.courses.map(buildBatchCoursePayload)
+  }
+  batchAddCourse(payload).then(response => {
+    proxy.$modal.msgSuccess(response.msg || '批量新增成功')
+    batchOpen.value = false
+    getList()
+  }).finally(() => {
+    batchSubmitLoading.value = false
+  })
+}
+
 function submitPackageForm() {
-  proxy.$refs.packageFormRef.validate(valid => {
-    if (valid) {
-      if (packageForm.value.id) {
-        proxy.$modal.msgSuccess('修改成功');
-      } else {
-        proxy.$modal.msgSuccess('新增成功');
-      }
-      packageOpen.value = false;
-      getPackageList();
+  packageFormRef.value.validate(valid => {
+    if (!valid || !validatePackageItems()) {
+      return
     }
-  });
+    packageSubmitLoading.value = true
+    const payload = buildPackagePayload()
+    const request = payload.id ? updateCoursePackage(payload) : addCoursePackage(payload)
+    request.then(() => {
+      proxy.$modal.msgSuccess(payload.id ? '修改成功' : '新增成功')
+      packageOpen.value = false
+      getPackageList()
+    }).finally(() => {
+      packageSubmitLoading.value = false
+    })
+  })
 }
 
-/** 计算套餐总价 */
-const calculatePackageTotal = computed(() => {
-  let total = 0;
-
-  // 计算课程价格
-  packageForm.value.courses?.forEach(course => {
-    if (course.price) {
-      total += parseFloat(course.price);
-    }
-  });
-
-  // 计算物品价格
-  packageForm.value.items?.forEach(item => {
-    if (item.price) {
-      total += parseFloat(item.price);
-    }
-  });
-
-  // 计算费用价格
-  packageForm.value.fees?.forEach(fee => {
-    if (fee.price) {
-      total += parseFloat(fee.price);
-    }
-  });
-
-  return total.toFixed(2);
-});
-
-// ==================== 选择课程相关方法 ====================
-
-/** 打开选择课程对话框 */
-function openCourseDialog() {
-  courseDialogVisible.value = true;
-  loadAvailableCourses();
+function cancel() {
+  open.value = false
 }
 
-/** 加载可选课程列表 */
-function loadAvailableCourses() {
-  // 模拟数据 - 从课程列表中获取，并展开定价标准
-  const allCourses = [];
-
-  // 课程1：小学数学999
-  allCourses.push({
-    id: 1,
-    courseName: '小学数学999',
-    courseType: '1',
-    pricingName: '单价(1200元/课时) 单-1课',
-    price: 1200
-  });
-
-  // 课程2：托管0322 - 展开多个定价标准
-  allCourses.push({
-    id: 2,
-    courseName: '托管0322',
-    courseType: '2',
-    pricingName: '单价(1500元/月)',
-    price: 1500
-  });
-  allCourses.push({
-    id: 3,
-    courseName: '托管0322',
-    courseType: '2',
-    pricingName: '套餐(1500元/月) 单-3月',
-    price: 1500
-  });
-  allCourses.push({
-    id: 4,
-    courseName: '托管0322',
-    courseType: '2',
-    pricingName: '半年(1200元/月) 单-6月',
-    price: 1200
-  });
-
-  // 添加更多模拟课程
-  allCourses.push({
-    id: 5,
-    courseName: '幼儿托班',
-    courseType: '1',
-    pricingName: '单价(1500元/月)',
-    price: 1500
-  });
-  allCourses.push({
-    id: 6,
-    courseName: '少儿英语',
-    courseType: '1',
-    pricingName: '单价(200元/课时) 单-1课',
-    price: 200
-  });
-
-  availableCourseList.value = allCourses;
-}
-
-/** 搜索课程 */
-function searchCourseList() {
-  loadAvailableCourses();
-  if (courseSearchName.value) {
-    availableCourseList.value = availableCourseList.value.filter(item =>
-      item.courseName.includes(courseSearchName.value)
-    );
-  }
-}
-
-/** 课程选择变化（对话框） */
-function handleDialogCourseSelectionChange(selection) {
-  selectedCourses.value = selection;
-}
-
-/** 确认选择课程 */
-function confirmCourseSelection() {
-  // 添加选中的课程到套餐中（去重）
-  selectedCourses.value.forEach(course => {
-    const exists = packageForm.value.courses.some(c =>
-      c.id === course.id && c.pricingName === course.pricingName
-    );
-    if (!exists) {
-      packageForm.value.courses.push({ ...course });
-    }
-  });
-  courseDialogVisible.value = false;
-  selectedCourses.value = [];
-}
-
-/** 移除课程 */
-function removeCourse(index) {
-  packageForm.value.courses.splice(index, 1);
-}
-
-// ==================== 选择物品相关方法 ====================
-
-/** 打开选择物品对话框 */
-function openItemDialog() {
-  itemDialogVisible.value = true;
-  loadAvailableItems();
-}
-
-/** 加载可选物品列表 */
-function loadAvailableItems() {
-  // 模拟数据
-  availableItemList.value = [
-    { id: 1, itemName: '物理自然笔', price: 150.00, stock: 56 },
-    { id: 2, itemName: '中包', price: 100.00, stock: 2 },
-    { id: 3, itemName: '古筝耳朵校区', price: 1999.00, stock: 215 },
-    { id: 4, itemName: '古筝耳朵校区', price: 1999.00, stock: 139 },
-    { id: 5, itemName: '工作服', price: 69.00, stock: 155 },
-    { id: 6, itemName: '教材', price: 100.00, stock: 12 },
-    { id: 7, itemName: '教材', price: 100.00, stock: 0 },
-    { id: 8, itemName: '教材', price: 90.00, stock: 2 }
-  ];
-}
-
-/** 搜索物品 */
-function searchItemList() {
-  loadAvailableItems();
-  if (itemSearchName.value) {
-    availableItemList.value = availableItemList.value.filter(item =>
-      item.itemName.includes(itemSearchName.value)
-    );
-  }
-}
-
-/** 物品选择变化 */
-function handleItemSelectionChange(selection) {
-  selectedItems.value = selection;
-}
-
-/** 确认选择物品 */
-function confirmItemSelection() {
-  // 添加选中的物品到套餐中（去重）
-  selectedItems.value.forEach(item => {
-    const exists = packageForm.value.items.some(i => i.id === item.id);
-    if (!exists) {
-      packageForm.value.items.push({ ...item });
-    }
-  });
-  itemDialogVisible.value = false;
-  selectedItems.value = [];
-}
-
-/** 移除物品 */
-function removeItem(index) {
-  packageForm.value.items.splice(index, 1);
-}
-
-// ==================== 选择费用相关方法 ====================
-
-/** 打开选择费用对话框 */
-function openFeeDialog() {
-  feeDialogVisible.value = true;
-  loadAvailableFees();
-}
-
-/** 加载可选费用列表 */
-function loadAvailableFees() {
-  // 模拟数据
-  availableFeeList.value = [
-    { id: 1, feeName: '产证', price: 20000.00 },
-    { id: 2, feeName: '广告1', price: 10000.00 },
-    { id: 3, feeName: '教育中心', price: 0.00 },
-    { id: 4, feeName: '教育中心天', price: 1500.00 },
-    { id: 5, feeName: '少年宫考级', price: 20000.00 },
-    { id: 6, feeName: '艺考考级', price: 10000.00 },
-    { id: 7, feeName: '监不到费用', price: 199.00 },
-    { id: 8, feeName: 'b站抽奖费', price: 150.00 }
-  ];
-}
-
-/** 搜索费用 */
-function searchFeeList() {
-  loadAvailableFees();
-  if (feeSearchName.value) {
-    availableFeeList.value = availableFeeList.value.filter(item =>
-      item.feeName.includes(feeSearchName.value)
-    );
-  }
-}
-
-/** 费用选择变化 */
-function handleFeeSelectionChange(selection) {
-  selectedFees.value = selection;
-}
-
-/** 确认选择费用 */
-function confirmFeeSelection() {
-  // 添加选中的费用到套餐中（去重）
-  selectedFees.value.forEach(fee => {
-    const exists = packageForm.value.fees.some(f => f.id === fee.id);
-    if (!exists) {
-      packageForm.value.fees.push({ ...fee });
-    }
-  });
-  feeDialogVisible.value = false;
-  selectedFees.value = [];
-}
-
-/** 移除费用 */
-function removeFee(index) {
-  packageForm.value.fees.splice(index, 1);
-}
-
-// 初始化
-getCourseList();
+getList()
 </script>
 
 <style scoped>
 .app-container {
   padding: 20px;
 }
-</style>
 
+.course-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.course-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.price-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 20px;
+}
+
+.muted {
+  color: #909399;
+}
+
+.color-swatches {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.color-swatch.active {
+  border-color: #303133;
+  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.18);
+}
+
+.charge-section {
+  border-top: 1px solid #ebeef5;
+  padding: 18px 0;
+}
+
+.charge-section:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.charge-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-left: 24px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.charge-body {
+  padding-left: 24px;
+}
+
+.price-alert {
+  margin-bottom: 12px;
+}
+
+.add-price {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.batch-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.package-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.package-item-table {
+  width: 100%;
+}
+
+.quantity-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quantity-cell :deep(.el-input-number) {
+  width: 104px;
+}
+
+.discount-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.discount-cell :deep(.el-select) {
+  width: 82px;
+  flex: 0 0 82px;
+}
+
+.discount-cell :deep(.el-input-number) {
+  width: 104px;
+}
+
+.package-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 16px;
+}
+
+.package-total span {
+  color: #f56c6c;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.selector-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.selected-count {
+  color: #606266;
+}
+
+.selector-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.danger-text {
+  color: #f56c6c;
+}
+</style>

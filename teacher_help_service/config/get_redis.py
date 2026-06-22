@@ -1,5 +1,7 @@
 from redis import asyncio as aioredis
-from redis.exceptions import AuthenticationError, TimeoutError, RedisError
+from redis.asyncio.retry import Retry
+from redis.backoff import ExponentialBackoff
+from redis.exceptions import AuthenticationError, ConnectionError, TimeoutError, RedisError
 from config.database import AsyncSessionLocal
 from config.env import RedisConfig
 from module_admin.service.config_service import ConfigService
@@ -23,11 +25,18 @@ class RedisUtil:
         redis = await aioredis.from_url(
             url=f'redis://{RedisConfig.redis_host}',
             port=RedisConfig.redis_port,
-            username=RedisConfig.redis_username,
-            password=RedisConfig.redis_password,
+            username=RedisConfig.redis_username or None,
+            password=RedisConfig.redis_password or None,
             db=RedisConfig.redis_database,
             encoding='utf-8',
             decode_responses=True,
+            socket_connect_timeout=5,
+            socket_timeout=10,
+            socket_keepalive=True,
+            health_check_interval=30,
+            retry=Retry(ExponentialBackoff(cap=1, base=0.1), 3),
+            retry_on_error=[ConnectionError, TimeoutError],
+            retry_on_timeout=True,
         )
         try:
             connection = await redis.ping()

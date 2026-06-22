@@ -1,8 +1,10 @@
 from collections import defaultdict
 from datetime import date, datetime
 from decimal import Decimal
+import io
 from itertools import product
 from uuid import uuid4
+import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 from module_admin.entity.vo.common_vo import CrudResponseModel
 from module_ast.dao.ast_inventory_dao import AstInventoryDao
@@ -21,6 +23,7 @@ from module_ast.entity.vo.ast_inventory_vo import (
     AddReceiveStockModel,
     AddReturnStockModel,
     AstFeeItemPageQueryModel,
+    AstStockOperationItemModel,
     AstStockRecordPageQueryModel,
     ChangeAstFeeStatusModel,
     DeleteAstFeeItemModel,
@@ -35,6 +38,36 @@ class AstInventoryService:
     """
     物品费用管理模块服务层
     """
+
+    BUSINESS_TYPE_LABELS = {
+        'sale': '销售',
+        'purchase': '采购',
+        'receive': '领用',
+        'return': '退领',
+        'inventory': '盘点',
+    }
+    ROLE_TYPE_LABELS = {
+        'student': '学员',
+        'learner': '学员',
+        'staff': '员工',
+        'teacher': '员工',
+        'employee': '员工',
+        'other': '其他',
+        'admin': '其他',
+    }
+    PAYMENT_METHOD_LABELS = {
+        'cash': '现金',
+        'wechat': '微信',
+        'alipay': '支付宝',
+        'bank': '银行卡',
+        'pos': 'POS机',
+        'transfer': '转账',
+    }
+    PURCHASE_STATUS_LABELS = {
+        0: '草稿',
+        1: '已完成',
+        2: '已取消',
+    }
 
     @classmethod
     def parse_date(cls, value=None):
@@ -65,6 +98,16 @@ class AstInventoryService:
     @classmethod
     def make_no(cls, prefix: str):
         return f'{prefix}{datetime.now().strftime("%Y%m%d%H%M%S%f")}{uuid4().hex[:4].upper()}'
+
+    @classmethod
+    async def get_role_options_services(cls, query_db: AsyncSession, role_type: str | None, keyword: str | None = None):
+        if role_type == 'student':
+            students = await AstInventoryDao.get_student_role_options(query_db, keyword)
+            return [{'id': student.id, 'label': student.student_name, 'value': student.student_name} for student in students]
+        if role_type in ['staff', 'teacher', 'employee']:
+            teachers = await AstInventoryDao.get_teacher_role_options(query_db, keyword)
+            return [{'id': teacher.id, 'label': teacher.teacher_name, 'value': teacher.teacher_name} for teacher in teachers]
+        return []
 
     @classmethod
     def split_values(cls, value):
@@ -388,14 +431,40 @@ class AstInventoryService:
         return result
 
     @classmethod
-    def format_stock_record_row(cls, record_row: dict):
+    def format_purchase_order_row(cls, order_row: dict):
+        if not order_row:
+            return None
+        order_row['businessNo'] = order_row.get('orderNo')
+        order_row['paymentMethodLabel'] = cls.PAYMENT_METHOD_LABELS.get(
+            order_row.get('paymentMethod'), order_row.get('paymentMethod') or '-'
+        )
+        order_row['statusLabel'] = cls.PURCHASE_STATUS_LABELS.get(order_row.get('status'), order_row.get('status'))
+        return order_row
+
+    @classmethod
+    def format_stock_record_row(cls, record_row: dict, purchase_order_map: dict | None = None):
+        purchase_order_map = purchase_order_map or {}
+        quantity = cls.to_int(record_row.get('quantity'), 0)
+        source_type = record_row.get('sourceType')
+        source_id = record_row.get('sourceId')
+        purchase_order = purchase_order_map.get(source_id) if source_type == 'purchase' else None
         record_row['stockDate'] = record_row.get('createTime') or record_row.get('recordDate')
         record_row['roleType'] = record_row.get('relatedType')
         record_row['roleName'] = record_row.get('relatedName')
-        record_row['businessNo'] = record_row.get('recordNo')
+        record_row['roleTypeLabel'] = cls.ROLE_TYPE_LABELS.get(record_row.get('roleType'), record_row.get('roleType') or '-')
+        record_row['businessTypeLabel'] = cls.BUSINESS_TYPE_LABELS.get(
+            record_row.get('businessType'), record_row.get('businessType') or '-'
+        )
+        record_row['stockType'] = 'in' if quantity > 0 else 'out'
+        record_row['stockTypeLabel'] = '入库' if quantity > 0 else '出库'
+        record_row['recordStatus'] = 'voided' if cls.to_int(record_row.get('delFlag'), 0) == 1 else 'normal'
+        record_row['recordStatusLabel'] = '已作废' if record_row['recordStatus'] == 'voided' else '正常'
+        record_row['businessNo'] = purchase_order.order_no if purchase_order else record_row.get('recordNo')
         record_row['operator'] = record_row.get('operatorName')
-        if record_row.get('skuName') and record_row.get('skuName') != '默认':
-            record_row['itemName'] = f"{record_row.get('itemName')} ({record_row.get('skuName')})"
+        record_row['specText'] = record_row.get('skuName')
+        if purchase_order:
+            record_row['purchaseOrderId'] = purchase_order.id
+            record_row['purchaseOrderNo'] = purchase_order.order_no
         return record_row
 
     @classmethod
@@ -421,9 +490,11 @@ class AstInventoryService:
             'inventory': '盘点',
         }
         role_type_map = {
-            'teacher': '教师',
-            'student': '学生',
-            'admin': '管理员',
+            'teacher': '员工',
+            'staff': '员工',
+            'student': '学员',
+            'other': '其他',
+            'admin': '其他',
         }
         for item in stock_record_list:
             item['businessType'] = business_type_map.get(item.get('businessType'), item.get('businessType'))
@@ -435,11 +506,29 @@ class AstInventoryService:
         cls, query_db: AsyncSession, query_object: AstStockRecordPageQueryModel, is_page: bool = False
     ):
         page_result = await AstInventoryDao.get_stock_record_list(query_db, query_object, is_page)
+        rows = page_result.rows if hasattr(page_result, 'rows') else page_result
+        purchase_order_ids = [
+            row.get('sourceId')
+            for row in rows
+            if row.get('sourceType') == 'purchase' and row.get('sourceId')
+        ]
+        purchase_orders = await AstInventoryDao.get_purchase_orders_by_ids(query_db, list(set(purchase_order_ids)))
+        purchase_order_map = {order.id: order for order in purchase_orders}
         if hasattr(page_result, 'rows'):
-            page_result.rows = [cls.format_stock_record_row(row) for row in page_result.rows]
+            page_result.rows = [cls.format_stock_record_row(row, purchase_order_map) for row in page_result.rows]
         else:
-            page_result = [cls.format_stock_record_row(row) for row in page_result]
+            page_result = [cls.format_stock_record_row(row, purchase_order_map) for row in page_result]
         return page_result
+
+    @classmethod
+    async def get_stock_record_summary_services(cls, query_db: AsyncSession, query_object: AstStockRecordPageQueryModel):
+        total_count, in_total, out_total, net_total = await AstInventoryDao.get_stock_record_summary(query_db, query_object)
+        return {
+            'currentCount': int(total_count or 0),
+            'inTotal': int(in_total or 0),
+            'outTotal': int(out_total or 0),
+            'netTotal': int(net_total or 0),
+        }
 
     @classmethod
     async def get_stock_record_detail_services(cls, query_db: AsyncSession, record_id: int):
@@ -447,13 +536,130 @@ class AstInventoryService:
         if not record:
             raise ServiceException(message='出入库记录不存在')
         result = CamelCaseUtil.transform_result(record)
-        cls.format_stock_record_row(result)
+        purchase_order_map = {}
         if record.source_type == 'purchase' and record.source_id:
             order = await AstInventoryDao.get_purchase_order_by_id(query_db, record.source_id)
             order_items = await AstInventoryDao.get_purchase_order_items_by_order_id(query_db, record.source_id)
-            result['purchaseOrder'] = CamelCaseUtil.transform_result(order) if order else None
+            purchase_order_map = {order.id: order} if order else {}
+            result['purchaseOrder'] = cls.format_purchase_order_row(CamelCaseUtil.transform_result(order)) if order else None
             result['purchaseItems'] = CamelCaseUtil.transform_result(order_items)
+            for item in result['purchaseItems']:
+                item['specText'] = item.get('skuName')
+                item['amount'] = item.get('totalAmount')
+        cls.format_stock_record_row(result, purchase_order_map)
         return result
+
+    @classmethod
+    async def void_stock_record_services(cls, query_db: AsyncSession, record_id: int, current_user_name: str):
+        record = await AstInventoryDao.get_stock_record_by_id(query_db, record_id)
+        if not record:
+            raise ServiceException(message='出入库记录不存在')
+        if record.del_flag == 1:
+            return CrudResponseModel(is_success=True, message='记录已作废')
+        try:
+            sku_item = await AstInventoryDao.get_sku_with_item_by_id(query_db, record.sku_id)
+            if not sku_item:
+                raise ServiceException(message='关联SKU不存在，无法作废')
+            sku, item = sku_item
+            stock_after_void = (sku.stock or 0) - (record.quantity or 0)
+            await AstInventoryDao.update_item_sku_dao(
+                query_db,
+                sku.id,
+                {
+                    'stock': stock_after_void,
+                    'available_stock': stock_after_void,
+                    'update_by': current_user_name,
+                    'update_time': datetime.now(),
+                },
+            )
+            await AstInventoryDao.update_stock_record_dao(
+                query_db,
+                record.id,
+                {
+                    'del_flag': 1,
+                    'remark': f"{record.remark or ''} 作废人:{current_user_name}".strip(),
+                },
+            )
+            await AstInventoryDao.refresh_item_stock_dao(query_db, item.id)
+            await query_db.commit()
+            return CrudResponseModel(is_success=True, message='作废成功，库存已回滚')
+        except Exception as e:
+            await query_db.rollback()
+            raise e
+
+    @classmethod
+    async def get_purchase_import_template_services(cls):
+        headers = ['物品名称', '物品规格', '采购单价', '采购数量', '支付方式', '账户', '年度账本', '采购日期', '采购备注', '明细备注']
+        selector_headers = ['支付方式']
+        option_list = [{'支付方式': ['现金', '微信', '支付宝', '银行卡', 'POS机', '转账']}]
+        return ExcelUtil.get_excel_template(headers, selector_headers, option_list)
+
+    @classmethod
+    def normalize_import_value(cls, value):
+        if pd.isna(value):
+            return None
+        value = str(value).strip()
+        return value if value else None
+
+    @classmethod
+    async def import_purchase_services(cls, query_db: AsyncSession, file, current_user_name: str):
+        file_bytes = await file.read()
+        if not file_bytes:
+            raise ServiceException(message='导入文件为空')
+        try:
+            data_frame = pd.read_excel(io.BytesIO(file_bytes))
+        except Exception as e:
+            raise ServiceException(message=f'读取Excel失败：{str(e)}')
+        required_headers = ['物品名称', '采购单价', '采购数量']
+        for header in required_headers:
+            if header not in data_frame.columns:
+                raise ServiceException(message=f'导入失败，缺少列：{header}')
+
+        payment_method_reverse = {label: key for key, label in cls.PAYMENT_METHOD_LABELS.items()}
+        items = []
+        first_row = data_frame.iloc[0] if not data_frame.empty else None
+        if first_row is None:
+            raise ServiceException(message='导入文件没有明细数据')
+        for index, row in data_frame.iterrows():
+            item_name = cls.normalize_import_value(row.get('物品名称'))
+            sku_name = cls.normalize_import_value(row.get('物品规格'))
+            if not item_name:
+                continue
+            sku_item = await AstInventoryDao.get_sku_by_item_name_and_sku_name(query_db, item_name, sku_name)
+            if not sku_item:
+                raise ServiceException(message=f'第{index + 2}行物品或规格不存在：{item_name} {sku_name or ""}'.strip())
+            sku, item = sku_item
+            quantity_value = cls.normalize_import_value(row.get('采购数量'))
+            quantity = cls.to_int(quantity_value, 0)
+            if quantity <= 0:
+                raise ServiceException(message=f'第{index + 2}行采购数量必须大于0')
+            unit_price = cls.to_decimal(cls.normalize_import_value(row.get('采购单价')), 0)
+            items.append(
+                AstStockOperationItemModel(
+                    skuId=sku.id,
+                    itemId=item.id,
+                    itemName=item.item_name,
+                    skuName=sku.sku_name,
+                    specText=sku.sku_name,
+                    quantity=quantity,
+                    unitPrice=unit_price,
+                    remark=cls.normalize_import_value(row.get('明细备注')),
+                )
+            )
+        if not items:
+            raise ServiceException(message='导入文件没有有效采购明细')
+
+        payment_method_text = cls.normalize_import_value(first_row.get('支付方式'))
+        purchase_form = AddPurchaseOrderModel(
+            purchaseDate=cls.normalize_import_value(first_row.get('采购日期')) or date.today(),
+            paymentMethod=payment_method_reverse.get(payment_method_text, payment_method_text),
+            accountName=cls.normalize_import_value(first_row.get('账户')),
+            yearBook=cls.normalize_import_value(first_row.get('年度账本')),
+            operatorName=current_user_name,
+            remark=cls.normalize_import_value(first_row.get('采购备注')),
+            items=items,
+        )
+        return await cls.create_purchase_services(query_db, purchase_form, current_user_name)
 
     @classmethod
     async def apply_stock_change(

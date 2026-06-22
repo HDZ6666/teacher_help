@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from config.enums import BusinessType
 from config.get_db import get_db
@@ -48,6 +48,21 @@ async def get_available_items(request: Request, keyword: str | None = None, quer
 
 
 @astInventoryController.get(
+    '/role-options',
+    dependencies=[Depends(CheckUserInterfaceAuth(['ast:inventory:add', 'ast:inventory:list']))],
+)
+async def get_role_options(
+    request: Request,
+    role_type: str | None = Query(default=None, alias='roleType'),
+    keyword: str | None = None,
+    query_db: AsyncSession = Depends(get_db),
+):
+    result = await AstInventoryService.get_role_options_services(query_db, role_type, keyword)
+    logger.info('获取成功')
+    return ResponseUtil.success(data=result)
+
+
+@astInventoryController.get(
     '/stock/list',
     response_model=PageResponseModel,
     dependencies=[Depends(CheckUserInterfaceAuth('ast:inventory:list'))],
@@ -58,8 +73,9 @@ async def get_stock_record_list(
     query_db: AsyncSession = Depends(get_db),
 ):
     result = await AstInventoryService.get_stock_record_list_services(query_db, stock_query, is_page=True)
+    summary = await AstInventoryService.get_stock_record_summary_services(query_db, stock_query)
     logger.info('获取成功')
-    return ResponseUtil.success(model_content=result)
+    return ResponseUtil.success(model_content=result, dict_content={'summary': summary})
 
 
 @astInventoryController.post(
@@ -89,6 +105,22 @@ async def get_stock_record_detail(request: Request, record_id: int, query_db: As
     return ResponseUtil.success(data=result)
 
 
+@astInventoryController.put(
+    '/stock/{record_id}/void',
+    dependencies=[Depends(CheckUserInterfaceAuth(['ast:inventory:edit', 'ast:inventory:add']))],
+)
+@Log(title='物品出入库记录作废', business_type=BusinessType.UPDATE)
+async def void_stock_record(
+    request: Request,
+    record_id: int,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user),
+):
+    result = await AstInventoryService.void_stock_record_services(query_db, record_id, current_user.user.user_name)
+    logger.info(result.message)
+    return ResponseUtil.success(msg=result.message)
+
+
 @astInventoryController.post('/purchase', dependencies=[Depends(CheckUserInterfaceAuth('ast:inventory:add'))])
 @Log(title='物品采购入库', business_type=BusinessType.INSERT)
 async def create_purchase(
@@ -98,6 +130,32 @@ async def create_purchase(
     current_user: CurrentUserModel = Depends(LoginService.get_current_user),
 ):
     result = await AstInventoryService.create_purchase_services(query_db, purchase_form, current_user.user.user_name)
+    logger.info(result.message)
+    return ResponseUtil.success(msg=result.message, data=result.result)
+
+
+@astInventoryController.post(
+    '/purchase/import/template',
+    dependencies=[Depends(CheckUserInterfaceAuth(['ast:inventory:add', 'ast:inventory:export']))],
+)
+async def download_purchase_import_template(request: Request):
+    result = await AstInventoryService.get_purchase_import_template_services()
+    logger.info('下载成功')
+    return ResponseUtil.streaming(data=bytes2file_response(result))
+
+
+@astInventoryController.post(
+    '/purchase/import',
+    dependencies=[Depends(CheckUserInterfaceAuth(['ast:inventory:add', 'ast:inventory:import']))],
+)
+@Log(title='物品采购导入', business_type=BusinessType.IMPORT)
+async def import_purchase(
+    request: Request,
+    file: UploadFile = File(...),
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user),
+):
+    result = await AstInventoryService.import_purchase_services(query_db, file, current_user.user.user_name)
     logger.info(result.message)
     return ResponseUtil.success(msg=result.message, data=result.result)
 

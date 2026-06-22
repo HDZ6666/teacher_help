@@ -42,47 +42,47 @@
             </el-row>
 
             <!-- 物品列表 -->
-            <el-table v-loading="itemLoading" :data="itemList">
-              <el-table-column label="物品名称" align="center" prop="itemName" width="180" />
-              <el-table-column label="物品图片" align="center" prop="imageUrl" width="90">
+            <el-table v-loading="itemLoading" :data="itemList" class="item-manage-table" table-layout="auto" style="width: 100%;">
+              <el-table-column label="物品名称" align="center" prop="itemName" min-width="160" show-overflow-tooltip />
+              <el-table-column label="物品图片" align="center" prop="imageUrl" width="76">
                 <template #default="scope">
                   <image-preview v-if="scope.row.imageUrl" :src="scope.row.imageUrl" :width="36" :height="36" />
                   <span v-else style="color: #909399;">-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="物品编码" align="center" prop="itemCode" width="150" />
-              <el-table-column label="物品类型" align="center" prop="itemType" width="120">
+              <el-table-column label="物品编码" align="center" prop="itemCode" width="130" show-overflow-tooltip />
+              <el-table-column label="物品类型" align="center" prop="itemType" width="90">
                 <template #default="scope">
                   <el-tag v-if="String(scope.row.itemType) === '1'">实物</el-tag>
                   <el-tag v-else type="info">虚拟</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column label="SKU数量" align="center" prop="skuCount" width="100">
+              <el-table-column label="SKU数量" align="center" prop="skuCount" width="86">
                 <template #default="scope">
                   <span style="color: #409EFF;">{{ scope.row.skuCount }}种</span>
                 </template>
               </el-table-column>
-              <el-table-column label="总库存" align="center" prop="totalStock" width="100">
+              <el-table-column label="总库存" align="center" prop="totalStock" width="86">
                 <template #default="scope">
                   <span :style="{ color: scope.row.isWarning ? '#F56C6C' : '#303133', fontWeight: scope.row.isWarning ? 'bold' : 'normal' }">
                     {{ scope.row.totalStock }}
                   </span>
                 </template>
               </el-table-column>
-              <el-table-column label="库存预警" align="center" prop="warningStock" width="110">
+              <el-table-column label="库存预警" align="center" prop="warningStock" width="96">
                 <template #default="scope">
                   <el-tag v-if="scope.row.isWarning" type="danger">≤ {{ scope.row.warningStock }}</el-tag>
                   <span v-else>{{ scope.row.warningStock || '-' }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="单价范围" align="center" prop="priceRange" width="150" />
-              <el-table-column label="绑定课程" align="center" prop="courseName" min-width="180">
+              <el-table-column label="单价范围" align="center" prop="priceRange" width="120" show-overflow-tooltip />
+              <el-table-column label="绑定课程" align="center" prop="courseName" min-width="170" show-overflow-tooltip>
                 <template #default="scope">
                   <span v-if="scope.row.courseName" style="color: #409EFF;">{{ scope.row.courseName }}</span>
                   <span v-else style="color: #909399;">未绑定</span>
                 </template>
               </el-table-column>
-              <el-table-column label="开启库存" align="center" prop="enableStock" width="100">
+              <el-table-column label="开启库存" align="center" prop="enableStock" width="88">
                 <template #default="scope">
                   <el-switch
                     v-model="scope.row.enableStock"
@@ -92,7 +92,7 @@
                   />
                 </template>
               </el-table-column>
-              <el-table-column label="线上售卖" align="center" prop="onlineSale" width="100">
+              <el-table-column label="线上售卖" align="center" prop="onlineSale" width="88">
                 <template #default="scope">
                   <el-switch
                     v-model="scope.row.onlineSale"
@@ -102,7 +102,7 @@
                   />
                 </template>
               </el-table-column>
-              <el-table-column label="启用状态" align="center" prop="status" width="100">
+              <el-table-column label="启用状态" align="center" prop="status" width="88">
                 <template #default="scope">
                   <el-switch
                     v-model="scope.row.status"
@@ -112,7 +112,7 @@
                   />
                 </template>
               </el-table-column>
-              <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
+              <el-table-column label="操作" align="center" width="220" fixed="right" class-name="small-padding fixed-width">
                 <template #default="scope">
                   <el-button link type="primary" icon="View" @click="handleViewItem(scope.row)">出入库记录</el-button>
                   <el-button link type="primary" icon="Edit" @click="handleUpdateItem(scope.row)">编辑</el-button>
@@ -134,33 +134,70 @@
           <!-- 出入库管理子Tab -->
           <el-tab-pane label="出入库管理" name="stockManage">
             <!-- 搜索栏 -->
-            <el-form :model="stockQueryParams" ref="stockQueryRef" :inline="true" v-show="showSearch" label-width="100px">
-              <el-form-item label="物品名称" prop="keyword">
-                <el-input
-                  v-model="stockQueryParams.keyword"
-                  placeholder="请输入物品名称"
+            <el-form :model="stockQueryParams" ref="stockQueryRef" :inline="true" v-show="showSearch" label-width="96px" class="stock-search-form">
+              <el-form-item label="物品名称" prop="itemNames">
+                <el-select
+                  v-model="stockQueryParams.itemNames"
+                  multiple
+                  filterable
                   clearable
-                  style="width: 200px;"
-                />
+                  collapse-tags
+                  collapse-tags-tooltip
+                  placeholder="请选择物品(支持多选)"
+                  style="width: 320px;"
+                >
+                  <el-option
+                    v-for="item in stockItemOptions"
+                    :key="item.id"
+                    :label="item.itemName"
+                    :value="item.itemName"
+                  />
+                </el-select>
               </el-form-item>
               <el-form-item label="出入库日期" prop="dateRange">
                 <el-date-picker
                   v-model="stockQueryParams.dateRange"
                   type="daterange"
+                  value-format="YYYY-MM-DD"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
-                  style="width: 240px;"
+                  style="width: 320px;"
                 />
               </el-form-item>
+              <el-form-item label="出入库类型" prop="stockTypes">
+                <el-checkbox-group v-model="stockQueryParams.stockTypes">
+                  <el-checkbox label="out">出库</el-checkbox>
+                  <el-checkbox label="in">入库</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
               <el-form-item label="业务类型" prop="businessType">
-                <el-select v-model="stockQueryParams.businessType" placeholder="请选择" clearable style="width: 150px;">
+                <el-select v-model="stockQueryParams.businessType" placeholder="请选择" clearable style="width: 180px;">
                   <el-option label="全部" value="" />
+                  <el-option label="销售" value="sale" />
                   <el-option label="采购" value="purchase" />
                   <el-option label="领用" value="receive" />
                   <el-option label="退领" value="return" />
                   <el-option label="盘点" value="inventory" />
                 </el-select>
+              </el-form-item>
+              <el-form-item label="角色类型" prop="relatedType">
+                <el-select v-model="stockQueryParams.relatedType" placeholder="请选择" clearable style="width: 180px;">
+                  <el-option label="学员" value="student" />
+                  <el-option label="员工" value="staff" />
+                  <el-option label="其他" value="other" />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="角色姓名" prop="relatedName">
+                <el-input
+                  v-model="stockQueryParams.relatedName"
+                  placeholder="请输入姓名/手机号"
+                  clearable
+                  style="width: 220px;"
+                />
+              </el-form-item>
+              <el-form-item label="记录状态" prop="excludeVoided">
+                <el-checkbox v-model="stockQueryParams.excludeVoided">过滤已作废</el-checkbox>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" icon="Search" @click="handleStockQuery">搜索</el-button>
@@ -169,61 +206,86 @@
             </el-form>
 
             <!-- 操作按钮 -->
-            <el-row :gutter="10" class="mb8">
-              <el-col :span="1.5">
+            <div class="stock-action-row mb8">
+              <div class="stock-action-buttons">
                 <el-button type="primary" plain icon="Plus" @click="handlePurchase">采购</el-button>
-              </el-col>
-              <el-col :span="1.5">
+                <el-dropdown trigger="click" @command="handlePurchaseCommand">
+                  <el-button type="primary" plain icon="ArrowDown" class="purchase-more-button" />
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="create">新建采购</el-dropdown-item>
+                      <el-dropdown-item command="import">导入采购单</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
                 <el-button type="success" plain icon="Minus" @click="handleReceive">领用</el-button>
-              </el-col>
-              <el-col :span="1.5">
                 <el-button type="warning" plain icon="RefreshLeft" @click="handleReturn">退领</el-button>
-              </el-col>
-              <el-col :span="1.5">
                 <el-button type="danger" plain icon="DocumentChecked" @click="handleInventory">盘点</el-button>
-              </el-col>
-              <el-col :span="1.5">
                 <el-button type="info" plain icon="Download" @click="handleStockExport">导出</el-button>
-              </el-col>
+              </div>
               <right-toolbar v-model:showSearch="showSearch" @queryTable="getStockList"></right-toolbar>
-            </el-row>
+            </div>
+
+            <div class="stock-summary-bar">
+              <span>当前结果：共 {{ stockSummary.currentCount }} 条记录</span>
+              <span>入库总计：{{ stockSummary.inTotal }}</span>
+              <span>出库总计：{{ stockSummary.outTotal }}</span>
+              <span>出入库总计：{{ stockSummary.netTotal }}</span>
+            </div>
 
             <!-- 出入库记录列表 -->
-            <el-table v-loading="stockLoading" :data="stockList">
-              <el-table-column label="出入库时间" align="center" prop="stockDate" width="160" />
-              <el-table-column label="物品名称" align="center" prop="itemName" width="180" />
-              <el-table-column label="业务类型" align="center" prop="businessType" width="100">
+            <el-table :key="stockTableKey" v-loading="stockLoading" :data="stockList" class="stock-record-table" table-layout="auto" style="width: 100%;">
+              <el-table-column label="出入库日期" align="center" prop="stockDate" width="168">
                 <template #default="scope">
-                  <el-tag v-if="scope.row.businessType === 'purchase'" type="success">采购</el-tag>
+                  {{ formatDate(scope.row.stockDate) || '-' }}
+                </template>
+              </el-table-column>
+              <el-table-column label="物品名称" align="left" prop="itemName" min-width="180" show-overflow-tooltip>
+                <template #default="scope">
+                  <div class="item-name-cell">
+                    <span>{{ scope.row.itemName || '-' }}</span>
+                    <small v-if="scope.row.specText && scope.row.specText !== '默认'">{{ scope.row.specText }}</small>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column label="业务类型" align="center" prop="businessType" width="92">
+                <template #default="scope">
+                  <el-tag v-if="scope.row.businessType === 'sale'" type="primary">销售</el-tag>
+                  <el-tag v-else-if="scope.row.businessType === 'purchase'" type="success">采购</el-tag>
                   <el-tag v-else-if="scope.row.businessType === 'receive'" type="warning">领用</el-tag>
                   <el-tag v-else-if="scope.row.businessType === 'return'" type="info">退领</el-tag>
                   <el-tag v-else-if="scope.row.businessType === 'inventory'" type="danger">盘点</el-tag>
-                  <el-tag v-else>-</el-tag>
+                  <el-tag v-else>{{ scope.row.businessTypeLabel || '-' }}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column label="出入库数量" align="center" prop="quantity" width="120">
+              <el-table-column label="出入库数量" align="center" prop="quantity" width="108">
                 <template #default="scope">
                   <span :style="{ color: scope.row.quantity > 0 ? '#67C23A' : '#F56C6C' }">
                     {{ scope.row.quantity > 0 ? '+' : '' }}{{ scope.row.quantity }}
                   </span>
                 </template>
               </el-table-column>
-              <el-table-column label="角色类型" align="center" prop="roleType" width="100">
+              <el-table-column label="角色类型" align="center" prop="roleType" width="92">
                 <template #default="scope">
-                  <span v-if="scope.row.roleType === 'teacher'">教师</span>
-                  <span v-else-if="scope.row.roleType === 'student'">学生</span>
-                  <span v-else-if="scope.row.roleType === 'admin'">管理员</span>
+                  {{ scope.row.roleTypeLabel || '-' }}
+                </template>
+              </el-table-column>
+              <el-table-column label="角色姓名" align="center" prop="roleName" width="120" show-overflow-tooltip />
+              <el-table-column label="关联业务" align="center" prop="businessNo" min-width="160" show-overflow-tooltip>
+                <template #default="scope">
+                  <el-button v-if="scope.row.businessNo" link type="primary" @click="handleViewStock(scope.row)">
+                    {{ scope.row.businessNo }}
+                  </el-button>
                   <span v-else>-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="角色名称" align="center" prop="roleName" width="120" />
-              <el-table-column label="关联业务" align="center" prop="businessNo" width="180">
+              <el-table-column label="经办人" align="center" prop="operator" width="90" show-overflow-tooltip />
+              <el-table-column label="备注" align="center" prop="remark" min-width="120" show-overflow-tooltip>
                 <template #default="scope">
-                  <span style="color: #409EFF; cursor: pointer;">{{ scope.row.businessNo || '-' }}</span>
+                  {{ scope.row.remark || '-' }}
                 </template>
               </el-table-column>
-              <el-table-column label="经办人" align="center" prop="operator" width="100" />
-              <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
+              <el-table-column label="操作" align="center" width="116" fixed="right" class-name="small-padding fixed-width">
                 <template #default="scope">
                   <el-button link type="primary" icon="View" @click="handleViewStock(scope.row)">查看详情</el-button>
                 </template>
@@ -309,7 +371,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="center" width="180" fixed="right" class-name="small-padding fixed-width">
             <template #default="scope">
               <el-button link type="primary" icon="Edit" @click="handleEditFee(scope.row)">编辑</el-button>
               <el-button link type="danger" icon="Delete" @click="handleDeleteFee(scope.row)">删除</el-button>
@@ -328,8 +390,8 @@
     </el-tabs>
 
     <!-- 新增/修改物品对话框 -->
-    <el-dialog :title="itemTitle" v-model="itemOpen" width="900px" append-to-body destroy-on-close>
-      <el-form ref="itemFormRef" :model="itemForm" :rules="itemRules" label-width="100px">
+    <el-dialog :title="itemTitle" v-model="itemOpen" width="1080px" class="item-form-dialog" append-to-body destroy-on-close>
+      <el-form ref="itemFormRef" :model="itemForm" :rules="itemRules" label-width="100px" class="item-form">
         <!-- 基本信息 -->
         <el-divider content-position="left">基本信息</el-divider>
         <el-row :gutter="20">
@@ -384,7 +446,7 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-form-item label="绑定课程">
-              <div style="width: 100%;">
+              <div class="course-bind-area">
                 <div v-if="itemForm.courseIds && itemForm.courseIds.length > 0" style="margin-bottom: 10px;">
                   <el-tag
                     v-for="(courseName, index) in itemForm.courseNames"
@@ -412,8 +474,8 @@
 
         <!-- 规格选项 -->
         <el-form-item label="规格" prop="specs">
-          <el-table :data="itemForm.specs" border style="width: 100%;">
-            <el-table-column label="排序" width="100" align="center">
+          <el-table :data="itemForm.specs" border class="spec-table" table-layout="auto" style="width: 100%;">
+            <el-table-column label="排序" width="88" align="center">
               <template #default="scope">
                 <el-button
                   link
@@ -429,7 +491,7 @@
                 />
               </template>
             </el-table-column>
-            <el-table-column label="规格名称" width="200">
+            <el-table-column label="规格名称" width="190">
               <template #default="scope">
                 <el-input
                   v-model="scope.row.name"
@@ -438,9 +500,9 @@
                 />
               </template>
             </el-table-column>
-            <el-table-column label="规格值（可使用回车键生成快速添加规格值）">
+            <el-table-column label="规格值（可使用回车键生成快速添加规格值）" min-width="420">
               <template #default="scope">
-                <div style="display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                <div class="spec-value-editor">
                   <el-tag
                     v-for="(tag, tagIndex) in scope.row.tags"
                     :key="tagIndex"
@@ -455,7 +517,7 @@
                     ref="tagInputRef"
                     v-model="scope.row.inputValue"
                     size="small"
-                    style="width: 100px;"
+                    class="spec-tag-input"
                     @keyup.enter="() => handleTagInputConfirm(scope.$index)"
                     @blur="() => handleTagInputConfirm(scope.$index)"
                   />
@@ -466,13 +528,13 @@
                   >
                     + 添加
                   </el-button>
-                  <span style="color: #909399; font-size: 12px; margin-left: 10px;">
+                  <span class="spec-tip">
                     单个规格值最多10个字符，如白色，至多添加20个规格值
                   </span>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="100" align="center">
+            <el-table-column label="操作" width="82" align="center" fixed="right">
               <template #default="scope">
                 <el-button
                   link
@@ -495,10 +557,10 @@
 
         <!-- SKU列表 -->
         <el-form-item label="SKU列表" v-if="itemForm.skus && itemForm.skus.length > 0">
-          <el-table :data="itemForm.skus" border style="width: 100%;">
-            <el-table-column label="序号" type="index" width="80" align="center" />
-            <el-table-column label="属性" prop="specText" width="200" />
-            <el-table-column label="启用状态" width="120" align="center">
+          <el-table :data="itemForm.skus" border class="sku-table" table-layout="auto" style="width: 100%;">
+            <el-table-column label="序号" type="index" width="72" align="center" />
+            <el-table-column label="属性" prop="specText" min-width="220" show-overflow-tooltip />
+            <el-table-column label="启用状态" width="108" align="center">
               <template #default="scope">
                 <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
               </template>
@@ -509,7 +571,7 @@
         <!-- 单品信息 -->
         <el-form-item label="单品信息" prop="singleInfo">
           <el-row :gutter="20">
-            <el-col :span="8">
+            <el-col :span="12">
               <el-input v-model="itemForm.singlePrice" placeholder="请输入单价">
                 <template #append>元</template>
               </el-input>
@@ -590,9 +652,174 @@
       </template>
     </el-dialog>
 
+    <!-- 出入库详情对话框 -->
+    <el-dialog title="出入库记录详情" v-model="stockDetailVisible" width="1100px" class="stock-detail-dialog" append-to-body>
+      <div v-loading="stockDetailLoading" class="stock-detail-panel">
+        <div class="detail-actions">
+          <el-button
+            icon="CircleClose"
+            :disabled="stockDetail.recordStatus === 'voided'"
+            @click="handleVoidStock(stockDetail)"
+          >
+            作废记录
+          </el-button>
+          <el-tag v-if="stockDetail.recordStatus === 'voided'" type="danger">已作废</el-tag>
+        </div>
+
+        <div class="detail-heading">
+          <div>
+            <strong>业务类型：{{ stockDetail.businessTypeLabel || '-' }}</strong>
+            <span>创建时间：{{ formatDate(stockDetail.createTime || stockDetail.stockDate) || '-' }}</span>
+          </div>
+          <el-tag :type="stockDetail.quantity > 0 ? 'success' : 'danger'">
+            {{ stockDetail.stockTypeLabel || '-' }} {{ stockDetail.quantity > 0 ? '+' : '' }}{{ stockDetail.quantity || 0 }}
+          </el-tag>
+        </div>
+
+        <div class="detail-grid">
+          <div>
+            <label>物品名称</label>
+            <span>{{ stockDetail.itemName || '-' }}</span>
+          </div>
+          <div>
+            <label>物品规格</label>
+            <span>{{ stockDetail.specText && stockDetail.specText !== '默认' ? stockDetail.specText : '-' }}</span>
+          </div>
+          <div>
+            <label>库存变化</label>
+            <span>{{ stockDetail.stockBefore ?? '-' }} -> {{ stockDetail.stockAfter ?? '-' }}</span>
+          </div>
+          <div>
+            <label>角色类型</label>
+            <span>{{ stockDetail.roleTypeLabel || '-' }}</span>
+          </div>
+          <div>
+            <label>角色姓名</label>
+            <span>{{ stockDetail.roleName || '-' }}</span>
+          </div>
+          <div>
+            <label>经办日期</label>
+            <span>{{ formatDate(stockDetail.recordDate || stockDetail.stockDate) || '-' }}</span>
+          </div>
+          <div>
+            <label>经办人</label>
+            <span>{{ stockDetail.operator || stockDetail.operatorName || '-' }}</span>
+          </div>
+          <div>
+            <label>流水号</label>
+            <span>{{ stockDetail.recordNo || '-' }}</span>
+          </div>
+          <div>
+            <label>备注</label>
+            <span>{{ stockDetail.remark || '-' }}</span>
+          </div>
+        </div>
+
+        <el-divider content-position="left">关联业务</el-divider>
+        <el-table :data="stockRelatedRows" border class="stock-detail-table" table-layout="auto">
+          <el-table-column label="业务单号" prop="businessNo" min-width="180" show-overflow-tooltip>
+            <template #default="scope">
+              <el-button v-if="scope.row.businessNo" link type="primary">{{ scope.row.businessNo }}</el-button>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="业务类型" prop="businessTypeLabel" width="120" />
+          <el-table-column label="业务来源" prop="sourceLabel" width="130" />
+          <el-table-column label="经办人" prop="operator" width="120" show-overflow-tooltip />
+          <el-table-column label="经办日期" prop="recordDate" width="160">
+            <template #default="scope">
+              {{ formatDate(scope.row.recordDate) || '-' }}
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" prop="createTime" width="170">
+            <template #default="scope">
+              {{ formatDate(scope.row.createTime) || '-' }}
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <template v-if="stockDetail.purchaseOrder">
+          <el-divider content-position="left">采购单信息</el-divider>
+          <div class="detail-grid">
+            <div>
+              <label>采购单号</label>
+              <span>{{ stockDetail.purchaseOrder.orderNo || '-' }}</span>
+            </div>
+            <div>
+              <label>采购日期</label>
+              <span>{{ formatDate(stockDetail.purchaseOrder.purchaseDate) || '-' }}</span>
+            </div>
+            <div>
+              <label>采购状态</label>
+              <span>{{ stockDetail.purchaseOrder.statusLabel || '-' }}</span>
+            </div>
+            <div>
+              <label>支付方式</label>
+              <span>{{ stockDetail.purchaseOrder.paymentMethodLabel || '-' }}</span>
+            </div>
+            <div>
+              <label>账户</label>
+              <span>{{ stockDetail.purchaseOrder.accountName || '-' }}</span>
+            </div>
+            <div>
+              <label>总金额</label>
+              <span>¥ {{ stockDetail.purchaseOrder.totalAmount || '0.00' }}</span>
+            </div>
+          </div>
+
+          <el-table :data="stockDetail.purchaseItems || []" border class="stock-detail-table" table-layout="auto">
+            <el-table-column label="物品名称" prop="itemName" min-width="160" show-overflow-tooltip />
+            <el-table-column label="物品规格" prop="specText" min-width="140" show-overflow-tooltip />
+            <el-table-column label="采购单价" prop="unitPrice" width="120">
+              <template #default="scope">¥ {{ scope.row.unitPrice || '0.00' }}</template>
+            </el-table-column>
+            <el-table-column label="采购数量" prop="quantity" width="110" align="center" />
+            <el-table-column label="采购总价" prop="totalAmount" width="120">
+              <template #default="scope">¥ {{ scope.row.totalAmount || '0.00' }}</template>
+            </el-table-column>
+            <el-table-column label="备注" prop="remark" min-width="140" show-overflow-tooltip />
+          </el-table>
+        </template>
+      </div>
+    </el-dialog>
+
+    <!-- 导入采购单对话框 -->
+    <el-dialog title="导入采购" v-model="importPurchaseDialogVisible" width="680px" append-to-body>
+      <div class="import-purchase-dialog">
+        <div class="import-step">
+          <strong>1. 按要求填写模板文件</strong>
+          <el-button link type="primary" @click="handleDownloadPurchaseTemplate">下载导入模板</el-button>
+        </div>
+        <div class="import-step">
+          <strong>2. 选择需要导入的文件，并开始导入</strong>
+          <el-upload
+            ref="purchaseUploadRef"
+            accept=".xlsx,.xls"
+            :auto-upload="false"
+            :limit="1"
+            :file-list="importPurchaseFileList"
+            :on-change="handlePurchaseFileChange"
+            :on-remove="handlePurchaseFileRemove"
+          >
+            <el-button type="primary" plain icon="Upload">添加文件</el-button>
+            <template #tip>
+              <div class="el-upload__tip">请使用模板文件，系统会按物品名称和物品规格匹配 SKU。</div>
+            </template>
+          </el-upload>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="importPurchaseDialogVisible = false">取 消</el-button>
+          <el-button type="primary" :loading="importPurchaseLoading" @click="submitImportPurchase">导 入</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 采购详情对话框 -->
-    <el-dialog title="采购" v-model="purchaseDialogVisible" width="1000px" append-to-body>
-      <el-form ref="purchaseFormRef" :model="purchaseForm" label-width="100px">
+    <el-dialog title="新建采购" v-model="purchaseDialogVisible" width="1000px" class="stock-form-dialog" append-to-body>
+      <el-form ref="purchaseFormRef" :model="purchaseForm" label-width="100px" class="stock-form">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="采购日期" prop="purchaseDate">
@@ -612,26 +839,28 @@
           选择物品
         </el-button>
 
-        <el-table :data="purchaseForm.items" border style="width: 100%;">
-          <el-table-column label="物品名称" prop="itemName" width="150" />
-          <el-table-column label="物品规格" prop="specText" width="150" />
+        <el-table :data="purchaseForm.items" border class="stock-detail-table" table-layout="auto" style="width: 100%;">
+          <el-table-column label="物品名称" prop="itemName" min-width="150" show-overflow-tooltip />
+          <el-table-column label="物品规格" prop="specText" min-width="130" show-overflow-tooltip />
           <el-table-column label="单价(元)" width="120">
             <template #default="scope">
               <el-input-number v-model="scope.row.price" :min="0" :precision="2" :controls="false" style="width: 100%;" />
             </template>
           </el-table-column>
-          <el-table-column label="采购数量" width="120">
+          <el-table-column label="采购数量" width="130">
             <template #default="scope">
-              <el-input-number v-model="scope.row.quantity" :min="1" :controls="false" style="width: 100%;" />
-              <span style="margin-left: 5px; color: #909399;">库存: {{ scope.row.stock }}</span>
+              <div class="quantity-cell">
+                <el-input-number v-model="scope.row.quantity" :min="1" :controls="false" style="width: 100%;" />
+                <span class="quantity-stock-tip">库存: {{ scope.row.stock }}</span>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="小计(元)" width="120">
+          <el-table-column label="小计(元)" width="110">
             <template #default="scope">
               ¥ {{ (scope.row.price * scope.row.quantity).toFixed(2) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="80" align="center">
+          <el-table-column label="操作" width="76" align="center" fixed="right">
             <template #default="scope">
               <el-button link type="danger" icon="Delete" @click="removePurchaseItem(scope.$index)">删除</el-button>
             </template>
@@ -660,12 +889,15 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="账户" prop="account">
-              <el-select v-model="purchaseForm.account" placeholder="请选择账户" style="width: 100%;">
-                <el-option label="现金账户" value="cash_account" />
-                <el-option label="微信账户" value="wechat_account" />
-                <el-option label="支付宝账户" value="alipay_account" />
-              </el-select>
-              <el-button type="primary" link style="margin-left: 10px;">创建</el-button>
+              <div class="account-select-line">
+                <el-select v-model="purchaseForm.account" placeholder="请选择账户">
+                  <el-option label="现金账户" value="现金账户" />
+                  <el-option label="微信账户" value="微信账户" />
+                  <el-option label="支付宝账户" value="支付宝账户" />
+                  <el-option label="银行卡账户" value="银行卡账户" />
+                </el-select>
+                <el-button type="primary" link>设置</el-button>
+              </div>
             </el-form-item>
           </el-col>
         </el-row>
@@ -673,7 +905,21 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-form-item label="年度账本" prop="yearBook">
-              <el-input v-model="purchaseForm.yearBook" placeholder="选择、2007-2100年" style="width: 300px;" />
+              <el-input v-model="purchaseForm.yearBook" placeholder="选择、2007-2100年" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item label="采购备注" prop="remark">
+              <el-input
+                v-model="purchaseForm.remark"
+                type="textarea"
+                :rows="3"
+                maxlength="200"
+                show-word-limit
+                placeholder="选填，200字以内"
+              />
             </el-form-item>
           </el-col>
         </el-row>
@@ -688,11 +934,11 @@
     </el-dialog>
 
     <!-- 领用对话框 -->
-    <el-dialog title="领用" v-model="receiveDialogVisible" width="900px" append-to-body>
-      <el-form ref="receiveFormRef" :model="receiveForm" label-width="100px">
+    <el-dialog title="领用" v-model="receiveDialogVisible" width="900px" class="stock-form-dialog" append-to-body>
+      <el-form ref="receiveFormRef" :model="receiveForm" label-width="100px" class="stock-form">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="领用时间" prop="receiveTime" required>
+            <el-form-item label="领用时间" prop="receiveTime">
               <el-date-picker
                 v-model="receiveForm.receiveTime"
                 type="datetime"
@@ -704,11 +950,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="角色" prop="roleType" required>
+            <el-form-item label="角色" prop="roleType">
               <el-select v-model="receiveForm.roleType" placeholder="请选择角色" style="width: 100%;" @change="handleRoleTypeChange">
-                <el-option label="教师" value="teacher" />
-                <el-option label="学生" value="student" />
-                <el-option label="管理员" value="admin" />
+                <el-option label="学员" value="student" />
+                <el-option label="员工" value="staff" />
+                <el-option label="其他" value="other" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -716,8 +962,17 @@
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="角色名称" prop="roleName" required>
-              <el-select v-model="receiveForm.roleName" placeholder="请选择" style="width: 100%;" filterable>
+            <el-form-item label="角色名称" prop="roleName">
+              <el-select
+                v-model="receiveForm.roleName"
+                :placeholder="receiveForm.roleType === 'other' ? '请输入' : '请选择'"
+                style="width: 100%;"
+                filterable
+                clearable
+                :loading="roleNameLoading"
+                :allow-create="receiveForm.roleType === 'other'"
+                default-first-option
+              >
                 <el-option
                   v-for="item in roleNameOptions"
                   :key="item.value"
@@ -725,11 +980,6 @@
                   :value="item.value"
                 />
               </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="操作人" prop="operator" required>
-              <el-input v-model="receiveForm.operator" placeholder="请输入操作人" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -740,11 +990,11 @@
           选择物品
         </el-button>
 
-        <el-table :data="receiveForm.items" border style="width: 100%;">
-          <el-table-column label="物品名称" prop="itemName" width="180" />
-          <el-table-column label="物品规格" prop="specText" width="150" />
-          <el-table-column label="当前库存" prop="stock" width="100" align="center" />
-          <el-table-column label="领用数量" width="150">
+        <el-table :data="receiveForm.items" border class="stock-detail-table" table-layout="auto" style="width: 100%;">
+          <el-table-column label="物品名称" prop="itemName" min-width="150" show-overflow-tooltip />
+          <el-table-column label="物品规格" prop="specText" min-width="130" show-overflow-tooltip />
+          <el-table-column label="当前库存" prop="stock" width="86" align="center" />
+          <el-table-column label="领用数量" width="128">
             <template #default="scope">
               <el-input-number
                 v-model="scope.row.quantity"
@@ -754,7 +1004,19 @@
               />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="100" align="center">
+          <el-table-column label="备注" min-width="180">
+            <template #default="scope">
+              <el-input
+                v-model="scope.row.remark"
+                type="textarea"
+                :rows="2"
+                maxlength="200"
+                show-word-limit
+                placeholder="选填，最多200个字"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="76" align="center" fixed="right">
             <template #default="scope">
               <el-button link type="danger" icon="Delete" @click="removeReceiveItem(scope.$index)">删除</el-button>
             </template>
@@ -775,11 +1037,11 @@
     </el-dialog>
 
     <!-- 退领对话框 -->
-    <el-dialog title="退领" v-model="returnDialogVisible" width="900px" append-to-body>
-      <el-form ref="returnFormRef" :model="returnForm" label-width="100px">
+    <el-dialog title="退领" v-model="returnDialogVisible" width="900px" class="stock-form-dialog" append-to-body>
+      <el-form ref="returnFormRef" :model="returnForm" label-width="100px" class="stock-form">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="退领时间" prop="returnTime" required>
+            <el-form-item label="退领时间" prop="returnTime">
               <el-date-picker
                 v-model="returnForm.returnTime"
                 type="datetime"
@@ -791,11 +1053,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="角色" prop="roleType" required>
+            <el-form-item label="角色" prop="roleType">
               <el-select v-model="returnForm.roleType" placeholder="请选择角色" style="width: 100%;" @change="handleReturnRoleTypeChange">
-                <el-option label="教师" value="teacher" />
-                <el-option label="学生" value="student" />
-                <el-option label="管理员" value="admin" />
+                <el-option label="学员" value="student" />
+                <el-option label="员工" value="staff" />
+                <el-option label="其他" value="other" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -803,8 +1065,17 @@
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="角色名称" prop="roleName" required>
-              <el-select v-model="returnForm.roleName" placeholder="请选择" style="width: 100%;" filterable>
+            <el-form-item label="角色名称" prop="roleName">
+              <el-select
+                v-model="returnForm.roleName"
+                :placeholder="returnForm.roleType === 'other' ? '请输入' : '请选择'"
+                style="width: 100%;"
+                filterable
+                clearable
+                :loading="returnRoleNameLoading"
+                :allow-create="returnForm.roleType === 'other'"
+                default-first-option
+              >
                 <el-option
                   v-for="item in returnRoleNameOptions"
                   :key="item.value"
@@ -812,11 +1083,6 @@
                   :value="item.value"
                 />
               </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="操作人" prop="operator" required>
-              <el-input v-model="returnForm.operator" placeholder="请输入操作人" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -827,11 +1093,11 @@
           选择物品
         </el-button>
 
-        <el-table :data="returnForm.items" border style="width: 100%;">
-          <el-table-column label="物品名称" prop="itemName" width="180" />
-          <el-table-column label="物品规格" prop="specText" width="150" />
-          <el-table-column label="当前库存" prop="stock" width="100" align="center" />
-          <el-table-column label="退领数量" width="150">
+        <el-table :data="returnForm.items" border class="stock-detail-table" table-layout="auto" style="width: 100%;">
+          <el-table-column label="物品名称" prop="itemName" min-width="150" show-overflow-tooltip />
+          <el-table-column label="物品规格" prop="specText" min-width="130" show-overflow-tooltip />
+          <el-table-column label="当前库存" prop="stock" width="86" align="center" />
+          <el-table-column label="退领数量" width="128">
             <template #default="scope">
               <el-input-number
                 v-model="scope.row.quantity"
@@ -841,7 +1107,19 @@
               />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="100" align="center">
+          <el-table-column label="备注" min-width="180">
+            <template #default="scope">
+              <el-input
+                v-model="scope.row.remark"
+                type="textarea"
+                :rows="2"
+                maxlength="200"
+                show-word-limit
+                placeholder="选填，最多200个字"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="76" align="center" fixed="right">
             <template #default="scope">
               <el-button link type="danger" icon="Delete" @click="removeReturnItem(scope.$index)">删除</el-button>
             </template>
@@ -862,8 +1140,8 @@
     </el-dialog>
 
     <!-- 盘点对话框 -->
-    <el-dialog title="库存盘点" v-model="inventoryDialogVisible" width="1200px" append-to-body>
-      <el-form ref="inventoryFormRef" :model="inventoryForm" label-width="100px">
+    <el-dialog title="库存盘点" v-model="inventoryDialogVisible" width="1200px" class="stock-form-dialog" append-to-body>
+      <el-form ref="inventoryFormRef" :model="inventoryForm" label-width="100px" class="stock-form">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="盘点日期" prop="inventoryDate" required>
@@ -890,15 +1168,15 @@
           选择物品
         </el-button>
 
-        <el-table :data="inventoryForm.items" border style="width: 100%;" max-height="450">
-          <el-table-column label="物品名称" prop="itemName" width="150" fixed />
-          <el-table-column label="物品规格" prop="specText" width="120" />
-          <el-table-column label="原库存" prop="originalStock" width="100" align="center">
+        <el-table :data="inventoryForm.items" border class="stock-detail-table inventory-detail-table" table-layout="auto" style="width: 100%;" max-height="450">
+          <el-table-column label="物品名称" prop="itemName" min-width="140" show-overflow-tooltip />
+          <el-table-column label="物品规格" prop="specText" min-width="120" show-overflow-tooltip />
+          <el-table-column label="原库存" prop="originalStock" width="82" align="center">
             <template #default="scope">
               <span style="color: #909399;">{{ scope.row.originalStock }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="当前库存" width="150" align="center">
+          <el-table-column label="当前库存" width="120" align="center">
             <template #default="scope">
               <el-input-number
                 v-model="scope.row.currentStock"
@@ -909,7 +1187,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column label="库存变动" width="120" align="center">
+          <el-table-column label="库存变动" width="92" align="center">
             <template #default="scope">
               <span
                 :style="{
@@ -921,7 +1199,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="备注" width="200">
+          <el-table-column label="备注" min-width="150">
             <template #default="scope">
               <el-input
                 v-model="scope.row.remark"
@@ -930,7 +1208,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="100" align="center" fixed="right">
+          <el-table-column label="操作" width="76" align="center" fixed="right">
             <template #default="scope">
               <el-button link type="danger" icon="Delete" @click="removeInventoryItem(scope.$index)">删除</el-button>
             </template>
@@ -1089,7 +1367,11 @@
 
 <script setup name="AssistantInventory">
 import { nextTick } from 'vue';
-import {
+import * as inventoryApi from '@/api/assistant/inventory';
+import { listCourseOptions } from '@/api/assistant/course';
+import useUserStore from '@/store/modules/user';
+
+const {
   addFee,
   addItem,
   changeFeeStatus,
@@ -1102,15 +1384,19 @@ import {
   getFee,
   getItem,
   getStockRecord,
+  importPurchase,
   listAvailableItems,
   listFee,
   listItem,
+  listRoleOptions,
   listStockRecord,
   updateFee,
-  updateItem
-} from '@/api/assistant/inventory';
+  updateItem,
+  voidStockRecord
+} = inventoryApi;
 
 const { proxy } = getCurrentInstance();
+const userStore = useUserStore();
 
 // Tab相关
 const activeTab = ref('item');
@@ -1134,15 +1420,34 @@ const itemQueryParams = ref({
 const stockList = ref([]);
 const stockLoading = ref(false);
 const stockTotal = ref(0);
+const stockTableKey = ref(0);
+const stockItemOptions = ref([]);
+const stockSummary = ref({
+  currentCount: 0,
+  inTotal: 0,
+  outTotal: 0,
+  netTotal: 0
+});
+const stockDetailVisible = ref(false);
+const stockDetailLoading = ref(false);
+const stockDetail = ref({});
+const importPurchaseDialogVisible = ref(false);
+const importPurchaseLoading = ref(false);
+const importPurchaseFileList = ref([]);
+const purchaseUploadRef = ref(null);
 
 // 出入库查询参数
 const stockQueryParams = ref({
   pageNum: 1,
   pageSize: 10,
   keyword: undefined,
+  itemNames: [],
   dateRange: [],
   businessType: '', // 业务类型：采购、领用、退领
-  stockType: ''
+  stockTypes: ['out', 'in'],
+  relatedType: '',
+  relatedName: '',
+  excludeVoided: true
 });
 
 // 物品表单相关
@@ -1188,7 +1493,8 @@ const purchaseForm = ref({
   items: [],
   paymentMethod: '',
   account: '',
-  yearBook: ''
+  yearBook: '',
+  remark: ''
 });
 
 // 计算采购总数量
@@ -1206,14 +1512,15 @@ const purchaseTotalAmount = computed(() => {
 
 // 领用对话框
 const receiveDialogVisible = ref(false);
+const receiveFormRef = ref();
 const receiveForm = ref({
   receiveTime: '',
   roleType: '',
   roleName: '',
-  operator: '',
   items: []
 });
 const roleNameOptions = ref([]); // 角色名称选项
+const roleNameLoading = ref(false);
 const currentDialogType = ref(''); // 当前打开的对话框类型：receive/return
 
 // 计算领用总数量
@@ -1223,14 +1530,15 @@ const receiveTotalQuantity = computed(() => {
 
 // 退领对话框
 const returnDialogVisible = ref(false);
+const returnFormRef = ref();
 const returnForm = ref({
   returnTime: '',
   roleType: '',
   roleName: '',
-  operator: '',
   items: []
 });
 const returnRoleNameOptions = ref([]); // 退领角色名称选项
+const returnRoleNameLoading = ref(false);
 
 // 计算退领总数量
 const returnTotalQuantity = computed(() => {
@@ -1305,13 +1613,38 @@ const filteredCourseList = computed(() => {
     return courseList.value;
   }
   return courseList.value.filter(course =>
-    course.courseName.includes(courseSearchKeyword.value)
+    (course.courseName || '').includes(courseSearchKeyword.value)
   );
 });
 
 // 已选择课程数量
 const selectedCourseCount = computed(() => {
   return selectedCourses.value.length;
+});
+
+const stockRelatedRows = computed(() => {
+  const detail = stockDetail.value || {};
+  if (detail.purchaseOrder) {
+    return [{
+      businessNo: detail.purchaseOrder.orderNo,
+      businessTypeLabel: '采购',
+      sourceLabel: '采购单',
+      operator: detail.purchaseOrder.operatorName || detail.operator || '-',
+      recordDate: detail.purchaseOrder.purchaseDate || detail.recordDate,
+      createTime: detail.purchaseOrder.createTime || detail.createTime
+    }];
+  }
+  if (detail.businessNo) {
+    return [{
+      businessNo: detail.businessNo,
+      businessTypeLabel: detail.businessTypeLabel || '-',
+      sourceLabel: detail.sourceType || '-',
+      operator: detail.operator || detail.operatorName || '-',
+      recordDate: detail.recordDate || detail.stockDate,
+      createTime: detail.createTime || detail.stockDate
+    }];
+  }
+  return [];
 });
 
 function cleanQuery(query) {
@@ -1325,18 +1658,69 @@ function cleanQuery(query) {
   return result;
 }
 
-function formatDate(value) {
+function formatDate(value, endOfDay = false) {
   if (!value) {
     return undefined;
   }
+  const pad = num => String(num).padStart(2, '0');
   if (typeof value === 'string') {
-    return value.slice(0, 10);
+    const rawValue = value.trim();
+    const normalizedValue = rawValue.replace('T', ' ').replace(/\.\d+$/, '');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+      return `${normalizedValue} ${endOfDay ? '23:59:59' : '00:00:00'}`;
+    }
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(normalizedValue)) {
+      return normalizedValue.slice(0, 19);
+    }
   }
   const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return String(value).slice(0, 19);
+  }
+  if (endOfDay) {
+    date.setHours(23, 59, 59, 0);
+  }
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hour = pad(date.getHours());
+  const minute = pad(date.getMinutes());
+  const second = pad(date.getSeconds());
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+
+function buildStockQueryParams() {
+  const dateRange = stockQueryParams.value.dateRange || [];
+  const stockTypes = stockQueryParams.value.stockTypes || [];
+  return cleanQuery({
+    ...stockQueryParams.value,
+    itemNames: (stockQueryParams.value.itemNames || []).join(','),
+    stockType: stockTypes.length === 1 ? stockTypes[0] : undefined,
+    stockTypes: undefined,
+    beginTime: dateRange[0] ? formatDate(dateRange[0]) : undefined,
+    endTime: dateRange[1] ? formatDate(dateRange[1], true) : undefined,
+    dateRange: undefined,
+    businessType: stockQueryParams.value.businessType || undefined,
+    relatedType: stockQueryParams.value.relatedType || undefined,
+    relatedName: stockQueryParams.value.relatedName || undefined,
+    excludeVoided: stockQueryParams.value.excludeVoided
+  });
+}
+
+function refreshInventoryViews({ refreshStock = true, refreshItems = true, refreshOptions = false } = {}) {
+  nextTick(() => {
+    window.setTimeout(() => {
+      if (refreshOptions) {
+        loadStockItemOptions();
+      }
+      if (refreshStock) {
+        getStockList();
+      }
+      if (refreshItems) {
+        getItemList();
+      }
+    }, 0);
+  });
 }
 
 function normalizeNumber(value, fallback = 0) {
@@ -1466,6 +1850,7 @@ function handleTabClick(tab) {
     if (itemSubTab.value === 'itemManage') {
       getItemList();
     } else if (itemSubTab.value === 'stockManage') {
+      loadStockItemOptions();
       getStockList();
     }
   } else if (tab.props.name === 'fee') {
@@ -1479,6 +1864,7 @@ function handleItemSubTabClick(tab) {
   if (tab.props.name === 'itemManage') {
     getItemList();
   } else if (tab.props.name === 'stockManage') {
+    loadStockItemOptions();
     getStockList();
   }
 }
@@ -1788,18 +2174,25 @@ function autoGenerateSKU() {
 /** 查询出入库列表 */
 function getStockList() {
   stockLoading.value = true;
-  const dateRange = stockQueryParams.value.dateRange || [];
-  listStockRecord(cleanQuery({
-    ...stockQueryParams.value,
-    beginTime: dateRange[0] ? formatDate(dateRange[0]) : undefined,
-    endTime: dateRange[1] ? formatDate(dateRange[1]) : undefined,
-    dateRange: undefined,
-    businessType: stockQueryParams.value.businessType || undefined
-  })).then(response => {
+  listStockRecord(buildStockQueryParams()).then(response => {
+    stockTableKey.value += 1;
     stockList.value = response.rows || [];
     stockTotal.value = response.total || 0;
+    stockSummary.value = response.summary || {
+      currentCount: stockTotal.value,
+      inTotal: 0,
+      outTotal: 0,
+      netTotal: 0
+    };
   }).finally(() => {
     stockLoading.value = false;
+  });
+}
+
+/** 加载出入库物品筛选项 */
+function loadStockItemOptions() {
+  return listAvailableItems({}).then(response => {
+    stockItemOptions.value = response.data || [];
   });
 }
 
@@ -1815,9 +2208,13 @@ function resetStockQuery() {
     pageNum: 1,
     pageSize: 10,
     keyword: undefined,
+    itemNames: [],
     dateRange: [],
     businessType: '', // 业务类型
-    stockType: ''
+    stockTypes: ['out', 'in'],
+    relatedType: '',
+    relatedName: '',
+    excludeVoided: true
   };
   handleStockQuery();
 }
@@ -1830,41 +2227,55 @@ function handlePurchase() {
     items: [],
     paymentMethod: '',
     account: '',
-    yearBook: ''
+    yearBook: '',
+    remark: ''
   };
+}
+
+function handlePurchaseCommand(command) {
+  if (command === 'import') {
+    importPurchaseDialogVisible.value = true;
+    importPurchaseFileList.value = [];
+    return;
+  }
+  handlePurchase();
 }
 
 /** 领用 */
 function handleReceive() {
   receiveDialogVisible.value = true;
   receiveForm.value = {
-    receiveTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    receiveTime: formatDate(new Date()),
     roleType: '',
     roleName: '',
-    operator: '',
     items: []
   };
   roleNameOptions.value = [];
+  nextTick(() => {
+    receiveFormRef.value?.clearValidate();
+  });
 }
 
 /** 退领 */
 function handleReturn() {
   returnDialogVisible.value = true;
   returnForm.value = {
-    returnTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    returnTime: formatDate(new Date()),
     roleType: '',
     roleName: '',
-    operator: '',
     items: []
   };
   returnRoleNameOptions.value = [];
+  nextTick(() => {
+    returnFormRef.value?.clearValidate();
+  });
 }
 
 /** 盘点 */
 function handleInventory() {
   inventoryDialogVisible.value = true;
   inventoryForm.value = {
-    inventoryDate: new Date().toISOString().slice(0, 10),
+    inventoryDate: formatDate(new Date()).slice(0, 10),
     operator: '',
     items: []
   };
@@ -1872,29 +2283,66 @@ function handleInventory() {
 
 /** 导出出入库 */
 function handleStockExport() {
-  const dateRange = stockQueryParams.value.dateRange || [];
-  proxy.download('ast/inventory/stock/export', cleanQuery({
-    ...stockQueryParams.value,
-    beginTime: dateRange[0] ? formatDate(dateRange[0]) : undefined,
-    endTime: dateRange[1] ? formatDate(dateRange[1]) : undefined,
-    dateRange: undefined,
-    businessType: stockQueryParams.value.businessType || undefined
-  }), `stock_record_${new Date().getTime()}.xlsx`);
+  proxy.download('ast/inventory/stock/export', buildStockQueryParams(), `stock_record_${new Date().getTime()}.xlsx`);
 }
 
 /** 查看出入库详情 */
 function handleViewStock(row) {
+  stockDetailVisible.value = true;
+  stockDetailLoading.value = true;
+  stockDetail.value = {};
   getStockRecord(row.id).then(response => {
-    const detail = response.data || {};
-    const message = [
-      `流水号：${detail.recordNo || '-'}`,
-      `物品：${detail.itemName || '-'} ${detail.skuName ? '(' + detail.skuName + ')' : ''}`,
-      `数量：${detail.quantity}`,
-      `库存：${detail.stockBefore} -> ${detail.stockAfter}`,
-      `经办人：${detail.operator || detail.operatorName || '-'}`,
-      `备注：${detail.remark || '-'}`
-    ].join('\n');
-    proxy.$modal.alert(message);
+    stockDetail.value = response.data || {};
+  }).finally(() => {
+    stockDetailLoading.value = false;
+  });
+}
+
+function handleVoidStock(detail) {
+  if (!detail || !detail.id) {
+    return;
+  }
+  proxy.$modal.confirm('确定要作废该出入库记录吗？作废后库存会按该记录数量回滚。').then(() => {
+    return voidStockRecord(detail.id);
+  }).then(() => {
+    proxy.$modal.msgSuccess('作废成功');
+    stockDetailVisible.value = false;
+    refreshInventoryViews();
+  }).catch(() => {});
+}
+
+function handleDownloadPurchaseTemplate() {
+  proxy.download(
+    'ast/inventory/purchase/import/template',
+    {},
+    `导入物品采购单模板_${new Date().getTime()}.xlsx`
+  );
+}
+
+function handlePurchaseFileChange(file, fileList) {
+  importPurchaseFileList.value = fileList.slice(-1);
+}
+
+function handlePurchaseFileRemove(file, fileList) {
+  importPurchaseFileList.value = fileList;
+}
+
+function submitImportPurchase() {
+  const file = importPurchaseFileList.value[0]?.raw;
+  if (!file) {
+    proxy.$modal.msgWarning('请先添加需要导入的采购单文件');
+    return;
+  }
+  const formData = new FormData();
+  formData.append('file', file);
+  importPurchaseLoading.value = true;
+  importPurchase(formData).then(() => {
+    proxy.$modal.msgSuccess('导入成功');
+    importPurchaseDialogVisible.value = false;
+    importPurchaseFileList.value = [];
+    refreshInventoryViews({ refreshOptions: true });
+  }).finally(() => {
+    importPurchaseLoading.value = false;
   });
 }
 
@@ -2016,61 +2464,50 @@ function submitPurchase() {
     paymentMethod: purchaseForm.value.paymentMethod,
     accountName: purchaseForm.value.account,
     yearBook: purchaseForm.value.yearBook,
+    remark: purchaseForm.value.remark,
     items: buildStockItems(purchaseForm.value.items)
   }).then(() => {
     proxy.$modal.msgSuccess('采购成功');
     purchaseDialogVisible.value = false;
-    getStockList();
-    getItemList();
+    refreshInventoryViews();
   });
 }
 
 /** 角色类型变化（领用） */
 function handleRoleTypeChange(value) {
   receiveForm.value.roleName = '';
-  // 根据角色类型加载对应的角色名称列表
-  if (value === 'teacher') {
-    roleNameOptions.value = [
-      { label: '李老师', value: '李老师' },
-      { label: '王老师', value: '王老师' },
-      { label: '张老师', value: '张老师' }
-    ];
-  } else if (value === 'student') {
-    roleNameOptions.value = [
-      { label: '小明', value: '小明' },
-      { label: '小红', value: '小红' },
-      { label: '小刚', value: '小刚' }
-    ];
-  } else if (value === 'admin') {
-    roleNameOptions.value = [
-      { label: '系统管理员', value: '系统管理员' },
-      { label: '采购员', value: '采购员' }
-    ];
-  }
+  loadRoleNameOptions(value, 'receive');
 }
 
 /** 角色类型变化（退领） */
 function handleReturnRoleTypeChange(value) {
   returnForm.value.roleName = '';
-  // 根据角色类型加载对应的角色名称列表
-  if (value === 'teacher') {
-    returnRoleNameOptions.value = [
-      { label: '李老师', value: '李老师' },
-      { label: '王老师', value: '王老师' },
-      { label: '张老师', value: '张老师' }
-    ];
-  } else if (value === 'student') {
-    returnRoleNameOptions.value = [
-      { label: '小明', value: '小明' },
-      { label: '小红', value: '小红' },
-      { label: '小刚', value: '小刚' }
-    ];
-  } else if (value === 'admin') {
-    returnRoleNameOptions.value = [
-      { label: '系统管理员', value: '系统管理员' },
-      { label: '采购员', value: '采购员' }
-    ];
+  loadRoleNameOptions(value, 'return');
+}
+
+function normalizeRoleOptions(rows) {
+  return (rows || [])
+    .map(item => {
+      const label = item.label || item.value || item.studentName || item.teacherName || item.name;
+      return label ? { label, value: item.value || label } : null;
+    })
+    .filter(Boolean);
+}
+
+function loadRoleNameOptions(roleType, target) {
+  const isReceive = target === 'receive';
+  const optionsRef = isReceive ? roleNameOptions : returnRoleNameOptions;
+  const loadingRef = isReceive ? roleNameLoading : returnRoleNameLoading;
+  optionsRef.value = [];
+  if (!roleType || roleType === 'other') {
+    return Promise.resolve();
   }
+  loadingRef.value = true;
+  return listRoleOptions(cleanQuery({ roleType })).then(response => {
+    optionsRef.value = normalizeRoleOptions(response.data);
+  }).finally(() => {
+    loadingRef.value = false;
+  });
 }
 
 /** 删除领用物品 */
@@ -2093,26 +2530,20 @@ function submitReceive() {
     proxy.$modal.msgWarning('请选择角色名称');
     return;
   }
-  if (!receiveForm.value.operator) {
-    proxy.$modal.msgWarning('请输入操作人');
-    return;
-  }
   if (receiveForm.value.items.length === 0) {
     proxy.$modal.msgWarning('请选择领用物品');
     return;
   }
 
   createReceive({
-    receiveTime: receiveForm.value.receiveTime,
+    receiveTime: formatDate(receiveForm.value.receiveTime),
     roleType: receiveForm.value.roleType,
     roleName: receiveForm.value.roleName,
-    operator: receiveForm.value.operator,
     items: buildStockItems(receiveForm.value.items)
   }).then(() => {
     proxy.$modal.msgSuccess('领用成功');
     receiveDialogVisible.value = false;
-    getStockList();
-    getItemList();
+    refreshInventoryViews();
   });
 }
 
@@ -2136,26 +2567,20 @@ function submitReturn() {
     proxy.$modal.msgWarning('请选择角色名称');
     return;
   }
-  if (!returnForm.value.operator) {
-    proxy.$modal.msgWarning('请输入操作人');
-    return;
-  }
   if (returnForm.value.items.length === 0) {
     proxy.$modal.msgWarning('请选择退领物品');
     return;
   }
 
   createReturn({
-    returnTime: returnForm.value.returnTime,
+    returnTime: formatDate(returnForm.value.returnTime),
     roleType: returnForm.value.roleType,
     roleName: returnForm.value.roleName,
-    operator: returnForm.value.operator,
     items: buildStockItems(returnForm.value.items)
   }).then(() => {
     proxy.$modal.msgSuccess('退领成功');
     returnDialogVisible.value = false;
-    getStockList();
-    getItemList();
+    refreshInventoryViews();
   });
 }
 
@@ -2214,8 +2639,7 @@ function submitInventory() {
   }).then(() => {
     proxy.$modal.msgSuccess('盘点成功，库存已更新');
     inventoryDialogVisible.value = false;
-    getStockList();
-    getItemList();
+    refreshInventoryViews();
   }).catch(() => {});
 }
 
@@ -2358,81 +2782,26 @@ function openSelectCourseDialog(target = 'fee') {
   selectCourseDialogVisible.value = true;
   courseSearchKeyword.value = '';
   selectedCourses.value = [];
-  loadCourseList();
-
-  // 延迟设置已选中的课程
-  nextTick(() => {
+  loadCourseList().then(() => {
     const targetCourseIds = getTargetCourseIds() || [];
-    if (courseTableRef.value && targetCourseIds.length > 0) {
-      const selectedRows = courseList.value.filter(course =>
-        targetCourseIds.includes(course.id)
-      );
-      selectedRows.forEach(row => {
-        courseTableRef.value.toggleRowSelection(row, true);
-      });
-    }
+    nextTick(() => {
+      if (courseTableRef.value && targetCourseIds.length > 0) {
+        const selectedRows = courseList.value.filter(course =>
+          targetCourseIds.includes(course.id)
+        );
+        selectedRows.forEach(row => {
+          courseTableRef.value.toggleRowSelection(row, true);
+        });
+      }
+    });
   });
 }
 
 /** 加载课程列表 */
 function loadCourseList() {
-  // 模拟课程数据
-  courseList.value = [
-    {
-      id: 1,
-      courseName: '早教一对一课程',
-      courseType: '一对一',
-      priceStandard: '一对一课包1(20000元96课时起) 等4项'
-    },
-    {
-      id: 2,
-      courseName: '早教半年卡',
-      courseType: '一对多',
-      priceStandard: '课程包3(12000元48课时起) 等4项'
-    },
-    {
-      id: 3,
-      courseName: '早教年卡',
-      courseType: '一对多',
-      priceStandard: '课程包1(20000元96课时起) 等4项'
-    },
-    {
-      id: 4,
-      courseName: '钢琴二级课程',
-      courseType: '一对多',
-      priceStandard: '单价(22元/课时)'
-    },
-    {
-      id: 5,
-      courseName: '钢琴一级课程',
-      courseType: '一对多',
-      priceStandard: '单价(11元/课时)'
-    },
-    {
-      id: 6,
-      courseName: '钢琴一对一课程',
-      courseType: '一对一',
-      priceStandard: '钢琴一节课单价(120元/课时) 等2项'
-    },
-    {
-      id: 7,
-      courseName: '按月托管',
-      courseType: '一对多',
-      priceStandard: '单价(1000元/月)'
-    },
-    {
-      id: 8,
-      courseName: '厨士舞',
-      courseType: '一对多',
-      priceStandard: '单价(100元/课时) 等3项'
-    },
-    {
-      id: 9,
-      courseName: '拉丁舞',
-      courseType: '一对多',
-      priceStandard: '单价(80元/课时) 等5项'
-    }
-  ];
+  return listCourseOptions().then(response => {
+    courseList.value = response.data || [];
+  });
 }
 
 /** 课程选择变化 */
@@ -2484,5 +2853,317 @@ getItemList();
 <style scoped>
 .app-container {
   padding: 20px;
+}
+
+.item-manage-table {
+  width: 100%;
+}
+
+.stock-record-table {
+  width: 100%;
+}
+
+.stock-search-form {
+  padding-top: 2px;
+}
+
+.stock-action-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-height: 34px;
+}
+
+.stock-action-buttons {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stock-action-buttons :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.purchase-more-button {
+  margin-left: -10px;
+  padding-left: 9px;
+  padding-right: 9px;
+}
+
+.stock-summary-bar {
+  align-items: center;
+  background: #fff3ea;
+  border-radius: 4px;
+  color: #606266;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  line-height: 22px;
+  margin: 8px 0 14px;
+  padding: 10px 14px;
+}
+
+.stock-summary-bar span:first-child {
+  font-weight: 600;
+}
+
+.item-name-cell {
+  display: flex;
+  flex-direction: column;
+  line-height: 20px;
+  min-width: 0;
+}
+
+.item-name-cell small {
+  color: #909399;
+  font-size: 12px;
+}
+
+.item-manage-table :deep(.cell) {
+  white-space: nowrap;
+}
+
+.stock-record-table :deep(.cell) {
+  white-space: nowrap;
+}
+
+.item-manage-table :deep(.el-button) {
+  margin: 0 3px;
+}
+
+.stock-record-table :deep(.el-button) {
+  margin: 0 3px;
+}
+
+.item-form :deep(.el-input),
+.item-form :deep(.el-select),
+.item-form :deep(.el-input-number),
+.item-form :deep(.el-textarea),
+.stock-form :deep(.el-input),
+.stock-form :deep(.el-select),
+.stock-form :deep(.el-input-number),
+.stock-form :deep(.el-date-editor),
+.stock-form :deep(.el-textarea) {
+  width: 100%;
+}
+
+.item-form :deep(.el-form-item__content),
+.stock-form :deep(.el-form-item__content) {
+  min-width: 0;
+}
+
+.course-bind-area {
+  width: 100%;
+  min-width: 0;
+}
+
+.spec-table,
+.sku-table,
+.stock-detail-table {
+  max-width: 100%;
+}
+
+.spec-table :deep(.cell),
+.stock-detail-table :deep(.cell) {
+  white-space: normal;
+}
+
+.sku-table :deep(.cell) {
+  white-space: nowrap;
+}
+
+.spec-value-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 2px 0;
+  width: 100%;
+}
+
+.spec-value-editor :deep(.el-tag) {
+  max-width: 160px;
+}
+
+.spec-tag-input {
+  width: 150px;
+  flex: 0 0 150px;
+}
+
+.spec-tip {
+  color: #909399;
+  flex: 1 1 240px;
+  font-size: 12px;
+  line-height: 20px;
+  min-width: 200px;
+  white-space: normal;
+}
+
+.quantity-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quantity-stock-tip {
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.account-select-line {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+.account-select-line :deep(.el-select) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.stock-detail-panel {
+  min-height: 220px;
+}
+
+.detail-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.detail-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.detail-heading div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-heading span {
+  color: #606266;
+}
+
+.detail-grid {
+  border: 1px solid #ebeef5;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.detail-grid > div {
+  border-bottom: 1px solid #ebeef5;
+  min-width: 0;
+  padding: 14px 18px;
+}
+
+.detail-grid > div:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.detail-grid label {
+  color: #909399;
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  margin-bottom: 6px;
+}
+
+.detail-grid span {
+  color: #303133;
+  display: block;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+
+.import-purchase-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 4px 8px 10px;
+}
+
+.import-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.import-step strong {
+  color: #303133;
+  font-size: 15px;
+}
+
+:global(.item-form-dialog),
+:global(.stock-form-dialog),
+:global(.stock-detail-dialog) {
+  max-width: calc(100vw - 40px);
+}
+
+:global(.item-form-dialog .el-dialog__header),
+:global(.item-form-dialog .el-dialog__footer),
+:global(.stock-form-dialog .el-dialog__header),
+:global(.stock-form-dialog .el-dialog__footer),
+:global(.stock-detail-dialog .el-dialog__header),
+:global(.stock-detail-dialog .el-dialog__footer) {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+:global(.item-form-dialog .el-dialog__body),
+:global(.stock-form-dialog .el-dialog__body),
+:global(.stock-detail-dialog .el-dialog__body) {
+  max-height: calc(100vh - 180px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px 20px 18px;
+}
+
+:global(.item-form-dialog .el-row),
+:global(.stock-form-dialog .el-row) {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+:global(.item-form-dialog [class*="el-col-"]),
+:global(.stock-form-dialog [class*="el-col-"]) {
+  padding-left: 0 !important;
+  padding-right: 20px !important;
+}
+
+:global(.item-form-dialog [class*="el-col-"]:last-child),
+:global(.stock-form-dialog [class*="el-col-"]:last-child) {
+  padding-right: 0 !important;
+}
+
+@media (max-width: 1280px) {
+  :global(.item-form-dialog),
+  :global(.stock-form-dialog),
+  :global(.stock-detail-dialog) {
+    width: calc(100vw - 40px) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid > div {
+    border-bottom: 1px solid #ebeef5;
+  }
+
+  .detail-grid > div:last-child {
+    border-bottom: 0;
+  }
 }
 </style>

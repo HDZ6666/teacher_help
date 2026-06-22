@@ -1,206 +1,63 @@
 # 物品费用管理模块 (module_ast)
 
-## 📋 模块概述
+物品费用管理模块负责维护机构的物品档案、SKU、采购入库、领用/退领、盘点流水和费用项目。当前模块已经具备独立管理与演示能力，后续完整业务闭环还需要继续对接课程套餐、报名订单和支付流水。
 
-物品费用管理模块负责管理教育培训机构的物品库存和费用项目。
+## 已实现范围
 
-### 功能模块
+- 物品管理：列表、详情、新增、编辑、删除、启停、库存预警、线上售卖、绑定课程。
+- SKU 管理：按规格生成 SKU，保存 SKU 价格、库存、状态和规格文本。
+- 出入库管理：采购入库、领用出库、退领入库、盘点、流水查询、详情、作废回滚、导出。
+- 采购导入：下载采购单模板，按 Excel 导入采购明细并生成入库流水。
+- 费用项目：列表、详情、新增、编辑、删除、启停、线上售卖、绑定课程。
+- 选择项接口：物品/SKU 选项、领用/退领角色姓名选项。
 
-- ✅ **物品管理** - 已实现
-- ⏳ **SKU管理** - 待实现
-- ⏳ **采购管理** - 待实现
-- ⏳ **出入库管理** - 待实现
-- ⏳ **费用项目管理** - 待实现
+## 主要接口
 
----
+| 功能 | 方法 | 路径 | 权限标识 |
+| --- | --- | --- | --- |
+| 物品列表 | GET | `/ast/item/list` | `ast:item:list` |
+| 物品详情 | GET | `/ast/item/{item_id}` | `ast:item:query` |
+| 新增物品 | POST | `/ast/item` | `ast:item:add` |
+| 编辑物品 | PUT | `/ast/item` | `ast:item:edit` |
+| 删除物品 | DELETE | `/ast/item/{item_ids}` | `ast:item:remove` |
+| SKU 列表 | GET | `/ast/inventory/item/{item_id}/skus` | `ast:item:query` 或 `ast:inventory:list` |
+| 可选物品 | GET | `/ast/inventory/items/options` | `ast:item:list` 或 `ast:inventory:list` |
+| 角色姓名选项 | GET | `/ast/inventory/role-options` | `ast:inventory:add` 或 `ast:inventory:list` |
+| 出入库列表 | GET | `/ast/inventory/stock/list` | `ast:inventory:list` |
+| 出入库详情 | GET | `/ast/inventory/stock/{record_id}` | `ast:inventory:query` |
+| 出入库作废 | PUT | `/ast/inventory/stock/{record_id}/void` | `ast:inventory:edit` 或 `ast:inventory:add` |
+| 出入库导出 | POST | `/ast/inventory/stock/export` | `ast:inventory:export` 或 `ast:inventory:list` |
+| 采购入库 | POST | `/ast/inventory/purchase` | `ast:inventory:add` |
+| 采购模板 | POST | `/ast/inventory/purchase/import/template` | `ast:inventory:add` 或 `ast:inventory:export` |
+| 采购导入 | POST | `/ast/inventory/purchase/import` | `ast:inventory:add` 或 `ast:inventory:import` |
+| 领用 | POST | `/ast/inventory/receive` | `ast:inventory:add` |
+| 退领 | POST | `/ast/inventory/return` | `ast:inventory:add` |
+| 盘点 | POST | `/ast/inventory/inventory` | `ast:inventory:add` |
+| 费用列表 | GET | `/ast/inventory/fee/list` | `ast:fee:list` |
+| 费用详情 | GET | `/ast/inventory/fee/{fee_id}` | `ast:fee:query` |
+| 新增费用 | POST | `/ast/inventory/fee` | `ast:fee:add` |
+| 编辑费用 | PUT | `/ast/inventory/fee` | `ast:fee:edit` |
+| 费用启停 | PUT | `/ast/inventory/fee/changeStatus` | `ast:fee:edit` |
+| 删除费用 | DELETE | `/ast/inventory/fee/{fee_ids}` | `ast:fee:remove` |
 
-## 🎯 已实现功能
+## 前端页面
 
-### 1. 物品管理 (ast_item)
+- 页面：`teacher_help_admin/src/views/assistant/inventory/index.vue`
+- API：`teacher_help_admin/src/api/assistant/inventory.js`
+- 风格：RuoYi Vue3 + Element Plus，使用查询表单、工具栏、表格、分页、弹窗和抽屉。
 
-#### API 接口列表
+## 数据字典
 
-| 接口 | 方法 | 路径 | 权限标识 | 说明 |
-|------|------|------|---------|------|
-| 获取物品列表 | GET | `/ast/item/list` | `ast:item:list` | 分页查询物品列表 |
-| 获取物品详情 | GET | `/ast/item/{item_id}` | `ast:item:query` | 根据ID查询物品详情 |
-| 新增物品 | POST | `/ast/item` | `ast:item:add` | 新增物品信息 |
-| 编辑物品 | PUT | `/ast/item` | `ast:item:edit` | 编辑物品信息 |
-| 删除物品 | DELETE | `/ast/item/{item_ids}` | `ast:item:remove` | 删除物品（逻辑删除） |
+- `ast_item_type`：物品类型。
+- `ast_business_type`：业务类型，包含 `purchase`、`receive`、`return`、`inventory`。
+- `ast_source_type`：来源类型。
+- `ast_purchase_status`：采购单状态。
+- `ast_role_type`：领用/退领角色类型。
+- `ast_payment_method`：支付方式。
 
-#### 查询参数
+## 后续待联动
 
-```json
-{
-  "pageNum": 1,
-  "pageSize": 10,
-  "itemName": "物品名称（模糊查询）",
-  "itemType": 1,  // 1=实物 2=虚拟
-  "category": "物品分类（模糊查询）",
-  "status": 1,  // 0=停用 1=启用
-  "beginTime": "2025-01-01",
-  "endTime": "2025-12-31"
-}
-```
-
-#### 响应数据格式
-
-**列表响应**：
-```json
-{
-  "code": 200,
-  "msg": "操作成功",
-  "success": true,
-  "data": {
-    "total": 3,
-    "rows": [
-      {
-        "id": 1,
-        "itemNo": "ITEM001",
-        "itemName": "T恤",
-        "itemType": 1,
-        "itemTypeLabel": "实物",
-        "category": "服装",
-        "unit": "件",
-        "defaultPrice": 99.00,
-        "totalStock": 0,
-        "availableStock": 0,
-        "status": 1,
-        "createTime": "2025-11-18T10:31:19",
-        "remark": "校服T恤"
-      }
-    ],
-    "pageNum": 1,
-    "pageSize": 10
-  }
-}
-```
-
-**详情响应**：
-```json
-{
-  "code": 200,
-  "msg": "操作成功",
-  "success": true,
-  "data": {
-    "id": 1,
-    "itemNo": "ITEM001",
-    "itemName": "T恤",
-    "itemType": 1,
-    "itemTypeLabel": "实物",
-    "category": "服装",
-    "unit": "件",
-    "defaultPrice": 99.00,
-    "imageUrl": null,
-    "spec1Name": "颜色",
-    "spec1Values": "黑色,白色",
-    "spec2Name": "码数",
-    "spec2Values": "X,L,XL",
-    "totalStock": 0,
-    "availableStock": 0,
-    "status": 1,
-    "createBy": "admin",
-    "createTime": "2025-11-18T10:31:19",
-    "updateBy": "",
-    "updateTime": "2025-11-18T10:31:19",
-    "remark": "校服T恤"
-  }
-}
-```
-
----
-
-## 📁 模块结构
-
-```
-module_ast/
-├── __init__.py
-├── README.md
-├── controller/
-│   └── ast_item_controller.py      # 物品管理控制器
-├── service/
-│   └── ast_item_service.py         # 物品管理服务层
-├── dao/
-│   └── ast_item_dao.py              # 物品管理数据访问层
-└── entity/
-    ├── do/
-    │   ├── ast_item_do.py           # 物品数据库实体
-    │   └── ast_item_sku_do.py       # SKU数据库实体
-    └── vo/
-        └── ast_item_vo.py           # 物品视图对象
-```
-
----
-
-## 🔧 技术栈
-
-- **框架**: FastAPI
-- **ORM**: SQLAlchemy (异步)
-- **验证**: Pydantic
-- **数据库**: MySQL
-- **架构**: 四层架构（Controller → Service → DAO → Entity）
-
----
-
-## 📝 开发规范
-
-遵循项目统一的编码规范，详见 `docs/code_architecture_style_analysis.md`
-
-### 命名规范
-
-- **模块前缀**: `ast_` (asset 的缩写)
-- **路由前缀**: `/ast/`
-- **权限标识**: `ast:{功能}:{操作}`
-- **表名**: `ast_{entity}` (复数形式)
-
-### 数据字典
-
-需要在系统字典中配置以下字典类型：
-
-- `ast_item_type` - 物品类型（1=实物 2=虚拟）
-- `ast_business_type` - 业务类型（purchase/receive/return/inventory）
-- `ast_source_type` - 来源类型
-- `ast_purchase_status` - 采购单状态
-- `ast_role_type` - 角色类型
-- `ast_payment_method` - 支付方式
-
----
-
-## 🚀 快速开始
-
-### 1. 启动服务
-
-```bash
-python app.py
-```
-
-### 2. 访问 API 文档
-
-```
-http://localhost:9099/docs
-```
-
-### 3. 测试接口
-
-使用 Swagger UI 或 Postman 测试接口，需要先登录获取 token。
-
----
-
-## ✅ 已完成
-
-- [x] 物品管理 CRUD 接口
-- [x] 分页查询
-- [x] 字典数据转换
-- [x] 数据权限控制
-- [x] 操作日志记录
-- [x] 参数验证
-
-## 📅 待开发
-
-- [ ] SKU 管理接口
-- [ ] 采购管理接口
-- [ ] 出入库管理接口
-- [ ] 费用项目管理接口
-- [ ] 导出功能
-- [ ] 批量导入功能
-
+- 与课程套餐模块联动：物品和费用作为套餐明细参与售卖方案。
+- 与报名订单模块联动：报名购买物品后自动生成销售出库流水。
+- 与支付/财务模块联动：采购付款、报名收款和费用消费进入统一财务账。
+- 与学员报读模块联动：报读记录沉淀课程、物品、费用、课时和有效期快照。
