@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>老师帮 - 九模块白板脑图</title>
+  <style>
+    :root {
+      --bg: #fbfcff;
+      --grid: #d9dee9;
+      --ink: #1f2937;
+      --muted: #64748b;
+      --blue: #3182f6;
+      --teal: #19b7b8;
+      --green: #20b26b;
+      --orange: #ff9900;
+      --purple: #9b5cff;
+      --rose: #f0527b;
+      --cyan: #0891b2;
+      --amber: #d97706;
+      --slate: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      background:
+        radial-gradient(circle, var(--grid) 1px, transparent 1.3px) 0 0 / 22px 22px,
+        var(--bg);
+      overflow: auto;
+    }
+
+    .board {
+      position: relative;
+      width: 1800px;
+      height: 1160px;
+      margin: 0 auto;
+    }
+
+    svg.links {
+      position: absolute;
+      inset: 0;
+      width: 1800px;
+      height: 1160px;
+      pointer-events: none;
+    }
+
+    .title {
+      position: absolute;
+      left: 50%;
+      top: 34px;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .title p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .node {
+      position: absolute;
+      min-width: 172px;
+      padding: 12px 15px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 14px 38px rgba(15, 23, 42, 0.1);
+      line-height: 1.45;
+    }
+
+    .hub {
+      left: 790px;
+      top: 506px;
+      width: 220px;
+      padding: 18px 22px;
+      color: #fff;
+      border: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      box-shadow: 0 20px 55px rgba(37, 99, 235, 0.3);
+      text-align: center;
+    }
+
+    .hub strong {
+      display: block;
+      font-size: 22px;
+    }
+
+    .hub span {
+      display: block;
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 12px;
+    }
+
+    .module {
+      border-left: 6px solid currentColor;
+    }
+
+    .module strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--ink);
+      font-size: 16px;
+    }
+
+    .module ul {
+      margin: 0;
+      padding-left: 16px;
+    }
+
+    .module li {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .blue { color: var(--blue); }
+    .teal { color: var(--teal); }
+    .green { color: var(--green); }
+    .orange { color: var(--orange); }
+    .purple { color: var(--purple); }
+    .rose { color: var(--rose); }
+    .cyan { color: var(--cyan); }
+    .amber { color: var(--amber); }
+    .slate { color: var(--slate); }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      margin-top: 9px;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tag.done { background: #16a34a; }
+    .tag.partial { background: #f59e0b; }
+    .tag.todo { background: #64748b; }
+
+    .note {
+      position: absolute;
+      width: 260px;
+      padding: 15px 16px;
+      border: 1px solid #b7ebce;
+      border-radius: 4px;
+      background: #d9fbe8;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      color: #335144;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .legend {
+      position: absolute;
+      right: 58px;
+      top: 48px;
+      width: 250px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend strong {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+
+    .flow {
+      position: absolute;
+      left: 422px;
+      bottom: 58px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid rgba(37, 99, 235, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #334155;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .arrow {
+      color: #94a3b8;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <main class="board" aria-label="老师帮九模块白板脑图">
+    <div class="title">
+      <h1>老师帮 PC 助教业务后台</h1>
+      <p>按 doc/产品图片 9 个原型模块整理，家长信息归入学员联系人</p>
+    </div>
+
+    <svg class="links" viewBox="0 0 1800 1160" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <path d="M790 528 C650 420 500 280 320 165" stroke="#3182f6" stroke-width="4" stroke-linecap="round" />
+      <path d="M795 535 C620 520 450 490 250 430" stroke="#20b26b" stroke-width="4" stroke-linecap="round" />
+      <path d="M805 565 C650 665 500 762 302 842" stroke="#19b7b8" stroke-width="4" stroke-linecap="round" />
+      <path d="M878 506 C858 370 860 236 900 128" stroke="#f0527b" stroke-width="4" stroke-linecap="round" />
+      <path d="M1008 530 C1148 420 1288 280 1480 166" stroke="#ff9900" stroke-width="4" stroke-linecap="round" />
+      <path d="M1012 545 C1200 520 1370 490 1570 430" stroke="#9b5cff" stroke-width="4" stroke-linecap="round" />
+      <path d="M1010 565 C1160 670 1305 770 1500 850" stroke="#0891b2" stroke-width="4" stroke-linecap="round" />
+      <path d="M898 600 C890 730 885 850 895 982" stroke="#d97706" stroke-width="4" stroke-linecap="round" />
+      <path d="M938 600 C1010 742 1100 858 1245 982" stroke="#475569" stroke-width="4" stroke-linecap="round" />
+
+      <path d="M320 240 C395 300 455 350 535 395" stroke="#3182f6" stroke-width="2" stroke-linecap="round" opacity=".55" />
+      <path d="M250 510 C365 525 470 532 620 536" stroke="#20b26b" stroke-width="2" stroke-linecap="round" opacity=".55" />
+      <path d="M302 915 C420 820 548 720 705 615" stroke="#19b7b8" stroke-width="2" stroke-linecap="round" opacity=".55" />
+      <path d="M1480 242 C1365 320 1260 392 1130 485" stroke="#ff9900" stroke-width="2" stroke-linecap="round" opacity=".55" />
+      <path d="M1570 500 C1430 520 1295 535 1125 545" stroke="#9b5cff" stroke-width="2" stroke-linecap="round" opacity=".55" />
+      <path d="M1500 922 C1380 820 1260 720 1105 610" stroke="#0891b2" stroke-width="2" stroke-linecap="round" opacity=".55" />
+    </svg>
+
+    <section class="legend">
+      <strong>状态说明</strong>
+      <div class="legend-row"><i class="dot" style="background:#16a34a"></i> 已有真实前后端闭环</div>
+      <div class="legend-row"><i class="dot" style="background:#f59e0b"></i> 有基础能力或页面原型</div>
+      <div class="legend-row"><i class="dot" style="background:#64748b"></i> 原型完整，后端待补齐</div>
+    </section>
+
+    <div class="node hub"><strong>九模块业务图</strong><span>学员到上课、消课、财务和权益</span></div>
+
+    <div class="node module blue" style="left:110px;top:118px">
+      <strong>1. 学员管理</strong>
+      <ul><li>档案 / 家长联系人 / 标签</li><li>报名订单 / 报读课程</li><li>课时账户 / 消费记录</li><li>转课 / 停课 / 结课</li></ul>
+      <i class="tag partial">闭环待复核</i>
+    </div>
+
+    <div class="node module green" style="left:94px;top:382px">
+      <strong>2. 班级管理</strong>
+      <ul><li>班课 / 一对一</li><li>班级学员 / 班级老师</li><li>班级排课 / 点名</li><li>升班 / 结业</li></ul>
+      <i class="tag partial">页面原型</i>
+    </div>
+
+    <div class="node module teal" style="left:124px;top:798px">
+      <strong>3. 课表管理</strong>
+      <ul><li>时间 / 老师 / 教室 / 班级课表</li><li>日 / 周 / 月视图</li><li>请假 / 调课 / 临时学员</li><li>导出签到名单和课表</li></ul>
+      <i class="tag partial">部分接口</i>
+    </div>
+
+    <div class="node module rose" style="left:780px;top:108px">
+      <strong>4. 上课记录</strong>
+      <ul><li>点名记录 / 考勤</li><li>课后点评</li><li>请假申请</li><li>缺课补课 / 超时未点名</li></ul>
+      <i class="tag partial">闭环待补</i>
+    </div>
+
+    <div class="node module orange" style="left:1435px;top:120px">
+      <strong>5. 课程管理</strong>
+      <ul><li>课程单品</li><li>收费方式 / 定价标准</li><li>课程套餐 / 套餐明细</li><li>选择课程 / 物品 / 费用</li></ul>
+      <i class="tag done">6月20日闭环</i>
+    </div>
+
+    <div class="node module purple" style="left:1456px;top:382px">
+      <strong>6. 老师管理</strong>
+      <ul><li>老师列表 / 老师详情</li><li>老师权限</li><li>授课班级</li><li>上课记录 / 签到列表</li></ul>
+      <i class="tag partial">基础接口</i>
+    </div>
+
+    <div class="node module cyan" style="left:1438px;top:802px">
+      <strong>7. 物品费用</strong>
+      <ul><li>物品 / SKU</li><li>采购 / 领用 / 退领</li><li>盘点 / 出入库流水</li><li>费用项目 / 关联订单</li></ul>
+      <i class="tag done">已较完整</i>
+    </div>
+
+    <div class="node module amber" style="left:780px;top:956px">
+      <strong>8. 会员卡</strong>
+      <ul><li>课程卡</li><li>场地折扣卡</li><li>卡详情</li><li>发放记录 / 权益核销</li></ul>
+      <i class="tag todo">后端待补</i>
+    </div>
+
+    <div class="node module slate" style="left:1175px;top:954px">
+      <strong>9. 场地管理</strong>
+      <ul><li>场馆 / 场地</li><li>价格规则 / 锁场</li><li>代预订 / 预订记录</li><li>核销 / 取消预订</li></ul>
+      <i class="tag todo">后端待补</i>
+    </div>
+
+    <div class="note" style="left:72px;top:650px">
+      原型目录没有独立“家长管理”。家长是学员档案内的联系人、通知对象和沟通对象。
+    </div>
+
+    <div class="note" style="right:82px;bottom:52px">
+      系统管理、权限、日志、监控和代码生成属于后台底座，支撑 9 个业务模块，不作为产品原型的独立业务模块计数。
+    </div>
+
+    <div class="flow">
+      <span class="pill">学员建档</span><span class="arrow">-></span>
+      <span class="pill">报名订单</span><span class="arrow">-></span>
+      <span class="pill">课时账户</span><span class="arrow">-></span>
+      <span class="pill">班级/课表</span><span class="arrow">-></span>
+      <span class="pill">点名消课</span><span class="arrow">-></span>
+      <span class="pill">消费/报表</span>
+    </div>
+  </main>
+</body>
+</html>

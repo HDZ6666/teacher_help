@@ -7,6 +7,7 @@ from module_admin.service.login_service import LoginService, CurrentUserModel
 from module_admin.annotation.log_annotation import Log
 from module_admin.aspect.interface_auth import CheckUserInterfaceAuth
 from module_admin.aspect.data_scope import GetDataScope
+from module_teach.service.teach_enrollment_service import TeachEnrollmentService
 from module_teach.service.teach_student_service import TeachStudentService
 from module_teach.entity.vo.teach_student_vo import (
     TeachStudentPageQueryModel,
@@ -14,7 +15,8 @@ from module_teach.entity.vo.teach_student_vo import (
     EditTeachStudentModel,
     DeleteTeachStudentModel,
     TeachStudentResponseModel,
-    TeachStudentDetailModel
+    TeachStudentDetailModel,
+    TeachStudentEnrollModel
 )
 from utils.response_util import ResponseUtil
 from utils.page_util import PageResponseModel
@@ -53,6 +55,64 @@ async def get_teach_student_list(
     logger.info('获取成功')
 
     return ResponseUtil.success(model_content=student_page_query_result)
+
+
+@teachStudentController.post('/enroll', dependencies=[Depends(CheckUserInterfaceAuth('teach:student:edit'))])
+@ValidateFields(validate_model='enroll_form')
+@Log(title='学生报名续费', business_type=BusinessType.INSERT)
+async def submit_student_enroll(
+    request: Request,
+    enroll_form: TeachStudentEnrollModel,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user)
+):
+    """
+    提交学生报名/续费订单
+    """
+    enroll_result = await TeachEnrollmentService.submit_student_enroll_services(
+        query_db, enroll_form, current_user.user.user_name
+    )
+    logger.info(enroll_result.message)
+
+    return ResponseUtil.success(msg=enroll_result.message, data=enroll_result.result)
+
+
+@teachStudentController.get(
+    '/{student_id}/courses',
+    dependencies=[Depends(CheckUserInterfaceAuth('teach:student:query'))],
+)
+async def get_student_courses(
+    request: Request,
+    student_id: int,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user)
+):
+    """
+    获取学生报读课程
+    """
+    course_result = await TeachEnrollmentService.get_student_course_accounts_services(query_db, student_id)
+    logger.info('获取成功')
+
+    return ResponseUtil.success(data=course_result)
+
+
+@teachStudentController.get(
+    '/{student_id}/orders',
+    dependencies=[Depends(CheckUserInterfaceAuth('teach:student:query'))],
+)
+async def get_student_orders(
+    request: Request,
+    student_id: int,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user)
+):
+    """
+    获取学生消费订单
+    """
+    order_result = await TeachEnrollmentService.get_student_orders_services(query_db, student_id)
+    logger.info('获取成功')
+
+    return ResponseUtil.success(data=order_result)
 
 
 @teachStudentController.get('/{student_id}', response_model=TeachStudentDetailModel, dependencies=[Depends(CheckUserInterfaceAuth('teach:student:query'))])

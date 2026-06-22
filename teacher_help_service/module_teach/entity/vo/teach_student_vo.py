@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from decimal import Decimal
 from typing import Optional, List, Union, Literal
 from pydantic import BaseModel, Field, ConfigDict, model_validator
 from pydantic.alias_generators import to_camel
@@ -168,3 +169,147 @@ class TeachStudentDetailModel(BaseModel):
     create_time: datetime = Field(description='创建时间')
     update_time: datetime = Field(description='更新时间')
     remark: Optional[str] = Field(default=None, description='备注')
+
+
+class TeachStudentEnrollItemModel(BaseModel):
+    """
+    学员报名/续费项目模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel)
+
+    item_type: Literal['course', 'item', 'fee'] = Field(description='项目类型')
+    item_id: int = Field(description='项目ID')
+    item_name: str = Field(description='项目名称')
+    spec_id: Optional[int] = Field(default=None, description='规格或定价ID')
+    spec_name: Optional[str] = Field(default=None, description='规格或定价名称')
+    charge_type: Optional[str] = Field(default=None, description='收费方式')
+    unit: Optional[str] = Field(default=None, description='单位')
+    quantity: int = Field(default=1, description='购买数量')
+    gift_quantity: int = Field(default=0, description='赠送数量')
+    leave_exempt_count: int = Field(default=0, description='请假免扣次数')
+    unit_price: Decimal = Field(default=Decimal('0'), description='单价')
+    total_price: Optional[Decimal] = Field(default=None, description='总价')
+    discount_type: Optional[Literal['reduce', 'discount']] = Field(default='reduce', description='优惠类型')
+    discount_value: Decimal = Field(default=Decimal('0'), description='优惠值')
+    subtotal_price: Optional[Decimal] = Field(default=None, description='小计')
+    start_date: Optional[date] = Field(default=None, description='课程开始日期')
+    end_date: Optional[date] = Field(default=None, description='课程结束日期')
+    validity_type: Optional[str] = Field(default=None, description='课程有效期类型')
+    class_id: Optional[int] = Field(default=None, description='班级ID')
+    class_name: Optional[str] = Field(default=None, description='班级名称')
+    package_id: Optional[int] = Field(default=None, description='套餐ID')
+    package_name: Optional[str] = Field(default=None, description='套餐名称')
+    remark: Optional[str] = Field(default=None, description='明细备注')
+    sort: Optional[int] = Field(default=0, description='排序')
+
+    def validate_fields(self):
+        if not self.item_name:
+            raise ModelValidatorException(message='报名项目名称不能为空')
+        if self.quantity <= 0:
+            raise ModelValidatorException(message='购买数量必须大于0')
+        if self.gift_quantity < 0:
+            raise ModelValidatorException(message='赠送数量不能小于0')
+        if self.unit_price < 0:
+            raise ModelValidatorException(message='项目单价不能小于0')
+
+
+class TeachStudentEnrollModel(BaseModel):
+    """
+    学员报名/续费提交模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel)
+
+    student_id: int = Field(description='学员ID')
+    order_type: Optional[Literal['enroll', 'renew']] = Field(default='enroll', description='订单类型')
+    enroll_date: Optional[date] = Field(default=None, description='经办日期')
+    performance_owner: Optional[str] = Field(default=None, description='业绩归属人')
+    performance_type: Optional[str] = Field(default=None, description='业绩类型')
+    performance_amount: Optional[Decimal] = Field(default=Decimal('0'), description='业绩金额')
+    remark: Optional[str] = Field(default=None, description='备注')
+    items: List[TeachStudentEnrollItemModel] = Field(default_factory=list, description='报名项目')
+
+    def validate_fields(self):
+        if not self.student_id:
+            raise ModelValidatorException(message='学员不能为空')
+        if not self.items:
+            raise ModelValidatorException(message='请至少选择一个报名项目')
+        for item in self.items:
+            item.validate_fields()
+
+
+class TeachStudentCourseAccountModel(BaseModel):
+    """
+    学员报读课程响应模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True)
+
+    id: int = Field(description='课程账户ID')
+    student_id: int = Field(description='学员ID')
+    course_id: int = Field(description='课程ID')
+    course_name: str = Field(description='课程名称')
+    order_id: int = Field(description='订单ID')
+    order_no: Optional[str] = Field(default=None, description='订单号')
+    charge_type: Optional[str] = Field(default=None, description='收费方式')
+    unit: Optional[str] = Field(default=None, description='单位')
+    purchased_quantity: int = Field(description='购买数量')
+    gift_quantity: int = Field(description='赠送数量')
+    consumed_quantity: int = Field(description='已消耗数量')
+    remaining_quantity: int = Field(description='剩余数量')
+    leave_exempt_count: Optional[int] = Field(default=0, description='请假免扣次数')
+    valid_start_date: Optional[date] = Field(default=None, description='有效期开始日期')
+    valid_end_date: Optional[date] = Field(default=None, description='有效期结束日期')
+    class_name: Optional[str] = Field(default=None, description='班级名称')
+    status: str = Field(description='状态')
+    create_time: Optional[datetime] = Field(default=None, description='创建时间')
+
+
+class TeachStudentOrderItemModel(BaseModel):
+    """
+    学员订单明细响应模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True)
+
+    id: int = Field(description='明细ID')
+    order_id: int = Field(description='订单ID')
+    item_type: str = Field(description='项目类型')
+    item_type_name: Optional[str] = Field(default=None, description='项目类型名称')
+    item_id: int = Field(description='项目ID')
+    item_name: str = Field(description='项目名称')
+    spec_name: Optional[str] = Field(default=None, description='规格名称')
+    unit: Optional[str] = Field(default=None, description='单位')
+    quantity: int = Field(description='购买数量')
+    gift_quantity: Optional[int] = Field(default=0, description='赠送数量')
+    unit_price: Decimal = Field(description='单价')
+    subtotal_price: Decimal = Field(description='小计')
+    package_name: Optional[str] = Field(default=None, description='套餐名称')
+
+
+class TeachStudentOrderModel(BaseModel):
+    """
+    学员订单响应模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True)
+
+    id: int = Field(description='订单ID')
+    order_no: str = Field(description='订单号')
+    student_id: int = Field(description='学员ID')
+    order_type: str = Field(description='订单类型')
+    order_type_name: Optional[str] = Field(default=None, description='订单类型名称')
+    order_source: Optional[str] = Field(default=None, description='订单来源')
+    enroll_date: Optional[date] = Field(default=None, description='经办日期')
+    item_count: int = Field(description='项目数量')
+    total_amount: Decimal = Field(description='总金额')
+    discount_amount: Decimal = Field(description='优惠金额')
+    receivable_amount: Decimal = Field(description='应收金额')
+    paid_amount: Decimal = Field(description='实收金额')
+    status: str = Field(description='订单状态')
+    status_name: Optional[str] = Field(default=None, description='订单状态名称')
+    performance_owner: Optional[str] = Field(default=None, description='业绩归属人')
+    remark: Optional[str] = Field(default=None, description='备注')
+    create_time: Optional[datetime] = Field(default=None, description='创建时间')
+    items: List[TeachStudentOrderItemModel] = Field(default_factory=list, description='订单明细')

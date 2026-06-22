@@ -61,11 +61,32 @@ export function exportStudent(query) {
   })
 }
 
-// Course enrollment is not implemented in the backend yet.
-export function getStudentCourses() {
-  return Promise.resolve({ data: [] })
+// 提交学生报名/续费
+export function submitStudentEnroll(data) {
+  return request({
+    url: '/teach/student/enroll',
+    method: 'post',
+    data
+  })
 }
 
+// 查询学生报读课程
+export function getStudentCourses(studentId) {
+  return request({
+    url: '/teach/student/' + studentId + '/courses',
+    method: 'get'
+  })
+}
+
+// 查询学生消费订单
+export function getStudentOrders(studentId) {
+  return request({
+    url: '/teach/student/' + studentId + '/orders',
+    method: 'get'
+  })
+}
+
+// 退课能力待课程消耗/财务闭环补齐后实现
 export function withdrawCourse() {
   return Promise.resolve({ code: 200, msg: 'success' })
 }
