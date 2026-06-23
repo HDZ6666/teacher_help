@@ -7,6 +7,8 @@ from sqlalchemy.orm import selectinload, joinedload
 from module_teach.entity.do.teach_teacher_do import TeachTeacher
 from module_teach.entity.do.teach_base_user_do import TeachBaseUser
 from module_teach.entity.do.teach_teacher_relation_do import TeachTeacherSubject, TeachTeacherGrade
+from module_teach.entity.do.teach_subject_do import TeachSubject
+from module_teach.entity.do.teach_grade_do import TeachGrade
 from module_teach.entity.vo.teach_teacher_vo import TeachTeacherPageQueryModel, TeacherSubjectModel, TeacherGradeModel
 from utils.page_util import PageUtil
 
@@ -168,7 +170,19 @@ class TeachTeacherDao:
         :param teacher_subject: 教师科目关联对象
         :return:
         """
-        db_teacher_subject = TeachTeacherSubject(**teacher_subject.model_dump())
+        subject_id = getattr(teacher_subject, 'subject_id', None)
+        subject_code = getattr(teacher_subject, 'subject_code', None)
+        if subject_id is None and subject_code:
+            result = await db.execute(
+                select(TeachSubject.subject_id).where(
+                    TeachSubject.subject_code == subject_code,
+                    TeachSubject.del_flag == '0'
+                )
+            )
+            subject_id = result.scalar()
+        if subject_id is None:
+            return
+        db_teacher_subject = TeachTeacherSubject(teacher_id=teacher_subject.teacher_id, subject_id=subject_id)
         db.add(db_teacher_subject)
 
     @classmethod
@@ -193,8 +207,14 @@ class TeachTeacherDao:
         :param teacher_id: 教师ID
         :return: 科目代码列表
         """
-        query = select(TeachTeacherSubject.subject_code).where(
-            TeachTeacherSubject.teacher_id == teacher_id
+        query = (
+            select(TeachSubject.subject_code)
+            .join(TeachTeacherSubject, TeachTeacherSubject.subject_id == TeachSubject.subject_id)
+            .where(
+                TeachTeacherSubject.teacher_id == teacher_id,
+                TeachSubject.del_flag == '0'
+            )
+            .order_by(TeachSubject.subject_sort, TeachSubject.subject_id)
         )
         result = await db.execute(query)
         return result.scalars().all()
@@ -208,7 +228,18 @@ class TeachTeacherDao:
         :param teacher_grade: 教师年级关联对象
         :return:
         """
-        db_teacher_grade = TeachTeacherGrade(**teacher_grade.model_dump())
+        grade_id = getattr(teacher_grade, 'grade_id', None)
+        grade_code = getattr(teacher_grade, 'grade_code', None)
+        if grade_id is None and grade_code:
+            result = await db.execute(
+                select(TeachGrade.grade_id).where(
+                    TeachGrade.grade_code == grade_code
+                )
+            )
+            grade_id = result.scalar()
+        if grade_id is None:
+            return
+        db_teacher_grade = TeachTeacherGrade(teacher_id=teacher_grade.teacher_id, grade_id=grade_id)
         db.add(db_teacher_grade)
 
     @classmethod
@@ -233,8 +264,11 @@ class TeachTeacherDao:
         :param teacher_id: 教师ID
         :return: 年级代码列表
         """
-        query = select(TeachTeacherGrade.grade_code).where(
-            TeachTeacherGrade.teacher_id == teacher_id
+        query = (
+            select(TeachGrade.grade_code)
+            .join(TeachTeacherGrade, TeachTeacherGrade.grade_id == TeachGrade.grade_id)
+            .where(TeachTeacherGrade.teacher_id == teacher_id)
+            .order_by(TeachGrade.grade_sort, TeachGrade.grade_id)
         )
         result = await db.execute(query)
         return result.scalars().all()

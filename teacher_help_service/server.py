@@ -26,6 +26,7 @@ from module_generator.controller.gen_controller import genController
 from module_teach.controller.teacher_controller import teacherController
 from module_teach.controller.teach_parent_controller import teachParentController
 from module_teach.controller.teach_student_controller import teachStudentController
+from module_teach.controller.teach_class_controller import teachClassController
 from module_teach.controller.teach_course_controller import teachCourseController
 from module_teach.controller.teach_schedule_event_controller import teachScheduleEventController
 from module_teach.controller.teach_schedule_attendance_controller import teachScheduleAttendanceController
@@ -90,6 +91,7 @@ controller_list = [
     {'router': teacherController, 'tags': ['教学管理-教师管理']},
     {'router': teachParentController, 'tags': ['教学管理-家长管理']},
     {'router': teachStudentController, 'tags': ['教学管理-学生管理']},
+    {'router': teachClassController, 'tags': ['教学管理-班级管理']},
     {'router': teachCourseController, 'tags': ['教学管理-课程管理']},
     {'router': teachScheduleEventController, 'tags': ['教学管理-排课管理']},
     {'router': teachScheduleAttendanceController, 'tags': ['教学管理-考勤管理']},

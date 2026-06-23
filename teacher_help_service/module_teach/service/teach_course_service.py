@@ -462,6 +462,7 @@ class TeachCourseService:
                 'courseName': row.get('courseName'),
                 'courseType': row.get('courseTypeName'),
                 'courseTypeValue': row.get('courseType'),
+                'scheduleColor': row.get('scheduleColor'),
                 'priceStandard': row.get('priceStandard') or '未设置',
                 'prices': row.get('prices') or [],
                 'status': row.get('status'),

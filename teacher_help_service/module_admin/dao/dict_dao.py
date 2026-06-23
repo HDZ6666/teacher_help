@@ -229,6 +229,25 @@ class DictDataDao:
         return dict_data_list
 
     @classmethod
+    async def query_dict_data_info(cls, db: AsyncSession, dict_type: str, dict_value: str):
+        """
+        根据字典类型和字典值获取字典数据
+
+        :param db: orm对象
+        :param dict_type: 字典类型
+        :param dict_value: 字典值
+        :return: 字典数据对象
+        """
+        result = await db.execute(
+            select(SysDictData).where(
+                SysDictData.dict_type == dict_type,
+                SysDictData.dict_value == str(dict_value),
+                SysDictData.status == '0',
+            )
+        )
+        return result.scalars().first()
+
+    @classmethod
     async def add_dict_data_dao(cls, db: AsyncSession, dict_data: DictDataModel):
         """
         新增字典数据数据库操作

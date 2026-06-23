@@ -50,7 +50,7 @@ async def get_teach_schedule_event_list(
         排课事件分页列表响应
     """
     event_page_query_result = await TeachScheduleEventService.get_teach_schedule_event_list_services(
-        request, query_db, event_page_query, data_scope_sql
+        request, query_db, event_page_query, data_scope_sql, is_page=True
     )
     logger.info('获取成功')
 
@@ -123,7 +123,7 @@ async def add_teach_schedule_event(
     logger.info(result.message)
 
     if result.is_success:
-        return ResponseUtil.success(msg=result.message)
+        return ResponseUtil.success(msg=result.message, data=result.result)
     else:
         return ResponseUtil.failure(msg=result.message)
 
@@ -159,7 +159,7 @@ async def edit_teach_schedule_event(
     logger.info(result.message)
 
     if result.is_success:
-        return ResponseUtil.success(msg=result.message)
+        return ResponseUtil.success(msg=result.message, data=result.result)
     else:
         return ResponseUtil.failure(msg=result.message)
 
@@ -190,7 +190,7 @@ async def delete_teach_schedule_event(
     delete_event = DeleteTeachScheduleEventModel(event_ids=event_ids)
     delete_event.validate_fields()
     result = await TeachScheduleEventService.delete_teach_schedule_event_services(
-        query_db, delete_event
+        query_db, delete_event, current_user.user.user_name
     )
     logger.info(result.message)
 
@@ -207,6 +207,9 @@ async def delete_teach_schedule_event(
 async def get_calendar_events(
     request: Request,
     teacher_id: int = None,
+    class_id: int = None,
+    course_id: int = None,
+    classroom: str = None,
     start: str = None,
     end: str = None,
     query_db: AsyncSession = Depends(get_db),
@@ -229,6 +232,9 @@ async def get_calendar_events(
     from datetime import datetime
     calendar_query = CalendarQueryModel(
         teacher_id=teacher_id,
+        class_id=class_id,
+        course_id=course_id,
+        classroom=classroom,
         start=datetime.fromisoformat(start.replace('Z', '+00:00')),
         end=datetime.fromisoformat(end.replace('Z', '+00:00'))
     )
@@ -240,4 +246,3 @@ async def get_calendar_events(
     logger.info('获取成功')
 
     return ResponseUtil.success(data=events)
-

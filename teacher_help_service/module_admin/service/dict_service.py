@@ -253,6 +253,19 @@ class DictDataService:
         return dict_data_list_result
 
     @classmethod
+    async def query_dict_data_info_services(cls, query_db: AsyncSession, dict_type: str, dict_value: str):
+        """
+        根据字典类型和值获取字典标签service
+
+        :param query_db: orm对象
+        :param dict_type: 字典类型
+        :param dict_value: 字典值
+        :return: 字典标签
+        """
+        dict_data = await DictDataDao.query_dict_data_info(query_db, dict_type, dict_value)
+        return dict_data.dict_label if dict_data else None
+
+    @classmethod
     async def init_cache_sys_dict_services(cls, query_db: AsyncSession, redis):
         """
         应用初始化：获取所有字典类型对应的字典数据信息并缓存service

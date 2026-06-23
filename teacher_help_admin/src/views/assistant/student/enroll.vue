@@ -144,12 +144,24 @@
 
           <el-table-column label="班级" width="140">
             <template #default="scope">
-              <el-input
+              <el-select
                 v-if="scope.row.itemType === 'course'"
-                v-model="scope.row.className"
+                v-model="scope.row.classId"
                 size="small"
                 placeholder="未选班"
-              />
+                clearable
+                filterable
+                style="width: 100%;"
+                @change="value => handleClassChange(scope.row, value)"
+              >
+                <el-option
+                  v-for="classItem in getClassOptionsForRow(scope.row)"
+                  :key="classItem.id"
+                  :label="classItem.className"
+                  :value="classItem.id"
+                  :disabled="classItem.disabled"
+                />
+              </el-select>
               <span v-else class="muted-text">-</span>
             </template>
           </el-table-column>
@@ -535,6 +547,7 @@ import { computed, getCurrentInstance, onMounted, ref } from 'vue';
 import { Edit, Search } from '@element-plus/icons-vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getStudent, getStudentCourses, submitStudentEnroll } from '@/api/teach/student';
+import { listClassOptions } from '@/api/assistant/class';
 import { getCoursePackage, listCourseOptions, listCoursePackage } from '@/api/assistant/course';
 import { listAvailableItems, listFee } from '@/api/assistant/inventory';
 
@@ -547,6 +560,7 @@ const loading = ref(false);
 const submitting = ref(false);
 const studentInfo = ref({});
 const existingCourseIds = ref([]);
+const classOptions = ref([]);
 
 const enrollForm = ref({
   items: [],
@@ -767,6 +781,11 @@ async function loadPackages() {
   }
 }
 
+async function loadClassOptions() {
+  const response = await listClassOptions();
+  classOptions.value = response.data || [];
+}
+
 function buildCoursePriceOptions(course) {
   const prices = course.prices || [];
   if (!prices.length) {
@@ -817,6 +836,7 @@ function createBaseRow(payload) {
     startDate: '',
     endDate: '',
     validityType: 'not_set',
+    classId: null,
     className: '',
     stock: null,
     canEditQuantity: true,
@@ -824,6 +844,15 @@ function createBaseRow(payload) {
   };
   updateItemAmount(row);
   return row;
+}
+
+function getClassOptionsForRow(row) {
+  return classOptions.value.filter(item => Number(item.courseId) === Number(row.itemId));
+}
+
+function handleClassChange(row, classId) {
+  const classItem = classOptions.value.find(item => Number(item.id) === Number(classId));
+  row.className = classItem?.className || '';
 }
 
 function createCourseRow(course, packageInfo = null, packageItem = null) {
@@ -1182,6 +1211,7 @@ function buildSubmitPayload() {
       startDate: item.startDate || undefined,
       endDate: item.endDate || undefined,
       validityType: item.validityType,
+      classId: item.classId,
       className: item.className,
       packageId: item.packageId,
       packageName: item.packageName,
@@ -1211,7 +1241,7 @@ function handleConfirmEnroll() {
 onMounted(async () => {
   loading.value = true;
   try {
-    await Promise.all([loadStudentInfo(), loadExistingCourses()]);
+    await Promise.all([loadStudentInfo(), loadExistingCourses(), loadClassOptions()]);
   } finally {
     loading.value = false;
   }

@@ -5,9 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from module_admin.entity.vo.common_vo import CrudResponseModel
 from module_ast.dao.ast_inventory_dao import AstInventoryDao
 from module_ast.service.ast_inventory_service import AstInventoryService
+from module_teach.dao.teach_class_dao import TeachClassDao
 from module_teach.dao.teach_course_dao import TeachCourseDao
 from module_teach.dao.teach_enrollment_dao import TeachEnrollmentDao
 from module_teach.dao.teach_student_dao import TeachStudentDao
+from module_teach.service.teach_class_service import TeachClassService
 from module_teach.entity.do.teach_enrollment_order_do import (
     TeachEnrollmentOrder,
     TeachEnrollmentOrderItem,
@@ -103,6 +105,22 @@ class TeachEnrollmentService:
         quantity = item.quantity or (price.quantity if price else 1)
         unit_price = price.unit_price if price else item.unit_price
         unit = item.unit or cls.CHARGE_UNITS.get(charge_type, '课时')
+        class_name = item.class_name
+        if item.class_id:
+            class_obj = await TeachClassDao.get_teach_class_by_id(query_db, item.class_id)
+            if not class_obj:
+                raise ServiceException(message=f'课程({course.course_name})选择的班级不存在')
+            if class_obj.status != 1 or class_obj.enroll_status == 3:
+                raise ServiceException(message=f'班级({class_obj.class_name})不可招生')
+            if class_obj.course_id != course.id:
+                raise ServiceException(message=f'班级({class_obj.class_name})与课程({course.course_name})不匹配')
+            if (
+                class_obj.max_students
+                and class_obj.allow_over_capacity != 1
+                and (class_obj.current_students or 0) >= class_obj.max_students
+            ):
+                raise ServiceException(message=f'班级({class_obj.class_name})已满员')
+            class_name = class_obj.class_name
         normalized = item.model_copy(
             update={
                 'item_name': course.course_name,
@@ -111,6 +129,7 @@ class TeachEnrollmentService:
                 'unit': unit,
                 'quantity': quantity,
                 'unit_price': unit_price,
+                'class_name': class_name,
             }
         )
         return normalized
@@ -254,7 +273,7 @@ class TeachEnrollmentService:
             update_by=current_user_name,
             update_time=datetime.now(),
         )
-        await TeachEnrollmentDao.add_student_course_account(query_db, account)
+        return await TeachEnrollmentDao.add_student_course_account(query_db, account)
 
     @classmethod
     async def create_inventory_sale_record(
@@ -324,7 +343,11 @@ class TeachEnrollmentService:
             for item in normalized_items:
                 order_item = await cls.add_order_item(query_db, order, item, current_user_name)
                 if item.item_type == 'course':
-                    await cls.create_course_account(query_db, order, order_item, item, current_user_name)
+                    account = await cls.create_course_account(query_db, order, order_item, item, current_user_name)
+                    if item.class_id:
+                        await TeachClassService.add_student_from_enrollment_services(
+                            query_db, item.class_id, order.student_id, account, order_item, current_user_name
+                        )
                 elif item.item_type == 'item':
                     await cls.create_inventory_sale_record(
                         query_db, order, item, student.student_name, current_user_name

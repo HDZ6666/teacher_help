@@ -1,5 +1,6 @@
 from config.database import async_engine, AsyncSessionLocal, Base
 from module_ast.schema import patch_ast_schema
+from module_teach.schema import patch_teach_schedule_schema
 from utils.log_util import logger
 
 
@@ -23,4 +24,5 @@ async def init_create_table():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         await patch_ast_schema(conn)
+        await patch_teach_schedule_schema(conn)
     logger.info('数据库连接成功')
