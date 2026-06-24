@@ -1,0 +1,242 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>老师管理轻入口</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002117",
+                        "tertiary": "#00583d",
+                        "surface-tint": "#166b53",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-dim": "#cddce4",
+                        "on-tertiary-container": "#8cf7c7",
+                        "surface-container": "#e1f0f8",
+                        "secondary-fixed": "#c2ebde",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "primary": "#005842",
+                        "on-secondary-fixed": "#00201a",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#c2ebde",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "surface-container-low": "#e7f6fe",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a4f2d4",
+                        "background": "#f3faff",
+                        "outline": "#6f7974",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#002114",
+                        "on-surface": "#0f1d23",
+                        "inverse-surface": "#243239",
+                        "primary-container": "#1f7159",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-primary-fixed-variant": "#00513d",
+                        "inverse-primary": "#88d6b9",
+                        "surface-container-high": "#dbebf3",
+                        "on-surface-variant": "#3f4944",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#d6e5ed",
+                        "on-secondary-container": "#466c61",
+                        "secondary": "#40655b",
+                        "inverse-on-surface": "#e4f3fb",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f3faff",
+                        "on-primary-container": "#a4f2d4",
+                        "on-background": "#0f1d23",
+                        "surface-variant": "#d6e5ed",
+                        "surface": "#f3faff",
+                        "outline-variant": "#bec9c3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_lg": "24px",
+                        "stack_sm": "8px",
+                        "gutter": "12px",
+                        "page_margin": "14px",
+                        "stack_md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col items-center">
+<div class="w-full max-w-[375px] bg-background min-h-screen relative pb-[80px] shadow-sm">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-40 bg-background flex items-center justify-between px-page_margin h-[56px]">
+<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-container-high transition-colors rounded-full active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">老师管理</h1>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="px-page_margin pt-stack_sm flex flex-col gap-gutter">
+<!-- Search and Add Actions -->
+<div class="flex items-center gap-2 mb-2">
+<div class="flex-1 relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none">search</span>
+<input class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-4 font-body-md text-on-surface placeholder:text-outline-variant focus:border-primary focus:ring-1 focus:ring-primary transition-colors" placeholder="搜索老师姓名/手机号" type="text">
+</div>
+<button class="h-11 px-4 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg flex items-center gap-1 active:scale-95 transition-transform whitespace-nowrap shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                新增
+            </button>
+</div>
+<!-- Teacher List Cards -->
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col gap-3 relative overflow-hidden transition-colors hover:bg-surface-container-low active:scale-[0.98]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover border border-surface-variant" data-alt="A professional studio headshot of a female teacher wearing a stylish dark green blazer over a white blouse. She has a warm, approachable smile and neat, shoulder-length black hair. The background is a very light, soft mint gradient, ensuring high contrast and a clean, modern educational vibe. The lighting is soft and flattering, creating a trustworthy and competent appearance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBul9brRyVZKiKAlhjAtNG6ouAegG2p0OxabPuPGoYPhU4-q0xnJPPzxRjL-n-iDKq942Fl2l6Gfg3zAgmgSEYybuP0WrxwUERRGsF1xWbYLyQh2M-pxk8AQavSZlTYMOcoxh4UmeInjCypaQVnC353DFKbg46DEIz3iylYHgTBywbDOZ2RCJds0OT-PVDXbjULVTiLbFCCitXssVUU9Fvmoh663CO4jT5NiURZNVCYOEMBsBQ2IBcDnmLR6MnXHngA4SdYVcwh4Co">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">王老师</span>
+<span class="bg-[#e9f6ef] text-[#227253] px-[12px] py-[4px] rounded-full font-label-sm text-label-sm">在岗</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">smartphone</span>
+                            138****8888
+                        </div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 bg-surface p-3 rounded-lg border border-surface-variant">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">今日课程</span>
+<span class="font-headline-sm text-headline-sm text-primary">3 节</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">本周课时</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">18 课时</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 mt-1">
+<button class="h-9 px-4 bg-transparent border border-primary-container text-primary-container font-label-md text-label-md rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+                    联系
+                </button>
+<button class="h-9 px-4 bg-transparent border border-primary-container text-primary-container font-label-md text-label-md rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+                    编辑
+                </button>
+<button class="h-9 px-4 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+                    查看课表
+                </button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col gap-3 relative overflow-hidden transition-colors hover:bg-surface-container-low active:scale-[0.98]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover border border-surface-variant" data-alt="A professional studio headshot of a male teacher in his 30s wearing a crisp light blue button-down shirt. He has short, neatly styled dark hair and subtle, modern glasses. He gazes slightly off-camera with a gentle, encouraging expression. The background is a very light, soft mint gradient, ensuring high contrast and a clean, modern educational vibe. The lighting is soft and flattering, creating a trustworthy and competent appearance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDLydTiEAHKSMF1kgKS9FN8NHyNCEdS-d0P-gYTr3DcTYoseqm-W_MkF3alSfCZKsqsIJLBd2WYeoft6Of0YRYIk4EbOAHcLajeWaIqN0ZIOE_vuKwopjknRdm3vZ6lUurE-HkziEyr_nIV9rcNeJkOAqwbo6Ay4iCw6edA5IRxE1TUe5aKknsqJwZeKUGDr-LWSqJPfJi3ay_vQeGEngLRRSZjaYEH2oUldUqP7Bm_BY4G7cVpWh-s7aK7Vl52maCO4w-U7-IBUQ">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">李老师</span>
+<span class="bg-[#e9f6ef] text-[#227253] px-[12px] py-[4px] rounded-full font-label-sm text-label-sm">在岗</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">smartphone</span>
+                            139****1234
+                        </div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 bg-surface p-3 rounded-lg border border-surface-variant">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">今日课程</span>
+<span class="font-headline-sm text-headline-sm text-primary">5 节</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">本周课时</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">24 课时</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 mt-1">
+<button class="h-9 px-4 bg-transparent border border-primary-container text-primary-container font-label-md text-label-md rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+                    联系
+                </button>
+<button class="h-9 px-4 bg-transparent border border-primary-container text-primary-container font-label-md text-label-md rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+                    编辑
+                </button>
+<button class="h-9 px-4 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+                    查看课表
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-[80px] bg-surface-container-lowest max-w-[375px] shadow-[0_-1px_3px_rgba(0,0,0,0.05)] border-t-0">
+<div class="flex justify-around items-center px-4 h-full">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-16 rounded-xl">
+<span class="material-symbols-outlined mb-1">today</span>
+<span class="font-label-md text-label-md">首页</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-16 rounded-xl">
+<span class="material-symbols-outlined mb-1">calendar_month</span>
+<span class="font-label-md text-label-md">排课</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-16 rounded-xl">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-label-md text-label-md">学生</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-16 rounded-xl">
+<span class="material-symbols-outlined mb-1">auto_stories</span>
+<span class="font-label-md text-label-md">错题本</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-16 rounded-xl">
+<span class="material-symbols-outlined fill mb-1">person</span>
+<span class="font-label-md text-label-md">我的</span>
+</button>
+</div>
+</nav>
+</div>
+
+
+</body></html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>点名异常确认</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#007351",
+                    "inverse-surface": "#243239",
+                    "error": "#ba1a1a",
+                    "primary-container": "#1f7159",
+                    "on-secondary": "#ffffff",
+                    "primary": "#005842",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#e7f6fe",
+                    "tertiary-fixed": "#8cf7c7",
+                    "surface-tint": "#166b53",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#88d6b9",
+                    "on-tertiary-container": "#8cf7c7",
+                    "on-primary-container": "#a4f2d4",
+                    "surface-container-high": "#dbebf3",
+                    "secondary-fixed": "#c2ebde",
+                    "on-background": "#0f1d23",
+                    "outline": "#6f7974",
+                    "on-secondary-container": "#466c61",
+                    "error-container": "#ffdad6",
+                    "surface": "#f3faff",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#bec9c3",
+                    "inverse-on-surface": "#e4f3fb",
+                    "on-primary-fixed-variant": "#00513d",
+                    "on-secondary-fixed": "#00201a",
+                    "surface-bright": "#f3faff",
+                    "background": "#f3faff",
+                    "surface-container-highest": "#d6e5ed",
+                    "primary-fixed": "#a4f2d4",
+                    "on-surface": "#0f1d23",
+                    "tertiary": "#00583d",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#3f4944",
+                    "tertiary-fixed-dim": "#6fdaac",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#005138",
+                    "inverse-primary": "#88d6b9",
+                    "surface-container": "#e1f0f8",
+                    "secondary-container": "#c2ebde",
+                    "surface-variant": "#d6e5ed",
+                    "on-secondary-fixed-variant": "#284d44",
+                    "surface-dim": "#cddce4",
+                    "secondary": "#40655b",
+                    "secondary-fixed-dim": "#a7cfc2",
+                    "on-tertiary-fixed": "#002114",
+                    "on-primary-fixed": "#002117"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack_sm": "8px",
+                    "stack_md": "16px",
+                    "page_margin": "14px",
+                    "gutter": "12px",
+                    "stack_lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-md": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-sm": [
+                            "Be Vietnam Pro"
+                    ],
+                    "body-md": [
+                            "Be Vietnam Pro"
+                    ],
+                    "body-lg": [
+                            "Be Vietnam Pro"
+                    ],
+                    "label-md": [
+                            "Be Vietnam Pro"
+                    ],
+                    "display": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "label-sm": [
+                            "Be Vietnam Pro"
+                    ],
+                    "headline-sm": [
+                            "Plus Jakarta Sans"
+                    ]
+            },
+            "fontSize": {
+                    "headline-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "13px",
+                            {
+                                    "lineHeight": "18px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-sm": [
+                            "11px",
+                            {
+                                    "lineHeight": "14px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-sm": [
+                            "17px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen w-full relative antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Mock Background Content (The Roll Call Page underneath) -->
+<div class="h-full w-full p-page_margin blur-sm select-none pointer-events-none opacity-60">
+<div class="flex justify-between items-center mb-stack_lg">
+<h1 class="font-headline-md text-headline-md">数学集训营 - 秋季班</h1>
+<span class="font-label-md text-label-md text-primary bg-primary-container/10 px-3 py-1 rounded-full">进行中</span>
+</div>
+<div class="space-y-gutter">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest"></div>
+<div>
+<p class="font-body-md text-body-md">张三</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">学号: 2023001</p>
+</div>
+</div>
+<div class="text-error font-label-md text-label-md">迟到</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest"></div>
+<div>
+<p class="font-body-md text-body-md">李四</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">学号: 2023002</p>
+</div>
+</div>
+<div class="text-tertiary-container font-label-md text-label-md">请假</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest"></div>
+<div>
+<p class="font-body-md text-body-md">王五</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">学号: 2023003</p>
+</div>
+</div>
+<div class="text-error font-label-md text-label-md">缺勤</div>
+</div>
+</div>
+</div>
+<!-- Overlay / Modal -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-on-background/40 backdrop-blur-sm p-page_margin transition-opacity duration-300">
+<!-- Dialog Container -->
+<div class="w-full max-w-sm bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant overflow-hidden flex flex-col transform transition-all duration-300 scale-100 opacity-100">
+<!-- Header -->
+<div class="px-[14px] pt-stack_lg pb-stack_md text-center">
+<div class="w-12 h-12 rounded-full bg-error-container/30 text-error flex items-center justify-center mx-auto mb-stack_sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-background">点名异常确认</h2>
+</div>
+<!-- Content Body -->
+<div class="px-[14px] pb-stack_lg">
+<div class="bg-surface-container rounded-lg p-stack_md mb-stack_md border border-outline-variant/30">
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-stack_sm">以下学员存在考勤异常：</p>
+<ul class="space-y-2">
+<li class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-background">张三</span>
+<span class="bg-[#e9f6ef] text-[#227253] font-label-md text-label-md py-1 px-3 rounded-full border border-[#227253]/20">迟到</span>
+</li>
+<li class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-background">李四</span>
+<span class="bg-surface-container-high text-on-surface-variant font-label-md text-label-md py-1 px-3 rounded-full border border-outline-variant/50">请假</span>
+</li>
+<li class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-background">王五</span>
+<span class="bg-error-container/50 text-error font-label-md text-label-md py-1 px-3 rounded-full border border-error/20">缺勤</span>
+</li>
+</ul>
+</div>
+<p class="font-body-md text-body-md text-on-background text-center">
+                    当前存在 <span class="font-headline-sm text-headline-sm text-error mx-1">3</span> 名异常学员，是否确认提交？
+                </p>
+</div>
+<!-- Actions / Footer -->
+<div class="px-[14px] pb-[14px] pt-stack_sm flex gap-gutter border-t border-surface-variant bg-surface-bright">
+<button class="flex-1 h-[44px] rounded-lg border border-[#1f7159] text-[#1f7159] bg-transparent font-label-md text-label-md flex items-center justify-center transition-colors hover:bg-primary-container/5 active:bg-primary-container/10" type="button">
+                    返回修改
+                </button>
+<button class="flex-1 h-[44px] rounded-lg bg-[#1f7159] text-white font-label-md text-label-md flex items-center justify-center transition-all hover:bg-primary active:scale-[0.98] shadow-sm" type="button">
+                    确认提交
+                </button>
+</div>
+</div>
+</div>
+</body></html>

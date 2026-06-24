@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>新增老师 - Teacher Help</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #1f7159;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #1f7159;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #bec9c3;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 3rem;
+            height: 1.5rem;
+            background-color: #bec9c3;
+            border-radius: 9999px;
+            transition: all 0.3s;
+        }
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed": "#002114",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#00583d",
+                        "surface-tint": "#166b53",
+                        "surface-container-highest": "#d6e5ed",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#8cf7c7",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "surface-container": "#e1f0f8",
+                        "surface-bright": "#f3faff",
+                        "inverse-surface": "#243239",
+                        "surface": "#f3faff",
+                        "on-surface-variant": "#3f4944",
+                        "on-primary-fixed": "#002117",
+                        "inverse-on-surface": "#e4f3fb",
+                        "on-secondary-container": "#466c61",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "outline": "#6f7974",
+                        "on-secondary-fixed": "#00201a",
+                        "background": "#f3faff",
+                        "inverse-primary": "#88d6b9",
+                        "on-surface": "#0f1d23",
+                        "on-background": "#0f1d23",
+                        "secondary-container": "#c2ebde",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-container-high": "#dbebf3",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-primary-fixed-variant": "#00513d",
+                        "secondary": "#40655b",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-primary-container": "#a4f2d4",
+                        "primary": "#005842",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#bec9c3",
+                        "surface-dim": "#cddce4",
+                        "primary-fixed": "#a4f2d4",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#d6e5ed",
+                        "secondary-fixed": "#c2ebde",
+                        "primary-container": "#1f7159",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#e7f6fe",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "page_margin": "14px",
+                        "stack_sm": "8px",
+                        "stack_lg": "24px",
+                        "gutter": "12px",
+                        "stack_md": "16px"
+                    },
+                    fontFamily: {
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    fontSize: {
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }],
+                        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-sm": ["11px", { lineHeight: "14px", fontWeight: "500" }],
+                        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-sm": ["17px", { lineHeight: "24px", fontWeight: "600" }],
+                        "display": ["24px", { lineHeight: "32px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col pb-24">
+<!-- TopAppBar from JSON -->
+<header class="flex items-center px-page_margin h-14 w-full z-50 sticky top-0 bg-surface border-b border-outline-variant">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center -ml-2 text-primary transition-all active:scale-95 hover:bg-surface-container rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="ml-2 font-headline-sm text-headline-sm text-primary flex-1 font-bold">新增老师</h1>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-page_margin pt-stack_md pb-stack_lg flex flex-col gap-gutter max-w-md mx-auto w-full">
+<!-- Section 1: Basic Info Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-[14px]">
+<div class="flex flex-col gap-stack_md">
+<!-- Name Input -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
+                        姓名 <span class="text-error">*</span>
+</label>
+<input class="h-[44px] w-full rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary bg-transparent px-3 text-on-surface font-body-md" placeholder="请输入姓名" type="text"/>
+</div>
+<!-- Phone Input -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">
+                        联系电话
+                    </label>
+<input class="h-[44px] w-full rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary bg-transparent px-3 text-on-surface font-body-md" placeholder="请输入手机号码" type="tel"/>
+</div>
+<!-- Gender Radio Chips -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">性别</label>
+<div class="flex gap-3">
+<label class="cursor-pointer relative">
+<input checked="" class="peer sr-only" name="gender" type="radio" value="male"/>
+<div class="px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant peer-checked:bg-surface-container-low peer-checked:border-primary peer-checked:text-primary transition-colors font-body-sm">
+                                男
+                            </div>
+</label>
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="gender" type="radio" value="female"/>
+<div class="px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant peer-checked:bg-surface-container-low peer-checked:border-primary peer-checked:text-primary transition-colors font-body-sm">
+                                女
+                            </div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Professional Info Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-[14px]">
+<div class="flex flex-col gap-stack_md">
+<!-- Specialized Subjects Tag Input (Simplified visual representation) -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">擅长科目</label>
+<div class="min-h-[44px] w-full rounded-lg border border-outline-variant p-2 flex flex-wrap gap-2 items-center bg-transparent">
+<div class="bg-surface-container-low text-primary px-3 py-1 rounded-full text-body-sm flex items-center gap-1 border border-primary-fixed-dim">
+                            数学 <span class="material-symbols-outlined text-[14px] cursor-pointer" data-icon="close">close</span>
+</div>
+<input class="flex-1 min-w-[80px] border-none bg-transparent focus:ring-0 p-0 text-on-surface font-body-sm" placeholder="添加科目..." type="text"/>
+</div>
+</div>
+<!-- Role Dropdown -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">角色</label>
+<div class="relative">
+<select class="h-[44px] w-full rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary bg-transparent px-3 text-on-surface font-body-md appearance-none">
+<option value="">选择角色</option>
+<option value="1">班主任</option>
+<option value="2">任课教师</option>
+<option value="3">教务</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Attendance Group Dropdown -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">考勤组</label>
+<div class="relative">
+<select class="h-[44px] w-full rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary bg-transparent px-3 text-on-surface font-body-md appearance-none">
+<option value="">选择考勤组</option>
+<option value="1">早班组</option>
+<option value="2">晚班组</option>
+<option value="3">全职组</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: Settings & Notes Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-[14px]">
+<div class="flex flex-col gap-stack_md">
+<!-- Allow Login Switch -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">允许登录</span>
+<span class="text-label-sm text-on-surface-variant font-body-sm">开启后该老师可登录系统</span>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="toggle"></label>
+</div>
+</div>
+<hr class="border-outline-variant border-t"/>
+<!-- Remarks Textarea -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">备注</label>
+<textarea class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary bg-transparent p-3 text-on-surface font-body-md resize-none" placeholder="请输入备注信息..." rows="3"></textarea>
+</div>
+</div>
+</div>
+<!-- Permission Hint Box -->
+<div class="bg-surface-container-low rounded-lg p-3 flex items-start gap-2 border border-surface-container-highest">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" data-icon="info">info</span>
+<p class="text-body-sm text-on-surface-variant">权限配置请到 PC 后台完成</p>
+</div>
+</main>
+<!-- Bottom Actions Sticky Container -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant p-page_margin pb-[env(safe-area-inset-bottom,14px)] z-40">
+<div class="max-w-md mx-auto flex gap-3">
+<button class="flex-1 h-[44px] rounded-lg border border-primary text-primary font-label-md text-label-md bg-transparent hover:bg-surface-container-low active:scale-95 transition-all">
+                取消
+            </button>
+<button class="flex-1 h-[44px] rounded-lg bg-primary-container text-on-primary font-label-md text-label-md active:scale-95 transition-all shadow-sm">
+                保存
+            </button>
+</div>
+</div>
+</body></html>

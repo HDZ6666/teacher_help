@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>会员卡详情 - 老师帮</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "on-primary-fixed": "#002117",
+                        "primary-fixed-dim": "#88d6b9",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-tint": "#166b53",
+                        "on-background": "#0f1d23",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-container-highest": "#d6e5ed",
+                        "on-primary-fixed-variant": "#00513d",
+                        "surface-container-low": "#e7f6fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#466c61",
+                        "on-primary-container": "#a4f2d4",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "on-surface-variant": "#3f4944",
+                        "inverse-primary": "#88d6b9",
+                        "primary": "#005842",
+                        "tertiary": "#00583d",
+                        "on-tertiary-container": "#8cf7c7",
+                        "surface-dim": "#cddce4",
+                        "outline-variant": "#bec9c3",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-container-high": "#dbebf3",
+                        "surface": "#f3faff",
+                        "primary-container": "#1f7159",
+                        "inverse-surface": "#243239",
+                        "inverse-on-surface": "#e4f3fb",
+                        "tertiary-container": "#007351",
+                        "on-tertiary-fixed": "#002114",
+                        "secondary-container": "#c2ebde",
+                        "surface-variant": "#d6e5ed",
+                        "on-secondary": "#ffffff",
+                        "outline": "#6f7974",
+                        "background": "#f3faff",
+                        "secondary": "#40655b",
+                        "surface-bright": "#f3faff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#00201a",
+                        "secondary-fixed": "#c2ebde",
+                        "on-surface": "#0f1d23",
+                        "surface-container": "#e1f0f8",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_md": "16px",
+                        "stack_sm": "8px",
+                        "stack_lg": "24px",
+                        "page_margin": "14px",
+                        "gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-[180px]">
+<!-- TopAppBar -->
+<header class="bg-surface border-b border-outline-variant docked full-width top-0 sticky z-50 transition-transform active:scale-95 flex items-center justify-between px-page_margin w-full h-14">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary truncate max-w-[200px]">会员卡详情</h1>
+<button aria-label="Add" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</header>
+<main class="px-page_margin pt-stack_md space-y-stack_md max-w-md mx-auto">
+<!-- Card Preview Section -->
+<section class="relative bg-primary-container text-on-primary-container rounded-xl p-5 overflow-hidden shadow-sm">
+<!-- Decorative Background Element -->
+<div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<h2 class="font-headline-sm text-headline-sm mb-1 text-white">VIP 数学强化卡</h2>
+<p class="font-body-sm text-body-sm text-primary-fixed-dim">初中数学专用</p>
+</div>
+<div class="bg-white/20 px-3 py-1 rounded-full border border-white/30 backdrop-blur-sm">
+<span class="font-label-md text-label-md text-white">已启用</span>
+</div>
+</div>
+<div class="mt-8 flex items-baseline gap-2 relative z-10">
+<span class="font-display text-display text-white">¥1,200</span>
+<span class="font-body-sm text-body-sm text-primary-fixed-dim line-through">¥1,500</span>
+</div>
+</section>
+<!-- Rights Information (权益信息) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 space-y-4 shadow-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-[20px]">verified</span>
+                权益信息
+            </h3>
+<div class="grid grid-cols-2 gap-y-4 gap-x-2">
+<div class="space-y-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant">适用课程</p>
+<p class="font-body-md text-body-md text-on-surface">初中数学</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant">可使用次数</p>
+<p class="font-body-md text-body-md text-on-surface">10次</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant">有效天数</p>
+<p class="font-body-md text-body-md text-on-surface">180天</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant">生效方式</p>
+<p class="font-body-md text-body-md text-on-surface">即时生效</p>
+</div>
+<div class="space-y-1 col-span-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant">购买限制</p>
+<p class="font-body-md text-body-md text-on-surface">不限</p>
+</div>
+</div>
+<div class="pt-2 border-t border-outline-variant border-dashed">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">使用说明</p>
+<p class="font-body-sm text-body-sm text-on-surface leading-relaxed">仅限本人使用。不可转让，不可与其他优惠叠加使用。过期后卡内剩余次数作废，不予退还。</p>
+</div>
+</section>
+</main>
+<!-- Bottom Fixed Actions -->
+<div class="fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline-variant p-page_margin pb-[env(safe-area-inset-bottom,14px)] z-40 max-w-md mx-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="flex gap-3 mb-3">
+<button class="flex-1 h-[44px] bg-transparent border border-primary-container text-primary-container rounded-lg font-label-md text-label-md flex items-center justify-center transition-colors hover:bg-surface-container-high active:scale-95">
+                编辑
+            </button>
+<button class="flex-1 h-[44px] bg-primary-container text-white rounded-lg font-label-md text-label-md flex items-center justify-center transition-colors hover:bg-surface-tint active:scale-95">
+                发放给学员
+            </button>
+</div>
+<div class="flex justify-between items-center px-2">
+<button class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">power_settings_new</span>
+                停用此卡
+            </button>
+<button class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">history</span>
+                查看发放记录
+            </button>
+</div>
+</div>
+</body></html>

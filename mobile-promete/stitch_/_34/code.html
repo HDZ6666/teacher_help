@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>课程管理</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002117",
+                        "tertiary": "#00583d",
+                        "surface-tint": "#166b53",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-dim": "#cddce4",
+                        "on-tertiary-container": "#8cf7c7",
+                        "surface-container": "#e1f0f8",
+                        "secondary-fixed": "#c2ebde",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "primary": "#005842",
+                        "on-secondary-fixed": "#00201a",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#c2ebde",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "surface-container-low": "#e7f6fe",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a4f2d4",
+                        "background": "#f3faff",
+                        "outline": "#6f7974",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#002114",
+                        "on-surface": "#0f1d23",
+                        "inverse-surface": "#243239",
+                        "primary-container": "#1f7159",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-primary-fixed-variant": "#00513d",
+                        "inverse-primary": "#88d6b9",
+                        "surface-container-high": "#dbebf3",
+                        "on-surface-variant": "#3f4944",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#d6e5ed",
+                        "on-secondary-container": "#466c61",
+                        "secondary": "#40655b",
+                        "inverse-on-surface": "#e4f3fb",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f3faff",
+                        "on-primary-container": "#a4f2d4",
+                        "on-background": "#0f1d23",
+                        "surface-variant": "#d6e5ed",
+                        "surface": "#f3faff",
+                        "outline-variant": "#bec9c3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_lg": "24px",
+                        "stack_sm": "8px",
+                        "gutter": "12px",
+                        "page_margin": "14px",
+                        "stack_md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f4f6f5; /* Level 0 Base from Style Guidance */
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:hidden">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-40 bg-background dark:bg-background flat no shadows">
+<div class="flex items-center justify-between px-page_margin h-[56px]">
+<button aria-label="Back" class="w-10 h-10 flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors active:scale-95 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-primary-fixed tracking-tight">课程管理</h1>
+<button aria-label="Settings" class="w-10 h-10 flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors active:scale-95 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 px-page_margin pb-[100px] pt-stack_sm flex flex-col gap-gutter">
+<!-- Search Bar -->
+<div class="w-full relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full h-[44px] pl-10 pr-4 bg-surface-container-lowest border border-[#e7ece9] rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all shadow-sm" placeholder="搜索课程..." type="text">
+</div>
+<!-- Course List -->
+<div class="flex flex-col gap-gutter">
+<!-- Course Card 1 -->
+<div class="bg-surface-container-lowest rounded-lg border border-[#e7ece9] p-[14px] flex flex-col gap-stack_sm active:bg-surface-container-low transition-colors duration-200">
+<div class="flex justify-between items-start">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">少儿英语进阶</h2>
+<span class="bg-[#e9f6ef] text-[#227253] font-label-sm text-label-sm px-3 py-1 rounded-full">已发布</span>
+</div>
+<div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-1">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">school</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">小学三年级</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">48课时</span>
+</div>
+</div>
+<div class="h-[1px] bg-[#e7ece9] w-full my-1"></div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="h-[36px] px-4 rounded-lg bg-transparent border border-primary-container text-primary-container font-label-md text-label-md active:bg-primary-container/10 transition-colors">查看</button>
+<button class="h-[36px] px-4 rounded-lg bg-transparent border border-primary-container text-primary-container font-label-md text-label-md active:bg-primary-container/10 transition-colors">编辑</button>
+<button class="h-[36px] px-4 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md active:bg-primary transition-colors">排课</button>
+</div>
+</div>
+<!-- Course Card 2 -->
+<div class="bg-surface-container-lowest rounded-lg border border-[#e7ece9] p-[14px] flex flex-col gap-stack_sm active:bg-surface-container-low transition-colors duration-200">
+<div class="flex justify-between items-start">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">趣味数学启蒙</h2>
+<span class="bg-[#e9f6ef] text-[#227253] font-label-sm text-label-sm px-3 py-1 rounded-full">已发布</span>
+</div>
+<div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-1">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">school</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">幼儿园大班</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">24课时</span>
+</div>
+</div>
+<div class="h-[1px] bg-[#e7ece9] w-full my-1"></div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="h-[36px] px-4 rounded-lg bg-transparent border border-primary-container text-primary-container font-label-md text-label-md active:bg-primary-container/10 transition-colors">查看</button>
+<button class="h-[36px] px-4 rounded-lg bg-transparent border border-primary-container text-primary-container font-label-md text-label-md active:bg-primary-container/10 transition-colors">编辑</button>
+<button class="h-[36px] px-4 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md active:bg-primary transition-colors">排课</button>
+</div>
+</div>
+<!-- Course Card 3 -->
+<div class="bg-surface-container-lowest rounded-lg border border-[#e7ece9] p-[14px] flex flex-col gap-stack_sm active:bg-surface-container-low transition-colors duration-200 opacity-75">
+<div class="flex justify-between items-start">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">初中物理精讲</h2>
+<span class="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-3 py-1 rounded-full">未发布</span>
+</div>
+<div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-1">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">school</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">初中二年级</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">60课时</span>
+</div>
+</div>
+<div class="h-[1px] bg-[#e7ece9] w-full my-1"></div>
+<div class="flex justify-end gap-2 mt-1">
+<button class="h-[36px] px-4 rounded-lg bg-transparent border border-primary-container text-primary-container font-label-md text-label-md active:bg-primary-container/10 transition-colors">查看</button>
+<button class="h-[36px] px-4 rounded-lg bg-transparent border border-primary-container text-primary-container font-label-md text-label-md active:bg-primary-container/10 transition-colors">编辑</button>
+<button class="h-[36px] px-4 rounded-lg bg-surface-variant text-on-surface-variant font-label-md text-label-md cursor-not-allowed">排课</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Nav Suppressed based on rules: Task-Focused sub-page (courses list within potentially a settings/admin area) -> No Bottom Nav required for a focused management page. I will omit it as per the Shell Visibility filter). -->
+<!-- Re-evaluating: The prompt implies a main top-level destination for "Course Management". Since Bottom Nav has 首页 排课 学生 错题本 我的, "排课" might be active, but this is "Course Management" (editing courses). I will suppress bottom nav to prioritize the canvas, as it's a specific management view. -->
+
+
+</body></html>

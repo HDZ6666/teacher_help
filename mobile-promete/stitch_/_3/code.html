@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>学员列表 - 老师帮</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#d6e5ed",
+                        "secondary-container": "#c2ebde",
+                        "inverse-primary": "#88d6b9",
+                        "on-tertiary-container": "#8cf7c7",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#e4f3fb",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-bright": "#f3faff",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-primary-fixed": "#002117",
+                        "outline-variant": "#bec9c3",
+                        "tertiary": "#00583d",
+                        "on-surface": "#0f1d23",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a4f2d4",
+                        "on-primary-container": "#a4f2d4",
+                        "on-background": "#0f1d23",
+                        "surface-container-low": "#e7f6fe",
+                        "on-tertiary-fixed": "#002114",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-surface-variant": "#3f4944",
+                        "surface-container-highest": "#d6e5ed",
+                        "surface": "#f3faff",
+                        "secondary": "#40655b",
+                        "primary": "#005842",
+                        "background": "#f3faff",
+                        "primary-container": "#1f7159",
+                        "on-primary-fixed-variant": "#00513d",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#166b53",
+                        "tertiary-container": "#007351",
+                        "surface-dim": "#cddce4",
+                        "surface-container": "#e1f0f8",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "on-secondary-fixed": "#00201a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#dbebf3",
+                        "secondary-fixed": "#c2ebde",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#243239",
+                        "outline": "#6f7974",
+                        "on-secondary-container": "#466c61"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "page_margin": "14px",
+                        "gutter": "12px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "stack_lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen flex flex-col font-body-md text-on-surface antialiased">
+<header class="fixed top-0 w-full z-50 bg-surface flex justify-between items-center px-page_margin h-14 border-b border-outline-variant">
+<div class="flex items-center gap-3">
+<img alt="Teacher Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a teacher smiling, high-quality lighting, corporate educational setting, circular crop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5q4W1Oi-Q2uIfxcOUcQcA7-uT-F2OxHXU8IF4x-mEKjZT8L3RjfwnD0MdvS1CESBeVNGFw1kWTUdqm-mBI-LfgQpsE5tAxsehJ9dQFFGkj9eSFlyQW-uGf4iH_tHh3J7s74OLB7pRV7hDo25GKur5fMwxRRMDD9SkNpANsjIez5cOCWxi6gdBjuGscRFO4Iytvb9_1ijj_yCQoqxDVmh9SI0Z2qzWYjJ5BZFP3dl36bXo-9O297sz_VQ7ru1CzwGfnUIAnDDit4c"/>
+<span class="font-headline-md font-bold text-primary">老师帮</span>
+</div>
+<button class="text-primary font-label-md hover:bg-surface-container-low px-2 py-1 rounded transition-colors duration-200">
+            切换校区
+        </button>
+</header>
+<main class="flex-1 pt-[72px] pb-[80px]">
+<div class="px-page_margin mb-stack_md flex justify-between items-center">
+<h1 class="font-display text-display text-on-surface">学员</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-primary">
+<span class="material-symbols-outlined" data-weight="fill">person_add</span>
+</button>
+</div>
+<div class="px-page_margin mb-stack_sm">
+<div class="relative flex items-center w-full h-[44px] bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant ml-3 mr-2 text-[20px]">search</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-body-md text-on-surface placeholder:text-on-surface-variant/60 h-full py-0 px-0" placeholder="搜索姓名、手机号、班级" type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto no-scrollbar py-2 mb-stack_sm px-page_margin">
+<div class="flex gap-2 w-max">
+<button class="bg-primary-container text-on-primary-container h-8 px-4 rounded-full flex items-center font-label-md whitespace-nowrap transition-transform active:scale-95 shadow-sm">
+                    全部
+                </button>
+<button class="bg-surface-container border border-outline-variant text-on-surface-variant h-8 px-4 rounded-full flex items-center font-label-md whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    在读
+                </button>
+<button class="bg-surface-container border border-outline-variant text-on-surface-variant h-8 px-4 rounded-full flex items-center font-label-md whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    待续费
+                </button>
+<button class="bg-surface-container border border-outline-variant text-on-surface-variant h-8 px-4 rounded-full flex items-center font-label-md whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    已停课
+                </button>
+<button class="bg-surface-container border border-outline-variant text-on-surface-variant h-8 px-4 rounded-full flex items-center font-label-md whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    今日有课
+                </button>
+<button class="bg-surface-container border border-outline-variant text-on-surface-variant h-8 px-4 rounded-full flex items-center font-label-md whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    请假中
+                </button>
+</div>
+</div>
+<div class="px-page_margin flex flex-col gap-gutter">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-headline-sm font-bold">
+                            张
+                        </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-body-lg font-bold text-on-surface">张小明</span>
+<span class="material-symbols-outlined text-[16px] text-surface-tint">male</span>
+</div>
+<span class="font-label-sm text-on-surface-variant">12岁 · 初一 · 英语进阶班</span>
+</div>
+</div>
+<div class="bg-secondary-container/50 text-secondary px-2 py-1 rounded font-label-sm font-bold border border-secondary/20">
+                        在读
+                    </div>
+</div>
+<div class="flex items-center gap-6 bg-surface-container-low p-3 rounded-md border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-label-sm text-on-surface-variant mb-1">剩余课时</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-sm text-primary">24</span>
+<span class="font-label-sm text-on-surface-variant">节</span>
+</div>
+</div>
+<div class="w-px h-8 bg-outline-variant/50"></div>
+<div class="flex flex-col">
+<span class="font-label-sm text-on-surface-variant mb-1">最近上课</span>
+<span class="font-body-sm text-on-surface font-medium">2023-10-27</span>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-3 mt-1 flex gap-2">
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-primary bg-surface-container-low hover:bg-surface-container rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">call</span>
+                        联系
+                    </button>
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-primary bg-surface-container-low hover:bg-surface-container rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">event_busy</span>
+                        请假
+                    </button>
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-primary bg-surface-container-low hover:bg-surface-container rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+                        详情
+                    </button>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A portrait of a young female student, soft neutral background, natural lighting, wearing a simple collared shirt, circular frame." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd4TEXCpekcZcFl0HvIeaqdaAwggeplEXJ3g1vFcbheHDOCnkB97wwKToz3Hhha5GmvtiWklgGH2iq4aWWKzrur1_Yo88hWzeVcBPAdSb_2x6Dl_3PDMWetcKcNwH0xq2Ewq99617RWv-JrB1AP6OsPLWebkywmN7NUgGn7SKAGN4xGyzYg81qRPr8QhqtcfvVXxvc1Fw9XAdi_pUPMf5Lcp_wVE2VCuj3H-6pw9cjMJ-5UaJUOGcTJrHLquXc2wr3UhxI-pGvvic"/>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-body-lg font-bold text-on-surface">李思思</span>
+<span class="material-symbols-outlined text-[16px] text-error">female</span>
+</div>
+<span class="font-label-sm text-on-surface-variant">10岁 · 小学四年级 · 数学思维班</span>
+</div>
+</div>
+<div class="bg-tertiary-container text-on-tertiary px-2 py-1 rounded font-label-sm font-bold shadow-sm">
+                        待续费
+                    </div>
+</div>
+<div class="flex items-center gap-6 bg-surface-container-low p-3 rounded-md border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-label-sm text-on-surface-variant mb-1">剩余课时</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-sm text-error">2</span>
+<span class="font-label-sm text-on-surface-variant">节</span>
+</div>
+</div>
+<div class="w-px h-8 bg-outline-variant/50"></div>
+<div class="flex flex-col">
+<span class="font-label-sm text-on-surface-variant mb-1">最近上课</span>
+<span class="font-body-sm text-on-surface font-medium">2023-10-25</span>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-3 mt-1 flex gap-2">
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-primary bg-surface-container-low hover:bg-surface-container rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">call</span>
+                        联系
+                    </button>
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-primary bg-surface-container-low hover:bg-surface-container rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">event_busy</span>
+                        请假
+                    </button>
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-primary bg-surface-container-low hover:bg-surface-container rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+                        详情
+                    </button>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col gap-3 opacity-75 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-headline-sm font-bold">
+                            王
+                        </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-body-lg font-bold text-on-surface-variant">王强</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">male</span>
+</div>
+<span class="font-label-sm text-on-surface-variant">15岁 · 高一 · 物理集训营</span>
+</div>
+</div>
+<div class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded font-label-sm font-bold border border-outline-variant">
+                        已停课
+                    </div>
+</div>
+<div class="flex items-center gap-6 bg-surface-container-low p-3 rounded-md border border-outline-variant/50 opacity-80">
+<div class="flex flex-col">
+<span class="font-label-sm text-on-surface-variant mb-1">剩余课时</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-sm text-on-surface-variant">12</span>
+<span class="font-label-sm text-on-surface-variant">节</span>
+</div>
+</div>
+<div class="w-px h-8 bg-outline-variant/50"></div>
+<div class="flex flex-col">
+<span class="font-label-sm text-on-surface-variant mb-1">最近上课</span>
+<span class="font-body-sm text-on-surface-variant font-medium">2023-09-10</span>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-3 mt-1 flex gap-2">
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-on-surface-variant bg-surface-container hover:bg-surface-variant rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">call</span>
+                        联系
+                    </button>
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-on-surface-variant bg-surface-container hover:bg-surface-variant rounded-md transition-colors" disabled="">
+<span class="material-symbols-outlined text-[18px]">event_busy</span>
+                        请假
+                    </button>
+<button class="flex-1 h-9 flex items-center justify-center gap-1 font-label-md text-primary bg-surface-container hover:bg-surface-variant rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+                        详情
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 w-full z-50 h-16 border-t border-outline-variant bg-surface flex justify-around items-center px-2 pb-safe">
+<button class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full hover:bg-surface-container-highest active:scale-95 transition-all duration-150 rounded-lg">
+<span class="material-symbols-outlined mb-1">today</span>
+<span class="font-label-sm">今日</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full hover:bg-surface-container-highest active:scale-95 transition-all duration-150 rounded-lg">
+<span class="material-symbols-outlined mb-1">calendar_month</span>
+<span class="font-label-sm">课表</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary font-bold w-16 h-full hover:bg-surface-container-highest active:scale-95 transition-all duration-150 rounded-lg">
+<span class="material-symbols-outlined mb-1" data-weight="fill">group</span>
+<span class="font-label-sm">学员</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full hover:bg-surface-container-highest active:scale-95 transition-all duration-150 rounded-lg">
+<span class="material-symbols-outlined mb-1">edit_note</span>
+<span class="font-label-sm">错题本</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full hover:bg-surface-container-highest active:scale-95 transition-all duration-150 rounded-lg">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm">我的</span>
+</button>
+</nav>
+</body></html>

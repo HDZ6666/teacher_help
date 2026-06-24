@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>学员详情 - 张子涵</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#d6e5ed",
+                        "secondary-container": "#c2ebde",
+                        "inverse-primary": "#88d6b9",
+                        "on-tertiary-container": "#8cf7c7",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#e4f3fb",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-bright": "#f3faff",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-primary-fixed": "#002117",
+                        "outline-variant": "#bec9c3",
+                        "tertiary": "#00583d",
+                        "on-surface": "#0f1d23",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a4f2d4",
+                        "on-primary-container": "#a4f2d4",
+                        "on-background": "#0f1d23",
+                        "surface-container-low": "#e7f6fe",
+                        "on-tertiary-fixed": "#002114",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-surface-variant": "#3f4944",
+                        "surface-container-highest": "#d6e5ed",
+                        "surface": "#f3faff",
+                        "secondary": "#40655b",
+                        "primary": "#005842",
+                        "background": "#f3faff",
+                        "primary-container": "#1f7159",
+                        "on-primary-fixed-variant": "#00513d",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#166b53",
+                        "tertiary-container": "#007351",
+                        "surface-dim": "#cddce4",
+                        "surface-container": "#e1f0f8",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "on-secondary-fixed": "#00201a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#dbebf3",
+                        "secondary-fixed": "#c2ebde",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#243239",
+                        "outline": "#6f7974",
+                        "on-secondary-container": "#466c61"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "page_margin": "14px",
+                        "gutter": "12px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "stack_lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-md-mobile": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "headline-sm-mobile": ["16px", { "lineHeight": "22px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Hide scrollbar for horizontal scroll areas */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen">
+<!-- Top Card / Header Section -->
+<div class="bg-primary-container text-on-primary pb-stack_md rounded-b-[20px] shadow-sm relative overflow-hidden">
+<!-- Abstract subtle pattern in background -->
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 100% 0%, #ffffff 0%, transparent 50%);"></div>
+<!-- Custom Navigation Bar inside card -->
+<div class="flex items-center px-page_margin h-14 relative z-10">
+<button aria-label="返回" class="p-1 -ml-1 rounded-full hover:bg-on-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[24px]">chevron_left</span>
+</button>
+<div class="flex-1 text-center font-headline-sm text-headline-sm-mobile">学员详情</div>
+<div class="w-[32px]"></div> <!-- Spacer to balance back button -->
+</div>
+<!-- Student Basic Info -->
+<div class="px-page_margin pt-stack_sm flex items-start gap-4 relative z-10">
+<div class="relative">
+<img class="w-16 h-16 rounded-full border-2 border-primary-fixed object-cover shadow-sm bg-surface" data-alt="A professional, soft-focus portrait photo of a young, cheerful Asian male elementary school student with neat short hair, wearing a casual light blue polo shirt, shot against a bright, well-lit white studio background. The lighting is even and creates a clean, approachable, high-quality aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOpqN5zG-bPDgsW29OGgDWUMHcLPk9GwP20ASDhWQCDDQkdR4wjwnYwj-WH_eyGFLQhSXmOxduW2YtT0s7szxDrhspHnFTZVjcdRyWKY2xsWoF8_Ct0W8jgI3ieaL0NXyDwQUS_UdaprC510h0E_JuD7DDR6TA8xhPoGuCMg45uZIE-iTc78J4zpLPZZ1pnYqsAHVmorFCPuND9f7BgkP0WS94-3rMnqnJZs99VIfUOaBmS7pNIkzZR8VVX-qzs7aGns8N7p-DGQU"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<h1 class="font-headline-md text-headline-md-mobile">张子涵</h1>
+<span class="bg-secondary text-on-secondary px-2 py-0.5 rounded-full font-label-sm text-label-sm border border-secondary/20 shadow-sm">在读学员</span>
+</div>
+<div class="mt-2 flex flex-col gap-1 font-body-sm text-body-sm text-on-primary/90">
+<div class="flex items-center gap-1.5 bg-on-primary/10 w-fit px-2 py-0.5 rounded-md">
+<span class="material-symbols-outlined text-[14px]">phone_iphone</span>
+<span>138****8888</span>
+<span class="text-on-primary/70 ml-1">(张爸爸)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Key Metrics Panel -->
+<div class="mx-page_margin mt-stack_lg bg-surface/10 backdrop-blur-sm rounded-xl p-3 flex justify-around items-center border border-on-primary/10 relative z-10">
+<div class="flex flex-col items-center">
+<span class="font-label-sm text-label-sm text-on-primary/80 mb-1">剩余课时</span>
+<div class="font-display text-display text-primary-fixed drop-shadow-sm">
+                    24<span class="font-body-sm text-body-sm text-on-primary/80 ml-1 font-normal">节</span>
+</div>
+</div>
+<div class="h-10 w-px bg-on-primary/20"></div>
+<div class="flex flex-col items-center">
+<span class="font-label-sm text-label-sm text-on-primary/80 mb-1">可用积分</span>
+<div class="font-display text-display text-on-primary drop-shadow-sm">
+                    1,250<span class="font-body-sm text-body-sm text-on-primary/80 ml-1 font-normal">分</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Actions Grid -->
+<div class="px-page_margin py-stack_md flex justify-between items-start bg-background">
+<!-- Action 1 -->
+<button class="flex flex-col items-center gap-1.5 w-[22%] active:scale-95 transition-transform">
+<div class="w-[52px] h-[52px] rounded-[16px] bg-surface-container-high flex items-center justify-center text-primary border border-surface-variant shadow-sm hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">联系家长</span>
+</button>
+<!-- Action 2 -->
+<button class="flex flex-col items-center gap-1.5 w-[22%] active:scale-95 transition-transform">
+<div class="w-[52px] h-[52px] rounded-[16px] bg-surface-container-high flex items-center justify-center text-primary border border-surface-variant shadow-sm hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_busy</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">学员请假</span>
+</button>
+<!-- Action 3 -->
+<button class="flex flex-col items-center gap-1.5 w-[22%] active:scale-95 transition-transform">
+<div class="w-[52px] h-[52px] rounded-[16px] bg-surface-container-high flex items-center justify-center text-primary border border-surface-variant shadow-sm hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_cart_checkout</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">报名/续费</span>
+</button>
+<!-- Action 4 -->
+<button class="flex flex-col items-center gap-1.5 w-[22%] active:scale-95 transition-transform">
+<div class="w-[52px] h-[52px] rounded-[16px] bg-surface-container-high flex items-center justify-center text-primary border border-surface-variant shadow-sm hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_reaction</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">添加跟进</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="w-full h-2 bg-surface-container-lowest"></div>
+<!-- Segmented Control (Tabs) -->
+<div class="bg-surface-container-lowest sticky top-0 z-20 shadow-sm">
+<div class="px-page_margin overflow-x-auto no-scrollbar flex gap-6 border-b border-outline-variant/30">
+<!-- Active Tab -->
+<button class="py-3 border-b-2 border-primary text-primary font-headline-sm text-headline-sm-mobile whitespace-nowrap relative">
+                课程
+                <!-- Notification dot indicator if needed -->
+<span class="absolute top-3 -right-2 w-1.5 h-1.5 rounded-full bg-error"></span>
+</button>
+<!-- Inactive Tabs -->
+<button class="py-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md whitespace-nowrap transition-colors">上课记录</button>
+<button class="py-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md whitespace-nowrap transition-colors">请假</button>
+<button class="py-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md whitespace-nowrap transition-colors">错题</button>
+<button class="py-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-body-md text-body-md whitespace-nowrap transition-colors">跟进</button>
+</div>
+</div>
+<!-- Tab Content Canvas: Course List -->
+<div class="p-page_margin flex flex-col gap-gutter bg-background pb-8">
+<!-- Course Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant/50 relative overflow-hidden">
+<!-- Decorative left accent line -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex justify-between items-start gap-2">
+<h3 class="font-headline-sm text-headline-sm-mobile text-on-surface leading-tight">小学六年级奥数秋季冲刺班</h3>
+<span class="shrink-0 bg-primary/10 text-primary px-2 py-0.5 rounded font-label-sm text-label-sm border border-primary/20">正价课</span>
+</div>
+<div class="mt-3 flex flex-col gap-1.5">
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-outline">meeting_room</span>
+<span>秋季周末A班 (周六 09:00-11:00)</span>
+</div>
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-outline">person</span>
+<span>李明老师</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant/30 my-3"></div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="font-body-sm text-body-sm text-on-surface-variant">进度:</div>
+<!-- Progress bar visualization -->
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 53%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant"><span class="text-primary font-semibold">8</span> / 15讲</span>
+</div>
+</div>
+<button class="font-label-md text-label-md text-primary bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors">课程详情</button>
+</div>
+</div>
+<!-- Course Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant/50 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary"></div>
+<div class="flex justify-between items-start gap-2">
+<h3 class="font-headline-sm text-headline-sm-mobile text-on-surface leading-tight">新概念英语第二册强化辅导</h3>
+<span class="shrink-0 bg-secondary/10 text-secondary px-2 py-0.5 rounded font-label-sm text-label-sm border border-secondary/20">正价课</span>
+</div>
+<div class="mt-3 flex flex-col gap-1.5">
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-outline">meeting_room</span>
+<span>周三晚班 (周三 18:30-20:30)</span>
+</div>
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-outline">person</span>
+<span>王丽老师</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant/30 my-3"></div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="font-body-sm text-body-sm text-on-surface-variant">进度:</div>
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 15%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant"><span class="text-secondary font-semibold">3</span> / 20讲</span>
+</div>
+</div>
+<button class="font-label-md text-label-md text-primary bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors">课程详情</button>
+</div>
+</div>
+<!-- Completed Course State (Greyed out) -->
+<div class="bg-surface-container-lowest opacity-75 rounded-xl p-4 border border-outline-variant/50 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline"></div>
+<div class="flex justify-between items-start gap-2">
+<h3 class="font-body-lg text-body-lg text-on-surface-variant leading-tight">暑期语文阅读理解特训营</h3>
+<span class="shrink-0 bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded font-label-sm text-label-sm border border-outline-variant/50">已结课</span>
+</div>
+<div class="mt-3 flex flex-col gap-1.5">
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant/80">
+<span class="material-symbols-outlined text-[16px] text-outline/70">meeting_room</span>
+<span>暑假第一期</span>
+</div>
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant/80">
+<span class="material-symbols-outlined text-[16px] text-outline/70">person</span>
+<span>赵老师</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant/30 my-3"></div>
+<div class="flex justify-between items-center">
+<div class="font-label-sm text-label-sm text-on-surface-variant/70">完成于 2023-08-25</div>
+<button class="font-label-md text-label-md text-on-surface-variant border border-outline-variant/80 px-3 py-1.5 rounded-full">回顾课程</button>
+</div>
+</div>
+</div>
+<!-- Note: BottomNavBar is intentionally suppressed as this is a specific detail/task screen with a back button, adhering to the "Semantic Shell Mandate". -->
+</body></html>

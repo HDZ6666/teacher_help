@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>课后点评</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#007351",
+                        "inverse-surface": "#243239",
+                        "error": "#ba1a1a",
+                        "primary-container": "#1f7159",
+                        "on-secondary": "#ffffff",
+                        "primary": "#005842",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#e7f6fe",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-tint": "#166b53",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-tertiary-container": "#8cf7c7",
+                        "on-primary-container": "#a4f2d4",
+                        "surface-container-high": "#dbebf3",
+                        "secondary-fixed": "#c2ebde",
+                        "on-background": "#0f1d23",
+                        "outline": "#6f7974",
+                        "on-secondary-container": "#466c61",
+                        "error-container": "#ffdad6",
+                        "surface": "#f3faff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#bec9c3",
+                        "inverse-on-surface": "#e4f3fb",
+                        "on-primary-fixed-variant": "#00513d",
+                        "on-secondary-fixed": "#00201a",
+                        "surface-bright": "#f3faff",
+                        "background": "#f3faff",
+                        "surface-container-highest": "#d6e5ed",
+                        "primary-fixed": "#a4f2d4",
+                        "on-surface": "#0f1d23",
+                        "tertiary": "#00583d",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#3f4944",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "inverse-primary": "#88d6b9",
+                        "surface-container": "#e1f0f8",
+                        "secondary-container": "#c2ebde",
+                        "surface-variant": "#d6e5ed",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "surface-dim": "#cddce4",
+                        "secondary": "#40655b",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "on-tertiary-fixed": "#002114",
+                        "on-primary-fixed": "#002117"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "page_margin": "14px",
+                        "gutter": "12px",
+                        "stack_lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-page_margin h-14 w-full bg-surface z-50 flex-shrink-0">
+<button class="flex items-center justify-center p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface">课后点评</h1>
+<div class="w-10"></div> <!-- Placeholder for balance -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-page_margin pb-[100px]">
+<!-- Student Info Header -->
+<div class="mb-stack_lg flex items-center space-x-3">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-headline-sm">李</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">李明轩</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">钢琴中级班 - 第12节</p>
+</div>
+</div>
+<form class="space-y-stack_lg">
+<!-- Performance Summary -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin shadow-sm">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-stack_sm">课堂表现总结</label>
+<textarea class="w-full bg-transparent border-none p-0 focus:ring-0 resize-none font-body-md text-on-surface placeholder-outline" placeholder="请描述学生本节课的学习状态、掌握情况..." rows="4"></textarea>
+<!-- Quick Templates -->
+<div class="mt-stack_md flex flex-wrap gap-2">
+<button class="bg-surface-container text-on-surface font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-surface-container-high transition-colors" type="button">表现积极</button>
+<button class="bg-surface-container text-on-surface font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-surface-container-high transition-colors" type="button">需加强练习</button>
+<button class="bg-surface-container text-on-surface font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-surface-container-high transition-colors" type="button">作业已布置</button>
+<button class="bg-surface-container text-on-surface font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-surface-container-high transition-colors" type="button">专注度高</button>
+</div>
+</div>
+<!-- Homework Instructions -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin shadow-sm">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-stack_sm">作业说明</label>
+<textarea class="w-full bg-transparent border-none p-0 focus:ring-0 resize-none font-body-md text-on-surface placeholder-outline" placeholder="填写课后需要完成的练习或作业内容..." rows="3"></textarea>
+</div>
+<!-- Class Photos -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin shadow-sm">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-stack_sm">课堂照片 (最多9张)</label>
+<div class="grid grid-cols-4 gap-2 mt-2">
+<button class="aspect-square border border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-2xl">add</span>
+<span class="font-label-sm text-[10px] mt-1">上传</span>
+</button>
+<!-- Pre-filled example photo -->
+<div class="aspect-square relative rounded-lg overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A close-up shot of a young student playing a grand piano during a music lesson. The lighting is bright and natural, creating a warm and focused atmosphere. The style is modern, professional, and consistent with an educational application context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUEO5isHZ7Lv_20vdrbWpCCV3MqndCL3C9a2tHvzUiCjA95tTvq8mA4J4XORtTNRTsYg_zD-40962PCSi0Iz2gRLNOT0R_htFe8eulnosFd6uKwmNClwRTRTX4bmhD8BEsHdNeMgebTb2omQct-1Yjeeb6dsDxbSCf2kvA9sfBluEH2hDj1J2wnqhWfybMvhCSZB2Ki4qmr9JfiXE7Z9nWaKy8_BTwxw-VbXTSObbuXeVrWKnogCUzwqgj0AJhfOjCUq0e30u2_74"/>
+<button class="absolute top-1 right-1 bg-surface/80 rounded-full p-0.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Note to Parents -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin shadow-sm">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-stack_sm">给家长的备注</label>
+<textarea class="w-full bg-transparent border-none p-0 focus:ring-0 resize-none font-body-md text-on-surface placeholder-outline" placeholder="仅家长可见，用于沟通注意事项..." rows="2"></textarea>
+</div>
+<!-- Sync Toggle -->
+<div class="flex items-center justify-between p-page_margin bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm">
+<div>
+<span class="font-body-lg text-body-lg text-on-surface block">同步给家长</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">发布后将通过微信通知家长</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</form>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 w-full bg-surface border-t border-outline-variant p-page_margin flex gap-3 z-50">
+<button class="flex-1 h-[44px] border border-primary-container text-primary-container font-label-md text-label-md rounded-lg flex items-center justify-center hover:bg-surface-container-low transition-colors">
+            保存草稿
+        </button>
+<button class="flex-[2] h-[44px] bg-primary-container text-on-primary font-label-md text-label-md rounded-lg flex items-center justify-center hover:bg-primary transition-colors shadow-sm">
+            发布点评
+        </button>
+</div>
+</body></html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Proxy Booking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f3faff",
+                        "surface": "#f3faff",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-variant": "#d6e5ed",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "surface-container-highest": "#d6e5ed",
+                        "surface-dim": "#cddce4",
+                        "on-primary-fixed-variant": "#00513d",
+                        "surface-container-low": "#e7f6fe",
+                        "surface-container-high": "#dbebf3",
+                        "surface-container": "#e1f0f8",
+                        "on-surface-variant": "#3f4944",
+                        "primary": "#005842",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "primary-container": "#1f7159",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#c2ebde",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-primary-container": "#a4f2d4",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-tertiary-container": "#8cf7c7",
+                        "background": "#f3faff",
+                        "inverse-surface": "#243239",
+                        "on-tertiary-fixed": "#002114",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bec9c3",
+                        "on-secondary-fixed": "#00201a",
+                        "tertiary": "#00583d",
+                        "on-surface": "#0f1d23",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#0f1d23",
+                        "on-secondary-container": "#466c61",
+                        "secondary-container": "#c2ebde",
+                        "on-primary-fixed": "#002117",
+                        "secondary": "#40655b",
+                        "outline": "#6f7974",
+                        "surface-tint": "#166b53",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "inverse-primary": "#88d6b9",
+                        "inverse-on-surface": "#e4f3fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_md": "16px",
+                        "gutter": "12px",
+                        "stack_lg": "24px",
+                        "page_margin": "14px",
+                        "stack_sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Be Vietnam Pro", "sans-serif"],
+                        "label-sm": ["Be Vietnam Pro", "sans-serif"],
+                        "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "label-md": ["Be Vietnam Pro", "sans-serif"],
+                        "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-sm": ["Be Vietnam Pro", "sans-serif"],
+                        "body-md": ["Be Vietnam Pro", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        };
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 border-b border-surface-variant dark:border-outline-variant bg-surface dark:bg-surface-dim sticky z-50">
+<div class="flex items-center justify-between px-page_margin h-14 w-full">
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-high dark:hover:bg-surface-container-highest p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim absolute left-1/2 -translate-x-1/2">Proxy Booking</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<!-- Main Content -->
+<main class="px-page_margin py-stack_md space-y-stack_md">
+<!-- Booking Details (Read-only) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin space-y-3">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-2">Booking Details</h2>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline" data-icon="storefront">storefront</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Venue</p>
+<p class="font-body-md text-body-md text-on-surface">Studio A - Downtown Campus</p>
+</div>
+</div>
+<div class="h-px bg-surface-variant w-full"></div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline" data-icon="calendar_today">calendar_today</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Date</p>
+<p class="font-body-md text-body-md text-on-surface">Oct 24, 2023</p>
+</div>
+</div>
+<div class="h-px bg-surface-variant w-full"></div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline" data-icon="schedule">schedule</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Time Slot</p>
+<p class="font-body-md text-body-md text-on-surface">14:00 - 15:30</p>
+</div>
+</div>
+</section>
+<!-- User Information Form -->
+<section class="space-y-4">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider ml-1">User Information</h2>
+<!-- User Type Toggle -->
+<div class="flex bg-surface-container-high rounded-lg p-1">
+<button class="flex-1 py-2 font-label-md text-label-md bg-surface-container-lowest text-primary-container rounded shadow-sm transition-all text-center">Student</button>
+<button class="flex-1 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low rounded transition-all text-center">Guest</button>
+</div>
+<!-- Name Input -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant ml-1">Full Name</label>
+<input class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-shadow" placeholder="Enter user's name" type="text"/>
+</div>
+<!-- Phone Input -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant ml-1">Phone Number</label>
+<input class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-shadow" placeholder="Enter phone number" type="tel"/>
+</div>
+</section>
+<!-- Payment Details -->
+<section class="space-y-4">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider ml-1 mt-6">Payment Details</h2>
+<div class="grid grid-cols-2 gap-3">
+<!-- Discount -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant ml-1">Discount (%)</label>
+<input class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-shadow text-right" placeholder="0" type="number"/>
+</div>
+<!-- Waiver Amount -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant ml-1">Waiver (¥)</label>
+<input class="w-full h-11 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-shadow text-right" placeholder="0.00" type="number"/>
+</div>
+</div>
+<!-- Final Amount -->
+<div class="flex justify-between items-center bg-primary-container/10 border border-primary-container/20 rounded-lg p-4">
+<span class="font-label-md text-label-md text-primary-container">Final Amount</span>
+<span class="font-headline-md text-headline-md text-primary-container">¥ 150.00</span>
+</div>
+<!-- Payment Method -->
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant ml-1">Payment Method</label>
+<div class="grid grid-cols-3 gap-2">
+<label class="cursor-pointer">
+<input checked="" class="peer sr-only" name="payment" type="radio"/>
+<div class="h-11 flex items-center justify-center border border-outline-variant rounded-lg peer-checked:border-primary-container peer-checked:bg-primary-container/5 peer-checked:text-primary-container text-on-surface-variant font-label-md transition-all">
+                            WeChat
+                        </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="payment" type="radio"/>
+<div class="h-11 flex items-center justify-center border border-outline-variant rounded-lg peer-checked:border-primary-container peer-checked:bg-primary-container/5 peer-checked:text-primary-container text-on-surface-variant font-label-md transition-all">
+                            Alipay
+                        </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="payment" type="radio"/>
+<div class="h-11 flex items-center justify-center border border-outline-variant rounded-lg peer-checked:border-primary-container peer-checked:bg-primary-container/5 peer-checked:text-primary-container text-on-surface-variant font-label-md transition-all">
+                            Cash
+                        </div>
+</label>
+</div>
+</div>
+<!-- Remarks -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant ml-1">Remarks (Optional)</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-shadow resize-none" placeholder="Add any notes for this booking..." rows="3"></textarea>
+</div>
+</section>
+</main>
+<!-- Footer Action -->
+<div class="fixed bottom-0 left-0 w-full bg-surface border-t border-surface-variant p-page_margin pb-safe z-40">
+<button class="w-full h-11 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg shadow-sm hover:bg-primary-container/90 transition-colors active:scale-[0.98] flex items-center justify-center gap-2">
+            Confirm Booking
+        </button>
+</div>
+</body></html>

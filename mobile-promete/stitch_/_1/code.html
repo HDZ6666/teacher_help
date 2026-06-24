@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Cancel Booking - Teacher Help App</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from system prompt -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f3faff",
+                        "surface": "#f3faff",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-variant": "#d6e5ed",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "surface-container-highest": "#d6e5ed",
+                        "surface-dim": "#cddce4",
+                        "on-primary-fixed-variant": "#00513d",
+                        "surface-container-low": "#e7f6fe",
+                        "surface-container-high": "#dbebf3",
+                        "surface-container": "#e1f0f8",
+                        "on-surface-variant": "#3f4944",
+                        "primary": "#005842",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "primary-container": "#1f7159",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#c2ebde",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-primary-container": "#a4f2d4",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-tertiary-container": "#8cf7c7",
+                        "background": "#f3faff",
+                        "inverse-surface": "#243239",
+                        "on-tertiary-fixed": "#002114",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bec9c3",
+                        "on-secondary-fixed": "#00201a",
+                        "tertiary": "#00583d",
+                        "on-surface": "#0f1d23",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#0f1d23",
+                        "on-secondary-container": "#466c61",
+                        "secondary-container": "#c2ebde",
+                        "on-primary-fixed": "#002117",
+                        "secondary": "#40655b",
+                        "outline": "#6f7974",
+                        "surface-tint": "#166b53",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "inverse-primary": "#88d6b9",
+                        "inverse-on-surface": "#e4f3fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_md": "16px",
+                        "gutter": "12px",
+                        "stack_lg": "24px",
+                        "page_margin": "14px",
+                        "stack_sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom styles for toggle switch to match brand */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #1f7159;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #1f7159;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 3rem;
+            height: 1.5rem;
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(1.5rem);
+        }
+        
+        /* Custom radio button styles */
+        .custom-radio:checked {
+            background-color: #1f7159;
+            border-color: #1f7159;
+        }
+        .custom-radio:focus {
+            --tw-ring-color: #a4f2d4;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim docked full-width top-0 border-b border-surface-variant dark:border-outline-variant flat no shadows flex flex-col items-center justify-between px-page_margin h-14 w-full">
+<div class="flex items-center justify-between w-full h-full">
+<button aria-label="Back" class="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim font-bold flex-1 text-center pr-10">Cancel Booking</h1>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-page_margin py-stack_md flex flex-col gap-stack_lg pb-32 overflow-y-auto">
+<!-- Warning Context Card -->
+<div class="bg-error-container rounded-lg p-page_margin border border-error/20 flex gap-gutter items-start">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-error-container mb-1">Cancellation Policy</h2>
+<p class="font-body-sm text-body-sm text-on-error-container/80">Cancellations made within 24 hours of the scheduled class may incur a fee. Please review the refund amount below.</p>
+</div>
+</div>
+<!-- Cancellation Form -->
+<form class="flex flex-col gap-stack_lg">
+<!-- Booking Details Summary (Read-only context) -->
+<section class="bg-surface-container-lowest rounded-lg border border-surface-variant p-page_margin">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-stack_sm uppercase tracking-wide">Target Class</h3>
+<div class="flex items-center gap-gutter">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface">Advanced Calculus 101</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Today, 2:00 PM - 3:30 PM • Room 4B</p>
+</div>
+</div>
+</section>
+<!-- Refund Amount -->
+<section class="flex flex-col gap-stack_sm">
+<label class="font-label-md text-label-md text-on-surface-variant" for="refundAmount">Refund Amount (¥)</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-lg">¥</span>
+<input class="w-full h-[44px] pl-8 pr-3 rounded-lg border-surface-variant bg-surface-container-lowest text-on-surface font-body-lg text-body-lg focus:ring-primary focus:border-primary" id="refundAmount" readonly="" type="text" value="450.00"/>
+</div>
+<p class="font-body-sm text-body-sm text-outline mt-1">Calculated based on standard policy rules.</p>
+</section>
+<!-- Reason for Cancellation -->
+<section class="flex flex-col gap-stack_sm">
+<span class="font-label-md text-label-md text-on-surface-variant">Reason for Cancellation</span>
+<div class="bg-surface-container-lowest rounded-lg border border-surface-variant overflow-hidden flex flex-col">
+<label class="flex items-center p-page_margin border-b border-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="custom-radio w-5 h-5 text-primary-container border-outline focus:ring-primary mr-3" name="cancelReason" type="radio" value="schedule"/>
+<span class="font-body-md text-body-md text-on-surface">Schedule Conflict</span>
+</label>
+<label class="flex items-center p-page_margin border-b border-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="custom-radio w-5 h-5 text-primary-container border-outline focus:ring-primary mr-3" name="cancelReason" type="radio" value="illness"/>
+<span class="font-body-md text-body-md text-on-surface">Illness / Emergency</span>
+</label>
+<label class="flex items-center p-page_margin border-b border-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="custom-radio w-5 h-5 text-primary-container border-outline focus:ring-primary mr-3" name="cancelReason" type="radio" value="student_request"/>
+<span class="font-body-md text-body-md text-on-surface">Student Request</span>
+</label>
+<label class="flex items-center p-page_margin cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="custom-radio w-5 h-5 text-primary-container border-outline focus:ring-primary mr-3" name="cancelReason" type="radio" value="other"/>
+<span class="font-body-md text-body-md text-on-surface">Other</span>
+</label>
+</div>
+<!-- Expanded text area for 'Other' (hidden by default, shown for mockup context) -->
+<textarea class="mt-2 w-full p-3 rounded-lg border-surface-variant bg-surface-container-lowest text-on-surface font-body-md focus:ring-primary focus:border-primary resize-none h-24 placeholder:text-outline" placeholder="Please specify the reason..."></textarea>
+</section>
+<!-- Notify User Toggle -->
+<section class="bg-surface-container-lowest rounded-lg border border-surface-variant p-page_margin flex items-center justify-between mt-stack_sm">
+<div class="flex flex-col pr-4">
+<span class="font-headline-sm text-headline-sm text-on-surface">Notify Student</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Send an automated SMS/Email notification about this cancellation.</span>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="notifyToggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="notifyToggle"></label>
+</div>
+</section>
+</form>
+</main>
+<!-- Footer Actions (Fixed at bottom) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface border-t border-surface-variant p-page_margin pb-safe flex flex-col gap-stack_sm z-40">
+<button class="w-full h-[46px] bg-primary-container text-on-primary font-headline-sm text-headline-sm rounded-lg flex items-center justify-center hover:bg-tertiary-container active:scale-[0.98] transition-all" type="button">
+            Confirm Cancellation
+        </button>
+<button class="w-full h-[46px] bg-transparent border border-primary-container text-primary-container font-headline-sm text-headline-sm rounded-lg flex items-center justify-center hover:bg-surface-container-low active:scale-[0.98] transition-all" type="button">
+            Back to Schedule
+        </button>
+</div>
+<!-- Padding for safe area on mobile if needed -->
+<div class="h-6 bg-surface w-full fixed bottom-0 z-30 pointer-events-none"></div>
+</body></html>

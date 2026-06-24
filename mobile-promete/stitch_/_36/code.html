@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Teacher Schedule</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#002114",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#00583d",
+                        "surface-tint": "#166b53",
+                        "surface-container-highest": "#d6e5ed",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#8cf7c7",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "surface-container": "#e1f0f8",
+                        "surface-bright": "#f3faff",
+                        "inverse-surface": "#243239",
+                        "surface": "#f3faff",
+                        "on-surface-variant": "#3f4944",
+                        "on-primary-fixed": "#002117",
+                        "inverse-on-surface": "#e4f3fb",
+                        "on-secondary-container": "#466c61",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "outline": "#6f7974",
+                        "on-secondary-fixed": "#00201a",
+                        "background": "#f3faff",
+                        "inverse-primary": "#88d6b9",
+                        "on-surface": "#0f1d23",
+                        "on-background": "#0f1d23",
+                        "secondary-container": "#c2ebde",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-container-high": "#dbebf3",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-primary-fixed-variant": "#00513d",
+                        "secondary": "#40655b",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-primary-container": "#a4f2d4",
+                        "primary": "#005842",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#bec9c3",
+                        "surface-dim": "#cddce4",
+                        "primary-fixed": "#a4f2d4",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#d6e5ed",
+                        "secondary-fixed": "#c2ebde",
+                        "primary-container": "#1f7159",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#e7f6fe",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "page_margin": "14px",
+                        "stack_sm": "8px",
+                        "stack_lg": "24px",
+                        "gutter": "12px",
+                        "stack_md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar hiding for horizontal list */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased h-screen flex flex-col overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface border-b border-outline-variant flex items-center px-page_margin h-14 w-full z-50 shrink-0">
+<button class="w-10 h-10 flex items-center justify-center text-primary transition-all active:scale-95 hover:bg-surface-container rounded-full mr-2">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary flex-1">李老师的课表</h1>
+<div class="w-10"></div> <!-- Spacer for balance -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto pb-20">
+<!-- Date Strip Container -->
+<div class="bg-surface border-b border-outline-variant sticky top-0 z-40">
+<!-- Month/Year Header -->
+<div class="px-page_margin py-2 flex justify-between items-center text-on-surface-variant">
+<span class="font-label-md text-label-md">2023年 10月</span>
+<button class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm mr-1">calendar_month</span>
+<span class="font-label-sm text-label-sm">日历</span>
+</button>
+</div>
+<!-- Horizontal Date Scroll -->
+<div class="flex overflow-x-auto hide-scrollbar px-page_margin pb-3 gap-3">
+<!-- Inactive Date -->
+<div class="flex flex-col items-center justify-center min-w-[48px] h-14 rounded-lg bg-surface-container-low text-on-surface-variant transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm mb-1">一</span>
+<span class="font-headline-sm text-headline-sm">16</span>
+</div>
+<!-- Active Date -->
+<div class="flex flex-col items-center justify-center min-w-[48px] h-14 rounded-lg bg-primary-container text-on-primary transition-transform active:scale-95 shadow-sm">
+<span class="font-label-sm text-label-sm mb-1 text-on-primary-container">二</span>
+<span class="font-headline-sm text-headline-sm text-white">17</span>
+</div>
+<!-- Inactive Date -->
+<div class="flex flex-col items-center justify-center min-w-[48px] h-14 rounded-lg bg-surface-container-low text-on-surface-variant transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm mb-1">三</span>
+<span class="font-headline-sm text-headline-sm">18</span>
+</div>
+<!-- Inactive Date -->
+<div class="flex flex-col items-center justify-center min-w-[48px] h-14 rounded-lg bg-surface-container-low text-on-surface-variant transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm mb-1">四</span>
+<span class="font-headline-sm text-headline-sm">19</span>
+</div>
+<!-- Inactive Date -->
+<div class="flex flex-col items-center justify-center min-w-[48px] h-14 rounded-lg bg-surface-container-low text-on-surface-variant transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm mb-1">五</span>
+<span class="font-headline-sm text-headline-sm">20</span>
+</div>
+<!-- Inactive Date -->
+<div class="flex flex-col items-center justify-center min-w-[48px] h-14 rounded-lg bg-surface-container-low text-on-surface-variant transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm mb-1">六</span>
+<span class="font-headline-sm text-headline-sm">21</span>
+</div>
+<!-- Inactive Date -->
+<div class="flex flex-col items-center justify-center min-w-[48px] h-14 rounded-lg bg-surface-container-low text-on-surface-variant transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm mb-1">日</span>
+<span class="font-headline-sm text-headline-sm">22</span>
+</div>
+</div>
+</div>
+<!-- Schedule List -->
+<div class="p-page_margin flex flex-col gap-gutter">
+<!-- Schedule Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin relative overflow-hidden">
+<!-- Status indicator line -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary"></div>
+<!-- Card Header: Time & Status -->
+<div class="flex justify-between items-start mb-3 pl-2">
+<div class="flex items-center text-on-surface">
+<span class="material-symbols-outlined text-primary mr-2" style="font-variation-settings: 'FILL' 1;">schedule</span>
+<span class="font-headline-sm text-headline-sm">09:00 - 10:30</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm">待点名</span>
+</div>
+<!-- Card Body: Details -->
+<div class="pl-2 mb-4">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">初中数学强化</h3>
+<div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-2">group</span>
+<span>秋季A班 (30人)</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-2">meeting_room</span>
+<span>A102 教室</span>
+</div>
+</div>
+</div>
+<!-- Card Footer: Actions -->
+<div class="flex justify-end gap-2 pl-2 border-t border-outline-variant pt-3 mt-2">
+<button class="px-4 py-2 rounded-DEFAULT border border-primary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                        调课
+                    </button>
+<button class="px-4 py-2 rounded-DEFAULT border border-primary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                        详情
+                    </button>
+<button class="px-6 py-2 rounded-DEFAULT bg-primary-container text-on-primary font-label-md text-label-md shadow-sm active:scale-95 transition-transform">
+                        点名
+                    </button>
+</div>
+</div>
+<!-- Schedule Card 2 (Completed Example) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin relative overflow-hidden opacity-80">
+<!-- Status indicator line -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline"></div>
+<div class="flex justify-between items-start mb-3 pl-2">
+<div class="flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined mr-2">schedule</span>
+<span class="font-headline-sm text-headline-sm">14:00 - 15:30</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">已结课</span>
+</div>
+<div class="pl-2 mb-4">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 text-on-surface-variant">初二英语培优</h3>
+<div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-2">group</span>
+<span>秋季C班 (25人)</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-2">meeting_room</span>
+<span>B205 教室</span>
+</div>
+</div>
+</div>
+<div class="flex justify-end gap-2 pl-2 border-t border-outline-variant pt-3 mt-2">
+<button class="px-4 py-2 rounded-DEFAULT border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                        详情
+                    </button>
+</div>
+</div>
+<!-- Schedule Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary"></div>
+<div class="flex justify-between items-start mb-3 pl-2">
+<div class="flex items-center text-on-surface">
+<span class="material-symbols-outlined text-primary mr-2" style="font-variation-settings: 'FILL' 1;">schedule</span>
+<span class="font-headline-sm text-headline-sm">16:00 - 17:30</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm">已点名</span>
+</div>
+<div class="pl-2 mb-4">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">初一语文基础</h3>
+<div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-2">group</span>
+<span>秋季B班 (40人)</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-2">meeting_room</span>
+<span>A105 教室</span>
+</div>
+</div>
+</div>
+<div class="flex justify-end gap-2 pl-2 border-t border-outline-variant pt-3 mt-2">
+<button class="px-4 py-2 rounded-DEFAULT border border-primary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                        调课
+                    </button>
+<button class="px-4 py-2 rounded-DEFAULT border border-primary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                        详情
+                    </button>
+<button class="px-6 py-2 rounded-DEFAULT border border-primary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                        修改考勤
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center bg-surface border-t border-outline-variant h-16 px-page_margin pb-safe">
+<button class="flex flex-col items-center justify-center w-16 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1 text-[24px]">calendar_today</span>
+<span class="font-label-md text-label-md">Today</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1 text-[24px]">event_note</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1 text-[24px]">group</span>
+<span class="font-label-md text-label-md">Students</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1 text-[24px]">error_outline</span>
+<span class="font-label-md text-label-md">Mistakes</span>
+</button>
+<!-- Active Tab: Mine -->
+<button class="flex flex-col items-center justify-center w-16 text-primary font-bold transition-transform duration-200 active:scale-90 rounded-lg py-1">
+<span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md">Mine</span>
+</button>
+</nav>
+<!-- Safe area padding for bottom nav on modern mobile devices -->
+<style>
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(4rem + env(safe-area-inset-bottom));
+        }
+    </style>
+</body></html>

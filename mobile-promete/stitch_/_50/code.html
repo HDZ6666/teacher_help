@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Lock Venue - Teacher Help</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f3faff",
+                    "surface": "#f3faff",
+                    "primary-fixed": "#a4f2d4",
+                    "surface-variant": "#d6e5ed",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#a7cfc2",
+                    "surface-container-highest": "#d6e5ed",
+                    "surface-dim": "#cddce4",
+                    "on-primary-fixed-variant": "#00513d",
+                    "surface-container-low": "#e7f6fe",
+                    "surface-container-high": "#dbebf3",
+                    "surface-container": "#e1f0f8",
+                    "on-surface-variant": "#3f4944",
+                    "primary": "#005842",
+                    "on-tertiary-fixed-variant": "#005138",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#007351",
+                    "primary-container": "#1f7159",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#c2ebde",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#88d6b9",
+                    "on-primary-container": "#a4f2d4",
+                    "on-secondary-fixed-variant": "#284d44",
+                    "on-tertiary-container": "#8cf7c7",
+                    "background": "#f3faff",
+                    "inverse-surface": "#243239",
+                    "on-tertiary-fixed": "#002114",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#8cf7c7",
+                    "on-error-container": "#93000a",
+                    "outline-variant": "#bec9c3",
+                    "on-secondary-fixed": "#00201a",
+                    "tertiary": "#00583d",
+                    "on-surface": "#0f1d23",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#0f1d23",
+                    "on-secondary-container": "#466c61",
+                    "secondary-container": "#c2ebde",
+                    "on-primary-fixed": "#002117",
+                    "secondary": "#40655b",
+                    "outline": "#6f7974",
+                    "surface-tint": "#166b53",
+                    "tertiary-fixed-dim": "#6fdaac",
+                    "inverse-primary": "#88d6b9",
+                    "inverse-on-surface": "#e4f3fb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack_md": "16px",
+                    "gutter": "12px",
+                    "stack_lg": "24px",
+                    "page_margin": "14px",
+                    "stack_sm": "8px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Be Vietnam Pro"],
+                    "label-sm": ["Be Vietnam Pro"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { background-color: #f4f6f5; }
+        .card-level-1 { background-color: #ffffff; border: 1px solid #e7ece9; }
+        .input-border { border: 1px solid #e7ece9; }
+        /* Focus styles for accessibility and modern feel */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1f7159;
+            box-shadow: 0 0 0 2px rgba(31, 113, 89, 0.2);
+        }
+        /* Custom checkbox/radio */
+        .form-radio:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+            border-color: transparent;
+            background-color: currentColor;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface antialiased min-h-screen flex flex-col md:max-w-md md:mx-auto md:shadow-xl md:bg-white pb-24 relative">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim docked full-width top-0 border-b border-surface-variant dark:border-outline-variant flat no shadows flex items-center justify-between px-page_margin h-14 w-full sticky z-50">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors group">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-[24px] group-hover:scale-95 transition-transform" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim absolute left-1/2 transform -translate-x-1/2">Lock Venue</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-page_margin pt-stack_lg pb-stack_md flex flex-col gap-gutter">
+<!-- Instructional Header -->
+<div class="mb-2">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Temporarily block a venue from being booked to accommodate maintenance or private events.</p>
+</div>
+<!-- Venue Selector Card -->
+<div class="card-level-1 rounded-lg p-page_margin">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="venue">Target Venue</label>
+<div class="relative">
+<select class="w-full h-11 px-3 appearance-none input-border rounded-lg font-body-md text-body-md text-on-surface bg-white" id="venue">
+<option disabled="" selected="" value="">Select a venue...</option>
+<option value="hall-a">Main Lecture Hall A</option>
+<option value="hall-b">Main Lecture Hall B</option>
+<option value="lab-1">Chemistry Lab 101</option>
+<option value="sports-hall">Indoor Sports Hall</option>
+<option value="music-room">Music Room C</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Date & Time Card -->
+<div class="card-level-1 rounded-lg p-page_margin flex flex-col gap-4">
+<!-- Date Range -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">Date Range</label>
+<div class="flex items-center gap-3">
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant" data-icon="calendar_month">calendar_month</span>
+</div>
+<input class="w-full h-11 pl-10 pr-3 input-border rounded-lg font-body-md text-body-md text-on-surface bg-white" placeholder="Start" type="date"/>
+</div>
+<span class="text-on-surface-variant">—</span>
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant" data-icon="calendar_month">calendar_month</span>
+</div>
+<input class="w-full h-11 pl-10 pr-3 input-border rounded-lg font-body-md text-body-md text-on-surface bg-white" placeholder="End" type="date"/>
+</div>
+</div>
+</div>
+<!-- Time Slot -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">Time Period</label>
+<div class="flex items-center gap-3">
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant" data-icon="schedule">schedule</span>
+</div>
+<input class="w-full h-11 pl-10 pr-3 input-border rounded-lg font-body-md text-body-md text-on-surface bg-white" type="time" value="08:00"/>
+</div>
+<span class="text-on-surface-variant">—</span>
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant" data-icon="schedule">schedule</span>
+</div>
+<input class="w-full h-11 pl-10 pr-3 input-border rounded-lg font-body-md text-body-md text-on-surface bg-white" type="time" value="17:00"/>
+</div>
+</div>
+</div>
+<!-- Repeat Pattern -->
+<div class="pt-2 border-t border-surface-variant">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-3">Repeat Pattern</label>
+<div class="flex gap-4">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="form-radio h-5 w-5 text-primary-container border-outline focus:ring-primary-container" name="repeat" type="radio" value="none"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary-container transition-colors">None</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="form-radio h-5 w-5 text-primary-container border-outline focus:ring-primary-container" name="repeat" type="radio" value="daily"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary-container transition-colors">Daily</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="form-radio h-5 w-5 text-primary-container border-outline focus:ring-primary-container" name="repeat" type="radio" value="weekly"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary-container transition-colors">Weekly</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Reason & Notes Card -->
+<div class="card-level-1 rounded-lg p-page_margin flex flex-col gap-4">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="reason">Reason for Locking</label>
+<div class="relative">
+<select class="w-full h-11 px-3 appearance-none input-border rounded-lg font-body-md text-body-md text-on-surface bg-white" id="reason">
+<option value="maintenance">Maintenance / Repair</option>
+<option value="cleaning">Deep Cleaning</option>
+<option value="exam">Examinations Setup</option>
+<option value="private">Private Event</option>
+<option value="other">Other (Specify below)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="notes">Additional Notes</label>
+<textarea class="w-full p-3 input-border rounded-lg font-body-md text-body-md text-on-surface bg-white resize-none" id="notes" placeholder="Provide any necessary details (e.g., specific contractor names, exact nature of repair)..." rows="3"></textarea>
+</div>
+</div>
+</main>
+<!-- Fixed Footer Button -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-surface-variant p-page_margin md:max-w-md md:left-1/2 md:-translate-x-1/2 z-40">
+<button class="w-full h-[46px] bg-primary-container hover:bg-tertiary-container active:scale-[0.98] transition-all duration-200 text-on-primary font-headline-sm text-headline-sm rounded-lg flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="lock">lock</span>
+            Confirm Lock
+        </button>
+</div>
+</body></html>

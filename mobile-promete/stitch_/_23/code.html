@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>更多工具</title>
+<!-- Google Fonts: Plus Jakarta Sans & Be Vietnam Pro -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration from Brand Anchors -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002117",
+                    "tertiary": "#00583d",
+                    "surface-tint": "#166b53",
+                    "primary-fixed-dim": "#88d6b9",
+                    "surface-dim": "#cddce4",
+                    "on-tertiary-container": "#8cf7c7",
+                    "surface-container": "#e1f0f8",
+                    "secondary-fixed": "#c2ebde",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#6fdaac",
+                    "secondary-fixed-dim": "#a7cfc2",
+                    "primary": "#005842",
+                    "on-secondary-fixed": "#00201a",
+                    "on-tertiary-fixed-variant": "#005138",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#c2ebde",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#007351",
+                    "surface-container-low": "#e7f6fe",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#a4f2d4",
+                    "background": "#f3faff",
+                    "outline": "#6f7974",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#002114",
+                    "on-surface": "#0f1d23",
+                    "inverse-surface": "#243239",
+                    "primary-container": "#1f7159",
+                    "tertiary-fixed": "#8cf7c7",
+                    "on-secondary-fixed-variant": "#284d44",
+                    "on-primary-fixed-variant": "#00513d",
+                    "inverse-primary": "#88d6b9",
+                    "surface-container-high": "#dbebf3",
+                    "on-surface-variant": "#3f4944",
+                    "on-error": "#ffffff",
+                    "surface-container-highest": "#d6e5ed",
+                    "on-secondary-container": "#466c61",
+                    "secondary": "#40655b",
+                    "inverse-on-surface": "#e4f3fb",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f3faff",
+                    "on-primary-container": "#a4f2d4",
+                    "on-background": "#0f1d23",
+                    "surface-variant": "#d6e5ed",
+                    "surface": "#f3faff",
+                    "outline-variant": "#bec9c3"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack_lg": "24px",
+                    "stack_sm": "8px",
+                    "gutter": "12px",
+                    "page_margin": "14px",
+                    "stack_md": "16px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "label-sm": ["Be Vietnam Pro"],
+                    "body-md": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md-mobile": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#f4f6f5] text-on-surface antialiased flex justify-center w-full min-h-screen">
+<!-- Mobile App Container (375px width simulation) -->
+<div class="w-full max-w-[375px] bg-background relative overflow-y-auto shadow-2xl flex flex-col h-[884px]">
+<!-- TopAppBar (from JSON + Prompt Overrides for Context) -->
+<header class="w-full sticky top-0 z-40 bg-background dark:bg-background text-primary dark:text-primary-fixed flex items-center justify-between px-page_margin h-[56px] flex-shrink-0">
+<button class="material-symbols-outlined text-[24px] hover:bg-surface-container-high transition-colors active:scale-95 flex items-center justify-center p-1 rounded-full" data-icon="arrow_back">
+                arrow_back
+            </button>
+<h1 class="font-headline-md text-headline-md-mobile flex-1 text-center font-bold tracking-tight">
+                更多工具
+            </h1>
+<!-- Placeholder for layout balance (since trailing icon is removed for this specific sub-page) -->
+<div class="w-[32px]"></div>
+</header>
+<!-- Canvas Area -->
+<main class="flex-1 px-page_margin pt-2 pb-stack_lg flex flex-col gap-stack_lg">
+<!-- Section 1: 高频工具 -->
+<section class="flex flex-col gap-stack_sm">
+<h2 class="font-body-md text-body-md font-semibold text-on-surface-variant px-1">
+                    高频工具
+                </h2>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-primary-container mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_month" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">排课管理</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">智能编排课程计划</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-primary-container mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="checklist" style="font-variation-settings: 'FILL' 1;">checklist</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">点名记录</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">课堂考勤快速登记</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-primary-container mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="event_busy" style="font-variation-settings: 'FILL' 1;">event_busy</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">学员请假</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">请假审批与补课</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-primary-container mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="auto_stories" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">错题分析记录</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">学情诊断与提分</p>
+</div>
+</div>
+</section>
+<!-- Section 2: 教务管理 -->
+<section class="flex flex-col gap-stack_sm">
+<h2 class="font-body-md text-body-md font-semibold text-on-surface-variant px-1">
+                    教务管理
+                </h2>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="menu_book">menu_book</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">课程管理</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">课程体系与大纲</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="group">group</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">班级管理</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">班级编排与升班</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="badge">badge</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">老师管理</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">教师档案与排期</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="room_preferences">room_preferences</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">教室/场地</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">场地资源与调配</p>
+</div>
+</div>
+</section>
+<!-- Section 3: 经营管理 -->
+<section class="flex flex-col gap-stack_sm">
+<h2 class="font-body-md text-body-md font-semibold text-on-surface-variant px-1">
+                    经营管理
+                </h2>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="shopping_cart">shopping_cart</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">物品费用</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">教材杂费管理</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="card_membership">card_membership</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">会员卡</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">储值卡与计次卡</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="receipt_long">receipt_long</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">收费记录</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">流水账单查询</p>
+</div>
+<!-- Tool Card -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex flex-col items-start active:scale-[0.98] transition-transform duration-200">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="bar_chart">bar_chart</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface mb-0.5">数据概览</h3>
+<p class="font-label-sm text-label-sm text-outline line-clamp-2">核心运营指标</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Note: BottomNavBar is intentionally SUPPRESSED per "Semantic Shell Mandate - Shell Visibility & Relevance" 
+             because this is a "Task-Focused: Any sub-page featuring a 'Close' or 'Back' action". -->
+</div>
+</body></html>

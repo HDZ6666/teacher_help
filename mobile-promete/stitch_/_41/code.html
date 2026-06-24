@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>调课申请</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#002114",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#466c61",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#00513d",
+                        "surface-container-highest": "#d6e5ed",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "surface-variant": "#d6e5ed",
+                        "surface-tint": "#166b53",
+                        "inverse-surface": "#243239",
+                        "tertiary-container": "#007351",
+                        "surface-container": "#e1f0f8",
+                        "on-error": "#ffffff",
+                        "surface": "#f3faff",
+                        "secondary-fixed": "#c2ebde",
+                        "primary": "#005842",
+                        "surface-container-low": "#e7f6fe",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "primary-container": "#1f7159",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#88d6b9",
+                        "secondary": "#40655b",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "outline": "#6f7974",
+                        "on-primary": "#ffffff",
+                        "background": "#f3faff",
+                        "on-primary-fixed": "#002117",
+                        "on-background": "#0f1d23",
+                        "secondary-container": "#c2ebde",
+                        "on-surface-variant": "#3f4944",
+                        "on-surface": "#0f1d23",
+                        "on-tertiary-container": "#8cf7c7",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-bright": "#f3faff",
+                        "on-primary-container": "#a4f2d4",
+                        "surface-container-high": "#dbebf3",
+                        "tertiary": "#00583d",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-secondary-fixed": "#00201a",
+                        "inverse-on-surface": "#e4f3fb",
+                        "tertiary-fixed": "#8cf7c7",
+                        "outline-variant": "#bec9c3",
+                        "surface-dim": "#cddce4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "12px",
+                        "stack_lg": "24px",
+                        "stack_md": "16px",
+                        "stack_sm": "8px",
+                        "page_margin": "14px"
+                    },
+                    "fontFamily": {
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f4f6f5; }
+        /* Custom toggle switch styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #1f7159;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #1f7159;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased text-on-surface pb-24">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background border-b border-outline-variant dark:border-outline flat no shadows flex items-center justify-between px-page_margin h-14 transition-colors duration-200 active:opacity-80">
+<button aria-label="Go back" class="text-on-surface-variant p-2 -ml-2 rounded-full hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed">调课申请</h1>
+<div class="w-10"></div> <!-- Placeholder for balance -->
+</header>
+<!-- Main Content -->
+<main class="pt-20 px-page_margin flex flex-col gap-[12px] max-w-md mx-auto">
+<!-- Original Course Info Card (Level 2 High Emphasis style conceptually, but keeping it light for this specific context, let's use the dark card style for impact) -->
+<section class="bg-[#193f36] text-on-primary rounded-xl p-[14px] flex flex-col gap-2 relative overflow-hidden shadow-sm">
+<div class="absolute top-0 right-0 opacity-10 transform translate-x-4 -translate-y-4">
+<span class="material-symbols-outlined text-[100px]" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+</div>
+<div class="flex items-center gap-2 mb-1 relative z-10">
+<span class="bg-[#e9f6ef] text-[#227253] font-label-sm text-label-sm px-3 py-1 rounded-full">原课程信息</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm relative z-10">少儿数学提高班</h2>
+<div class="flex items-center gap-4 mt-2 font-body-sm text-body-sm text-primary-fixed-dim relative z-10">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="calendar_today">calendar_today</span>
+<span>6月23日 (周日)</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span>14:00 - 16:00</span>
+</div>
+</div>
+</section>
+<!-- Reschedule Form Area -->
+<section class="bg-white border border-[#e7ece9] rounded-lg p-[14px] shadow-sm flex flex-col gap-stack_md mt-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 border-b border-[#e7ece9] pb-3">新课程安排</h3>
+<!-- Date & Time -->
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">新日期</label>
+<div class="relative">
+<input class="w-full h-[44px] border border-[#e7ece9] rounded-lg px-3 font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary bg-surface-container-lowest" type="date" value="2024-06-30"/>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">新时间</label>
+<div class="relative">
+<input class="w-full h-[44px] border border-[#e7ece9] rounded-lg px-3 font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary bg-surface-container-lowest" type="time" value="14:00"/>
+</div>
+</div>
+</div>
+<!-- Teacher -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">任课老师</label>
+<div class="relative">
+<select class="w-full h-[44px] border border-[#e7ece9] rounded-lg px-3 appearance-none font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary bg-surface-container-lowest">
+<option>王老师 (Wang)</option>
+<option>李老师 (Li)</option>
+<option>张老师 (Zhang)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Classroom -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">上课教室</label>
+<div class="relative">
+<select class="w-full h-[44px] border border-[#e7ece9] rounded-lg px-3 appearance-none font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary bg-surface-container-lowest">
+<option>301 数学活动室</option>
+<option>302 多媒体教室</option>
+<option>205 综合教室</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Reason -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant">调课原因</label>
+<textarea class="w-full border border-[#e7ece9] rounded-lg p-3 font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary bg-surface-container-lowest resize-none" placeholder="请输入调课原因，例如：老师请假、教室冲突等..." rows="3"></textarea>
+</div>
+<!-- Notification Toggle -->
+<div class="flex items-center justify-between pt-2 border-t border-[#e7ece9] mt-2">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-medium text-on-surface">通知学员/家长</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">调课成功后自动发送微信/短信通知</span>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-transform duration-200 ease-in-out transform translate-x-0" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-[#bec9c3] cursor-pointer transition-colors duration-200 ease-in-out" for="toggle"></label>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Fixed Actions -->
+<div class="fixed bottom-0 w-full z-50 bg-white border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] px-page_margin py-3 flex gap-3 max-w-md mx-auto left-0 right-0">
+<button class="flex-1 h-[44px] rounded-lg border border-[#1f7159] text-[#1f7159] font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[18px]" data-icon="rule">rule</span>
+            检查冲突
+        </button>
+<button class="flex-[2] h-[44px] rounded-lg bg-[#1f7159] text-white font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-opacity-90 transition-colors shadow-sm active:scale-95">
+<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
+            确认调课
+        </button>
+</div>
+<script>
+        // Simple toggle switch logic for visual feedback
+        const toggle = document.getElementById('toggle');
+        toggle.addEventListener('change', function() {
+            if(this.checked) {
+                this.classList.add('translate-x-6');
+                this.classList.remove('translate-x-0');
+            } else {
+                this.classList.remove('translate-x-6');
+                this.classList.add('translate-x-0');
+            }
+        });
+        
+        // Initialize toggle position based on checked state
+        if(toggle.checked) {
+            toggle.classList.add('translate-x-6');
+        }
+    </script>
+</body></html>

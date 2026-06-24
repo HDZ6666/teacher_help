@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>物品列表 - Teacher Help</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#00201a",
+                        "background": "#f3faff",
+                        "secondary-fixed": "#c2ebde",
+                        "outline": "#6f7974",
+                        "surface": "#f3faff",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-tertiary-fixed": "#002114",
+                        "tertiary": "#00583d",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#d6e5ed",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-container-low": "#e7f6fe",
+                        "on-surface": "#0f1d23",
+                        "on-primary-fixed-variant": "#00513d",
+                        "secondary": "#40655b",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f3faff",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-variant": "#d6e5ed",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "surface-container-high": "#dbebf3",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "outline-variant": "#bec9c3",
+                        "surface-tint": "#166b53",
+                        "primary": "#005842",
+                        "on-primary-container": "#a4f2d4",
+                        "inverse-surface": "#243239",
+                        "secondary-container": "#c2ebde",
+                        "on-surface-variant": "#3f4944",
+                        "on-background": "#0f1d23",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#e4f3fb",
+                        "tertiary-container": "#007351",
+                        "primary-container": "#1f7159",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#cddce4",
+                        "inverse-primary": "#88d6b9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#8cf7c7",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#002117",
+                        "surface-container": "#e1f0f8",
+                        "on-secondary-container": "#466c61"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "page_margin": "14px",
+                        "gutter": "12px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "stack_lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f4f6f5; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#f4f6f5] text-on-surface antialiased font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline w-full sticky top-0 z-50 flat no shadows flex items-center justify-between px-page_margin h-14 transition-colors">
+<div class="flex items-center gap-3">
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 p-2 rounded-full -ml-2 flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed">物品列表</h1>
+</div>
+<div>
+<!-- Optional actions could go here -->
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-page_margin py-stack_md hide-scrollbar pb-24">
+<!-- Filter/Sort Bar (Contextual Add-on) -->
+<div class="flex items-center justify-between mb-4">
+<div class="flex gap-2 overflow-x-auto hide-scrollbar">
+<button class="bg-primary-container text-white font-label-md text-label-md px-4 py-1.5 rounded-full whitespace-nowrap border border-primary-container">全部</button>
+<button class="bg-surface text-on-surface-variant font-label-md text-label-md px-4 py-1.5 rounded-full whitespace-nowrap border border-outline-variant hover:bg-surface-container-low transition-colors">教材</button>
+<button class="bg-surface text-on-surface-variant font-label-md text-label-md px-4 py-1.5 rounded-full whitespace-nowrap border border-outline-variant hover:bg-surface-container-low transition-colors">文具</button>
+<button class="bg-surface text-on-surface-variant font-label-md text-label-md px-4 py-1.5 rounded-full whitespace-nowrap border border-outline-variant hover:bg-surface-container-low transition-colors">设备</button>
+</div>
+<button class="flex items-center text-primary ml-2 pl-2 border-l border-outline-variant">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+<!-- Items Grid -->
+<div class="flex flex-col gap-gutter">
+<!-- Item Card 1: Normal Stock -->
+<div class="bg-white border border-[#e7ece9] rounded-lg p-[14px] flex flex-col gap-3 transition-transform active:scale-[0.98]">
+<div class="flex gap-4">
+<!-- Thumbnail -->
+<div class="w-20 h-20 rounded bg-surface-container-low flex-shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="A clean, brightly lit top-down photo of a colorful children's English textbook lying on a light oak wooden desk. The book cover features cheerful illustrations. The lighting is soft and natural, emphasizing the professional and educational setting. Modern corporate aesthetic with a hint of deep forest green in the background accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFHWGjQtCjADhSX5638S4qcVrbVIh3jO0YQfKc-2ziEDa5sCp0_O555pXR-2j5Df9i2n4UtMplrbLahdYNoF5517lsXtEXKY0T5gqJdzo2ClWtBGP4mQBQj80KWpc3OCY2dx6UlHyVx3hy_6yHCBa8Pu9bBVV2WSjisae2nrwt6jK_4orzZ-8AFlhsUzXjnRHIqiI_A9kEtdx3T1Kjr1j-fQRoAuhuhLytkriOBAOeWQ27o_5jEO1IyXEWpXeT6xL3EIBFUv_VBMM"/>
+</div>
+<!-- Details -->
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">少儿英语教材 (Level 1)</h2>
+</div>
+<div class="flex flex-col gap-0.5 mb-2">
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">规格: A4全彩精装</p>
+<div class="flex items-center justify-between mt-1">
+<span class="font-headline-sm text-headline-sm text-primary">¥85.00</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">库存: <span class="text-on-surface font-medium">45件</span></span>
+</div>
+</div>
+<!-- Badges -->
+<div class="flex flex-wrap gap-2 mt-1">
+<span class="bg-[#e9f6ef] text-[#227253] font-label-sm text-label-sm px-3 py-1 rounded-full">库存充足</span>
+<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-3 py-1 rounded-full border border-outline-variant">线上售卖</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="border-t border-outline-variant pt-3 flex gap-2 mt-1">
+<button class="flex-1 bg-surface text-primary border border-primary-container font-label-md text-label-md py-2 rounded-lg hover:bg-surface-container-low transition-colors">详情</button>
+<button class="flex-1 bg-surface text-primary border border-primary-container font-label-md text-label-md py-2 rounded-lg hover:bg-surface-container-low transition-colors">领用</button>
+<button class="flex-1 bg-primary-container text-white font-label-md text-label-md py-2 rounded-lg hover:bg-primary-container/90 transition-colors">入库</button>
+</div>
+</div>
+<!-- Item Card 2: Low Stock Warning -->
+<div class="bg-white border border-[#e7ece9] rounded-lg p-[14px] flex flex-col gap-3 transition-transform active:scale-[0.98]">
+<div class="flex gap-4">
+<!-- Thumbnail -->
+<div class="w-20 h-20 rounded bg-surface-container-low flex-shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="A neat stack of blank white index cards and a green ballpoint pen on a minimalist white desk. The lighting is bright and even, casting soft shadows. The overall tone is organized, clean, and professional, fitting a modern educational environment with a green and mint color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKXXowrHl2Y4W6D4-pmaSEmFZ3xGp6atzhKZrvHu2xfs7U0CAw5YpvjWBbFQQv1TT83szYckXejlN_9T0DViYb2kJEtMQDZ_f9ql2CZH822Ck12-yaXV-BzLd-cZILPu7YqNep4vbcgL4Fu95th2NxqA0dvBhWpakBKnxKWRMquODtE-BqLWeKyME9qEzLv1I8BxDEOA_5Na6FWZ29sPfCylRTC2KImqkxXYrSbCjy0vFAkc-NAvAGZ2Y5XMn-8_VWdDAx6K3ipS8"/>
+</div>
+<!-- Details -->
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">学生随堂测验纸</h2>
+</div>
+<div class="flex flex-col gap-0.5 mb-2">
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">规格: B5单色 100张/包</p>
+<div class="flex items-center justify-between mt-1">
+<span class="font-headline-sm text-headline-sm text-primary">¥15.00</span>
+<span class="font-body-sm text-body-sm text-error">库存: <span class="font-medium">3包</span></span>
+</div>
+</div>
+<!-- Badges -->
+<div class="flex flex-wrap gap-2 mt-1">
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-3 py-1 rounded-full">库存预警</span>
+<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-3 py-1 rounded-full border border-outline-variant">内部领用</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="border-t border-outline-variant pt-3 flex gap-2 mt-1">
+<button class="flex-1 bg-surface text-primary border border-primary-container font-label-md text-label-md py-2 rounded-lg hover:bg-surface-container-low transition-colors">详情</button>
+<button class="flex-1 bg-surface text-primary border border-primary-container font-label-md text-label-md py-2 rounded-lg hover:bg-surface-container-low opacity-50 cursor-not-allowed">领用</button>
+<button class="flex-1 bg-error text-white font-label-md text-label-md py-2 rounded-lg hover:bg-error/90 transition-colors">紧急采购</button>
+</div>
+</div>
+<!-- Item Card 3: Normal Stock, Equipment -->
+<div class="bg-white border border-[#e7ece9] rounded-lg p-[14px] flex flex-col gap-3 transition-transform active:scale-[0.98]">
+<div class="flex gap-4">
+<!-- Thumbnail -->
+<div class="w-20 h-20 rounded bg-surface-container-low flex-shrink-0 overflow-hidden relative">
+<div class="w-full h-full flex items-center justify-center bg-surface-container">
+<span class="material-symbols-outlined text-outline text-[32px]">devices</span>
+</div>
+</div>
+<!-- Details -->
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">教学平板电脑 (备用)</h2>
+</div>
+<div class="flex flex-col gap-0.5 mb-2">
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">规格: 10.5英寸 64G</p>
+<div class="flex items-center justify-between mt-1">
+<span class="font-headline-sm text-headline-sm text-primary">--</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">库存: <span class="text-on-surface font-medium">12台</span></span>
+</div>
+</div>
+<!-- Badges -->
+<div class="flex flex-wrap gap-2 mt-1">
+<span class="bg-[#e9f6ef] text-[#227253] font-label-sm text-label-sm px-3 py-1 rounded-full">库存充足</span>
+<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-3 py-1 rounded-full border border-outline-variant">固定资产</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="border-t border-outline-variant pt-3 flex gap-2 mt-1">
+<button class="flex-1 bg-surface text-primary border border-primary-container font-label-md text-label-md py-2 rounded-lg hover:bg-surface-container-low transition-colors">详情</button>
+<button class="flex-1 bg-surface text-primary border border-primary-container font-label-md text-label-md py-2 rounded-lg hover:bg-surface-container-low transition-colors">借用</button>
+<button class="flex-1 bg-primary-container text-white font-label-md text-label-md py-2 rounded-lg hover:bg-primary-container/90 transition-colors">归还登记</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

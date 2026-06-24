@@ -34,6 +34,14 @@
         "pagePath": "pages/schedule/index"
       },
       {
+        "text": "学员",
+        "pagePath": "pages/student/index"
+      },
+      {
+        "text": "错题本",
+        "pagePath": "pages/wrong-question/index"
+      },
+      {
         "text": "我的",
         "pagePath": "pages/me/me"
       }
@@ -77,6 +85,106 @@
       "style": {
         "navigationBarTitleText": "课表",
         "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/schedule/create",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "新增排课"
+      }
+    },
+    {
+      "path": "pages/schedule/conflict",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "排课冲突"
+      }
+    },
+    {
+      "path": "pages/schedule/reschedule",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "调课"
+      }
+    },
+    {
+      "path": "pages/schedule/course-detail",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "课次详情"
+      }
+    },
+    {
+      "path": "pages/schedule/checkin-done",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "点名完成"
+      }
+    },
+    {
+      "path": "pages/student/index",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "学员",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/student/detail",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "学员详情"
+      }
+    },
+    {
+      "path": "pages/student/add",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "添加学员"
+      }
+    },
+    {
+      "path": "pages/student/leave",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "学员请假"
+      }
+    },
+    {
+      "path": "pages/wrong-question/index",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "错题本",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/wrong-question/upload",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "拍照上传"
+      }
+    },
+    {
+      "path": "pages/wrong-question/analyzing",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "AI 分析中"
+      }
+    },
+    {
+      "path": "pages/wrong-question/detail",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "错题详情"
+      }
+    },
+    {
+      "path": "pages/wrong-question/edit",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "编辑解析"
       }
     }
   ],

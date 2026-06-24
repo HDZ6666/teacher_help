@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>物品费用 - Item &amp; Fees Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#00201a",
+                        "background": "#f3faff",
+                        "secondary-fixed": "#c2ebde",
+                        "outline": "#6f7974",
+                        "surface": "#f3faff",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-tertiary-fixed": "#002114",
+                        "tertiary": "#00583d",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#d6e5ed",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-container-low": "#e7f6fe",
+                        "on-surface": "#0f1d23",
+                        "on-primary-fixed-variant": "#00513d",
+                        "secondary": "#40655b",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f3faff",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-variant": "#d6e5ed",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "surface-container-high": "#dbebf3",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "outline-variant": "#bec9c3",
+                        "surface-tint": "#166b53",
+                        "primary": "#005842",
+                        "on-primary-container": "#a4f2d4",
+                        "inverse-surface": "#243239",
+                        "secondary-container": "#c2ebde",
+                        "on-surface-variant": "#3f4944",
+                        "on-background": "#0f1d23",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#e4f3fb",
+                        "tertiary-container": "#007351",
+                        "primary-container": "#1f7159",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#cddce4",
+                        "inverse-primary": "#88d6b9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#8cf7c7",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#002117",
+                        "surface-container": "#e1f0f8",
+                        "on-secondary-container": "#466c61"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "page_margin": "14px",
+                        "gutter": "12px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "stack_lg": "24px",
+                        "safe-bottom": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f4f6f5; /* Explicit body background per prompt style */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar hiding */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Tonal elevation level 1 */
+        .card-level-1 {
+            background-color: #ffffff;
+            border: 1px solid #e7ece9;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface font-body-md min-h-screen flex flex-col pb-[calc(56px+env(safe-area-inset-bottom))]">
+<!-- TopAppBar from JSON -->
+<header class="bg-surface sticky top-0 z-50 border-b border-outline-variant flat no shadows flex items-center justify-between px-page_margin h-14 w-full">
+<div class="flex items-center">
+<button aria-label="Go back" class="mr-3 text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform w-10 h-10 flex items-center justify-center rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">物品费用</h1>
+</div>
+<button aria-label="Add item" class="text-primary hover:bg-surface-container-high transition-colors active:scale-95 transition-transform w-10 h-10 flex items-center justify-center rounded-full">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-page_margin pt-stack_md pb-stack_lg flex flex-col gap-gutter max-w-3xl mx-auto w-full">
+<!-- Search Bar -->
+<div class="relative w-full h-[44px]">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+</div>
+<input class="block w-full h-full pl-10 pr-3 py-2 border border-[#e7ece9] rounded-lg text-body-md text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-1 focus:ring-primary-container focus:border-primary-container bg-surface-container-lowest shadow-sm" placeholder="搜索物品或费用名称" type="text"/>
+</div>
+<!-- Segmented Control -->
+<div class="bg-surface-container-low p-1 rounded-lg flex shadow-sm w-full">
+<button class="flex-1 py-1.5 px-3 text-center rounded-md bg-surface-container-lowest text-primary-container font-label-md shadow-sm transition-all">
+                物品
+            </button>
+<button class="flex-1 py-1.5 px-3 text-center rounded-md text-on-surface-variant hover:text-on-surface font-label-md transition-all">
+                费用
+            </button>
+<button class="flex-1 py-1.5 px-3 text-center rounded-md text-on-surface-variant hover:text-on-surface font-label-md transition-all">
+                库存流水
+            </button>
+</div>
+<!-- Statistics Card Grid (Bento style) -->
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Total Items Card -->
+<div class="card-level-1 rounded-lg p-[14px] flex flex-col justify-between hover:bg-[#fcfdfc] transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-2 mb-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="category">category</span>
+<span class="font-label-md">物品总数</span>
+</div>
+<div class="font-display text-display text-primary-container">
+                    128
+                </div>
+</div>
+<!-- Inventory Alert Card (Highlighted in soft red per prompt) -->
+<div class="card-level-1 rounded-lg p-[14px] flex flex-col justify-between bg-error-container/30 border-error-container hover:bg-error-container/40 transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-2 mb-2 text-[#93000a]">
+<span class="material-symbols-outlined text-[20px]" data-icon="warning">warning</span>
+<span class="font-label-md">库存预警</span>
+</div>
+<div class="font-display text-display text-[#ba1a1a]">
+                    5
+                </div>
+</div>
+<!-- Today In Card -->
+<div class="card-level-1 rounded-lg p-[14px] flex flex-col justify-between hover:bg-[#fcfdfc] transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-2 mb-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="move_to_inbox">move_to_inbox</span>
+<span class="font-label-md">今日入库</span>
+</div>
+<div class="font-display text-display text-primary-container">
+                    45
+                </div>
+</div>
+<!-- Today Out Card -->
+<div class="card-level-1 rounded-lg p-[14px] flex flex-col justify-between hover:bg-[#fcfdfc] transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-2 mb-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="outbox">outbox</span>
+<span class="font-label-md">今日出库</span>
+</div>
+<div class="font-display text-display text-primary-container">
+                    12
+                </div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar from JSON (Mobile Shell) -->
+<nav class="bg-surface-container-lowest fixed bottom-0 w-full z-50 border-t border-outline-variant flat no shadows flex justify-around items-center w-full h-[56px] px-2 pb-safe md:hidden block">
+<!-- Today (Inactive) -->
+<button aria-label="Today" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 transition-transform w-16 h-full rounded-lg">
+<span class="material-symbols-outlined mb-1" data-icon="today">today</span>
+<span class="font-label-sm text-label-sm">Today</span>
+</button>
+<!-- Schedule (Inactive) -->
+<button aria-label="Schedule" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 transition-transform w-16 h-full rounded-lg">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</button>
+<!-- Students (Inactive) -->
+<button aria-label="Students" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 transition-transform w-16 h-full rounded-lg">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="font-label-sm text-label-sm">Students</span>
+</button>
+<!-- Mistakes (Inactive) -->
+<button aria-label="Mistakes" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 transition-transform w-16 h-full rounded-lg">
+<span class="material-symbols-outlined mb-1" data-icon="edit_document">edit_document</span>
+<span class="font-label-sm text-label-sm">Mistakes</span>
+</button>
+<!-- Mine (Active) -->
+<button aria-label="Mine" class="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container-low transition-colors active:scale-95 transition-transform w-16 h-full rounded-lg">
+<span class="material-symbols-outlined filled mb-1" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Mine</span>
+</button>
+</nav>
+<!-- Desktop Sidebar (Hidden on mobile, visible on md screens) -->
+<!-- Note: Since prompt is mobile-focused, we keep it simple, but follow shell visibility rules -->
+<aside class="hidden md:flex flex-col fixed left-0 top-14 bottom-0 w-64 bg-surface-container-lowest border-r border-outline-variant z-40 p-4">
+<div class="font-headline-sm text-headline-sm text-on-surface mb-6 px-4">Menu</div>
+<div class="flex flex-col gap-2">
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low w-full text-left">
+<span class="material-symbols-outlined" data-icon="today">today</span>
+<span class="font-body-md">Today</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low w-full text-left">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-body-md">Schedule</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low w-full text-left">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-md">Students</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low w-full text-left">
+<span class="material-symbols-outlined" data-icon="edit_document">edit_document</span>
+<span class="font-body-md">Mistakes</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-container-high text-primary font-bold w-full text-left">
+<span class="material-symbols-outlined filled" data-icon="person">person</span>
+<span class="font-body-md">Mine</span>
+</button>
+</div>
+</aside>
+</body></html>

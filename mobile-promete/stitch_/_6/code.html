@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>套餐轻入口</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#40655b",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "on-tertiary-container": "#8cf7c7",
+                        "on-surface-variant": "#3f4944",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#c2ebde",
+                        "primary-fixed": "#a4f2d4",
+                        "on-secondary-fixed": "#00201a",
+                        "on-primary-container": "#a4f2d4",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#007351",
+                        "surface-container": "#e1f0f8",
+                        "on-surface": "#0f1d23",
+                        "on-primary-fixed": "#002117",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f3faff",
+                        "surface": "#f3faff",
+                        "inverse-on-surface": "#e4f3fb",
+                        "background": "#f3faff",
+                        "surface-variant": "#d6e5ed",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#bec9c3",
+                        "on-primary-fixed-variant": "#00513d",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "secondary-container": "#c2ebde",
+                        "outline": "#6f7974",
+                        "on-tertiary-fixed": "#002114",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-container-high": "#dbebf3",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#cddce4",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#d6e5ed",
+                        "primary": "#005842",
+                        "primary-container": "#1f7159",
+                        "inverse-surface": "#243239",
+                        "tertiary": "#00583d",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-secondary-container": "#466c61",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#e7f6fe",
+                        "on-background": "#0f1d23",
+                        "surface-tint": "#166b53",
+                        "inverse-primary": "#88d6b9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_sm": "8px",
+                        "stack_lg": "24px",
+                        "gutter": "12px",
+                        "stack_md": "16px",
+                        "page_margin": "14px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f4f6f5; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased max-w-[375px] mx-auto relative min-h-screen border-x border-outline-variant shadow-sm flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant flex justify-between items-center px-page_margin h-14 bg-surface max-w-[375px]">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary border border-outline-variant overflow-hidden">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">老师帮</h1>
+</div>
+<button class="font-label-sm text-label-sm text-primary flex items-center gap-1 hover:bg-surface-container-low transition-colors duration-200 px-2 py-1 rounded">
+            切换校区
+            <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 pt-14 pb-8 px-page_margin flex flex-col gap-gutter overflow-y-auto mt-4">
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">特惠套餐</h2>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">filter_list</span>
+</div>
+<!-- Collapsed Card (Example 1) -->
+<article class="bg-surface-container-lowest rounded-lg border border-outline-variant p-[14px] flex flex-col gap-stack_sm cursor-pointer hover:bg-surface-container-low transition-colors duration-200">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">思维+编程启蒙包</h3>
+<span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm">已售罄</span>
+</div>
+<div class="text-on-surface-variant font-headline-md text-headline-md font-bold mt-1">￥3200</div>
+<div class="flex gap-4 text-on-surface-variant font-body-sm text-body-sm mt-1">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">library_books</span> 课程 2 门</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">category</span> 物品 0 个</div>
+</div>
+</article>
+<!-- Expanded Card (Detail View Example) -->
+<article class="bg-surface-container-lowest rounded-lg border border-outline-variant p-[14px] flex flex-col gap-stack_md border-primary relative overflow-hidden">
+<!-- Decorative Accent -->
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="flex justify-between items-start pl-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">英语+美术暑期联报包</h3>
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold">可售</span>
+</div>
+<div class="pl-2">
+<div class="text-primary font-display text-display font-bold">￥4800</div>
+</div>
+<hr class="border-outline-variant border-t ml-2"/>
+<!-- Detail Sections -->
+<div class="flex flex-col gap-stack_sm pl-2">
+<div class="text-on-surface-variant font-label-md text-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">school</span> 包含课程 (2)
+                </div>
+<div class="flex gap-2 flex-wrap">
+<span class="bg-surface-container px-3 py-1.5 rounded text-on-surface font-body-sm text-body-sm border border-outline-variant/50">少儿英语</span>
+<span class="bg-surface-container px-3 py-1.5 rounded text-on-surface font-body-sm text-body-sm border border-outline-variant/50">创意美术</span>
+</div>
+</div>
+<div class="flex flex-col gap-stack_sm pl-2 mt-2">
+<div class="text-on-surface-variant font-label-md text-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span> 物品及费用 (2)
+                </div>
+<div class="flex gap-2 flex-wrap">
+<span class="bg-surface-container px-3 py-1.5 rounded text-on-surface font-body-sm text-body-sm border border-outline-variant/50">教材包</span>
+<span class="bg-surface-container px-3 py-1.5 rounded text-on-surface font-body-sm text-body-sm border border-outline-variant/50">建档费</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 mt-2 ml-2 flex flex-col gap-2">
+<div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
+<span>原价合计</span>
+<span class="line-through">￥5600</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm text-error">
+<span>套餐优惠</span>
+<span>- ￥800</span>
+</div>
+<hr class="border-outline-variant border-t border-dashed my-1"/>
+<div class="flex justify-between font-headline-sm text-headline-sm text-on-surface items-center">
+<span>应收金额</span>
+<span class="text-primary font-bold">￥4800</span>
+</div>
+</div>
+<div class="ml-2 mt-2 flex gap-3">
+<button class="flex-1 h-[44px] rounded-lg border border-primary text-primary font-label-md text-label-md flex items-center justify-center hover:bg-surface-container transition-colors">
+                    分享海报
+                </button>
+<button class="flex-[2] h-[44px] rounded-lg bg-primary-container text-white font-label-md text-label-md flex items-center justify-center hover:opacity-90 transition-opacity">
+                    立即办理
+                </button>
+</div>
+</article>
+</main>
+</body></html>

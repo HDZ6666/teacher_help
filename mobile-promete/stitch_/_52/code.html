@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>冲突处理</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#002114",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#466c61",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#00513d",
+                    "surface-container-highest": "#d6e5ed",
+                    "tertiary-fixed-dim": "#6fdaac",
+                    "surface-variant": "#d6e5ed",
+                    "surface-tint": "#166b53",
+                    "inverse-surface": "#243239",
+                    "tertiary-container": "#007351",
+                    "surface-container": "#e1f0f8",
+                    "on-error": "#ffffff",
+                    "surface": "#f3faff",
+                    "secondary-fixed": "#c2ebde",
+                    "primary": "#005842",
+                    "surface-container-low": "#e7f6fe",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#a7cfc2",
+                    "primary-container": "#1f7159",
+                    "on-tertiary-fixed-variant": "#005138",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#88d6b9",
+                    "secondary": "#40655b",
+                    "on-secondary-fixed-variant": "#284d44",
+                    "outline": "#6f7974",
+                    "on-primary": "#ffffff",
+                    "background": "#f3faff",
+                    "on-primary-fixed": "#002117",
+                    "on-background": "#0f1d23",
+                    "secondary-container": "#c2ebde",
+                    "on-surface-variant": "#3f4944",
+                    "on-surface": "#0f1d23",
+                    "on-tertiary-container": "#8cf7c7",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#a4f2d4",
+                    "surface-bright": "#f3faff",
+                    "on-primary-container": "#a4f2d4",
+                    "surface-container-high": "#dbebf3",
+                    "tertiary": "#00583d",
+                    "primary-fixed-dim": "#88d6b9",
+                    "on-secondary-fixed": "#00201a",
+                    "inverse-on-surface": "#e4f3fb",
+                    "tertiary-fixed": "#8cf7c7",
+                    "outline-variant": "#bec9c3",
+                    "surface-dim": "#cddce4",
+                    "warning-bg": "#fff5d8",
+                    "warning-text": "#8a671b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "12px",
+                    "stack_lg": "24px",
+                    "stack_md": "16px",
+                    "stack_sm": "8px",
+                    "page_margin": "14px"
+            },
+            "fontFamily": {
+                    "display": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-md": [
+                            "Be Vietnam Pro"
+                    ],
+                    "headline-md": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-lg": [
+                            "Be Vietnam Pro"
+                    ],
+                    "headline-sm": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-sm": [
+                            "Be Vietnam Pro"
+                    ],
+                    "label-sm": [
+                            "Be Vietnam Pro"
+                    ],
+                    "label-md": [
+                            "Be Vietnam Pro"
+                    ]
+            },
+            "fontSize": {
+                    "display": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-sm": [
+                            "17px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "13px",
+                            {
+                                    "lineHeight": "18px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "11px",
+                            {
+                                    "lineHeight": "14px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f4f6f5; /* Theme base color */
+        }
+        /* TopAppBar is suppressed as this is a task-focused screen (conflict resolution) */
+        /* BottomNavBar is suppressed as this is a task-focused screen */
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-background min-h-screen flex flex-col pt-4 pb-24">
+<!-- Header / Nav Back -->
+<header class="px-page_margin pb-4 flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-background">arrow_back</span>
+</button>
+<h1 class="font-display text-display text-on-background flex-1">排课冲突</h1>
+</header>
+<!-- Main Content -->
+<main class="px-page_margin flex flex-col gap-stack_md flex-1">
+<!-- Context Alert -->
+<div class="bg-warning-bg border border-warning-text/20 rounded-lg p-4 flex gap-3 items-start">
+<span class="material-symbols-outlined text-warning-text mt-0.5">warning</span>
+<div class="flex-1">
+<p class="font-headline-sm text-headline-sm text-warning-text mb-1">发现 2 个排课冲突</p>
+<p class="font-body-sm text-body-sm text-warning-text/80">请处理以下冲突以完成排课。您也可以选择跳过这些有冲突的课次。</p>
+</div>
+</div>
+<!-- Conflict Item 1: Teacher Conflict -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-lg overflow-hidden shadow-sm">
+<div class="p-4 border-b border-[#e7ece9] bg-surface/30">
+<div class="flex items-center gap-2 mb-2">
+<span class="inline-flex items-center gap-1 bg-[#fff5d8] text-[#8a671b] px-2 py-0.5 rounded-full font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">person_off</span>
+                        老师冲突
+                    </span>
+<span class="font-label-md text-label-md text-on-surface-variant">第 3 节课次</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-background">王老师在 14:00 已有课程</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">原计划：2023-10-25 14:00 - 15:30 · 高一数学强化班</p>
+</div>
+<div class="p-4 bg-surface-container-lowest flex gap-3">
+<button class="flex-1 h-[44px] rounded-lg border border-primary-container text-primary-container font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+                    更换老师
+                </button>
+<button class="flex-1 h-[44px] rounded-lg border border-primary-container text-primary-container font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                    修改时间
+                </button>
+</div>
+</div>
+<!-- Conflict Item 2: Room Conflict -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-lg overflow-hidden shadow-sm">
+<div class="p-4 border-b border-[#e7ece9] bg-surface/30">
+<div class="flex items-center gap-2 mb-2">
+<span class="inline-flex items-center gap-1 bg-[#fff5d8] text-[#8a671b] px-2 py-0.5 rounded-full font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">meeting_room</span>
+                        教室占用
+                    </span>
+<span class="font-label-md text-label-md text-on-surface-variant">第 5 节课次</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-background">A区201 已被占用</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">原计划：2023-10-26 10:00 - 11:30 · 物理实验课</p>
+</div>
+<div class="p-4 bg-surface-container-lowest flex gap-3">
+<button class="w-full h-[44px] rounded-lg border border-primary-container text-primary-container font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">home_pin</span>
+                    更换教室
+                </button>
+</div>
+</div>
+</main>
+<!-- Bottom Actions (Fixed) -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-surface-container-lowest border-t border-[#e7ece9] flex gap-3 z-40">
+<button class="flex-1 h-[46px] rounded-lg border border-outline text-on-surface-variant font-headline-sm text-headline-sm flex items-center justify-center hover:bg-surface-variant transition-colors">
+            跳过冲突课次
+        </button>
+<button class="flex-1 h-[46px] rounded-lg bg-primary-container text-on-primary font-headline-sm text-headline-sm flex items-center justify-center hover:bg-primary transition-colors">
+            仍然保存
+        </button>
+</div>
+</body></html>

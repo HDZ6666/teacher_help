@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>错题本</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#d6e5ed",
+                      "surface-container-low": "#e7f6fe",
+                      "on-primary-container": "#a4f2d4",
+                      "on-secondary-fixed-variant": "#284d44",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "inverse-on-surface": "#e4f3fb",
+                      "secondary-fixed": "#c2ebde",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#00201a",
+                      "surface-tint": "#166b53",
+                      "secondary-fixed-dim": "#a7cfc2",
+                      "on-primary-fixed": "#002117",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#a4f2d4",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#c2ebde",
+                      "primary-fixed-dim": "#88d6b9",
+                      "outline-variant": "#bec9c3",
+                      "error-container": "#ffdad6",
+                      "primary-container": "#1f7159",
+                      "on-tertiary-fixed": "#002114",
+                      "on-surface": "#0f1d23",
+                      "secondary": "#40655b",
+                      "primary": "#005842",
+                      "on-secondary-container": "#466c61",
+                      "surface-dim": "#cddce4",
+                      "inverse-surface": "#243239",
+                      "tertiary-fixed-dim": "#6fdaac",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#8cf7c7",
+                      "surface-container-highest": "#d6e5ed",
+                      "outline": "#6f7974",
+                      "background": "#f3faff",
+                      "tertiary-container": "#007351",
+                      "on-background": "#0f1d23",
+                      "on-tertiary-fixed-variant": "#005138",
+                      "on-primary-fixed-variant": "#00513d",
+                      "inverse-primary": "#88d6b9",
+                      "surface": "#f3faff",
+                      "surface-container-high": "#dbebf3",
+                      "tertiary-fixed": "#8cf7c7",
+                      "surface-bright": "#f3faff",
+                      "tertiary": "#00583d",
+                      "on-surface-variant": "#3f4944",
+                      "surface-container": "#e1f0f8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack_lg": "24px",
+                      "gutter": "12px",
+                      "page_margin": "14px",
+                      "stack_sm": "8px",
+                      "stack_md": "16px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "label-md": [
+                              "Be Vietnam Pro"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-lg": [
+                              "Be Vietnam Pro"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "17px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-50 bg-surface dark:bg-on-surface border-b border-outline-variant dark:border-outline flat no shadows flex items-center justify-between px-page_margin h-14 w-full">
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors active:scale-95 transition-transform p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-display text-display text-primary dark:text-primary-fixed font-bold">错题本</h1>
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors active:scale-95 transition-transform p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">search</span>
+</button>
+</header>
+<main class="px-page_margin pt-stack_sm space-y-stack_lg">
+<!-- Search Bar -->
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-outline-variant rounded-lg leading-5 bg-surface-container-lowest placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-body-md text-body-md" placeholder="搜索题目、知识点、学员..." type="text"/>
+</div>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-2 gap-gutter">
+<div class="bg-primary-container text-on-primary-container rounded-lg p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:scale-[1.02] transition-transform">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-20">
+<span class="material-symbols-outlined text-6xl" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container/80 z-10">今日新增</span>
+<span class="font-display text-display font-bold mt-2 z-10">24</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:scale-[1.02] transition-transform">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-5">
+<span class="material-symbols-outlined text-6xl" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant z-10">待分析</span>
+<span class="font-headline-md text-headline-md text-on-surface font-bold mt-2 z-10">8</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:scale-[1.02] transition-transform">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-5">
+<span class="material-symbols-outlined text-6xl" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant z-10">已解析</span>
+<span class="font-headline-md text-headline-md text-on-surface font-bold mt-2 z-10">156</span>
+</div>
+<div class="bg-secondary-container text-on-secondary-container rounded-lg p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:scale-[1.02] transition-transform">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-20">
+<span class="material-symbols-outlined text-6xl" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<span class="font-label-md text-label-md text-on-secondary-container/80 z-10">已掌握</span>
+<span class="font-headline-md text-headline-md font-bold mt-2 z-10">89%</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex space-x-gutter">
+<button class="flex-1 bg-primary-container text-on-primary hover:bg-primary-container/90 transition-colors h-[46px] rounded-lg font-label-md text-label-md flex items-center justify-center space-x-2 active:scale-95">
+<span class="material-symbols-outlined text-on-primary">photo_camera</span>
+<span>拍照上传</span>
+</button>
+<button class="flex-1 bg-transparent border border-primary-container text-primary-container hover:bg-primary-container/10 transition-colors h-[46px] rounded-lg font-label-md text-label-md flex items-center justify-center space-x-2 active:scale-95">
+<span class="material-symbols-outlined text-primary-container">photo_library</span>
+<span>相册选择</span>
+</button>
+</div>
+<!-- List Section -->
+<div class="space-y-stack_sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold mb-4">最近错题</h2>
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin flex flex-col space-y-3">
+<div class="flex items-start space-x-3">
+<img class="w-20 h-20 object-cover rounded bg-surface-variant shrink-0" data-alt="A modern educational user interface showing a thumbnail of a math problem written on a clean white piece of paper. The image is brightly lit with a soft, even light, conveying a professional and academic tone. The surrounding app interface uses deep forest greens and soft mints." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1ootebXj1gU3FlwcNX3kheneAjF4ms43doGR790zd3sSlK8NN-5Ly_EAHPzfeZgZGl1PDTPDdU3KhmOoxEniYg70VBqMgQoWgGwznI06C7LkUaXLX1b39pxvP0iljKCaOjkTYXMgGFUpCAD-O6GCx0fWq0gSmDM7BbLYatf8T5iDCr20eEsFOLSW9l1MZPQmgf3Dltr_6AZ1sN-yJzX9s-mrcWtgnmUvb2pqrdiWITBN7g-gem-fGmS19juR1rf7uSDp-n5ovZEU"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-md text-label-md text-on-surface font-bold truncate">张子涵</span>
+<span class="font-label-sm text-label-sm text-tertiary px-2 py-0.5 bg-tertiary-container/20 rounded-full">数学</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate mb-2">一元二次方程根的判别式</p>
+<div class="flex items-center space-x-2">
+<span class="font-label-sm text-label-sm text-primary px-2 py-0.5 bg-primary-container/10 rounded-full flex items-center">
+<span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>已解析
+                             </span>
+<span class="font-label-sm text-label-sm text-error px-2 py-0.5 bg-error-container/50 rounded-full">未掌握</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin flex flex-col space-y-3">
+<div class="flex items-start space-x-3">
+<img class="w-20 h-20 object-cover rounded bg-surface-variant shrink-0" data-alt="A clean, minimalist UI thumbnail displaying a physics diagram with force vectors drawn clearly on a whiteboard. The aesthetic is modern and academic, bathed in natural daylight, emphasizing clarity and precision within a sleek corporate app design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXlLyzPZGuwN55RsRHf2NKIsFfcmr65Ybo3b7sWRPTIu5pAYf-l04WutzSF0RHyJ6KY9Wzzn13YqmmHhztA4TMh077h3DrNLVybYOam9QuYQd_mOzSWuXDqoJ0Y6ra7aNg9XUfTP5GxalwQPnqCzfzUD3yHBinJFaDm4TsS9Fd8zXRnyVwOFEsqWFQukvO0AW6DxMCDKxlgxnQ1BSKPgAxNyrJSmdRjoW8r3sMPc5mOGOCMcPe2LqSxxcAbkPbMGthhWATVThL71g"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-md text-label-md text-on-surface font-bold truncate">李心怡</span>
+<span class="font-label-sm text-label-sm text-tertiary px-2 py-0.5 bg-tertiary-container/20 rounded-full">物理</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate mb-2">牛顿第二定律综合应用</p>
+<div class="flex items-center space-x-2">
+<span class="font-label-sm text-label-sm text-outline px-2 py-0.5 bg-surface-variant rounded-full flex items-center">
+<span class="material-symbols-outlined text-[14px] mr-1 animate-spin">sync</span>分析中
+                             </span>
+<span class="font-label-sm text-label-sm text-on-secondary-container px-2 py-0.5 bg-secondary-container/50 rounded-full">部分掌握</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin flex flex-col space-y-3">
+<div class="flex items-start space-x-3">
+<img class="w-20 h-20 object-cover rounded bg-surface-variant shrink-0" data-alt="A high-quality thumbnail showing an English reading comprehension passage on a digital tablet screen. The UI context is elegant and lightweight, featuring a white background with subtle mint green accents. The lighting is crisp and modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyqQfx4us2qTsNasdlz-RFu3AHluHS3_8EHuiua_1vmkhS9dbuhezZoi2AzBHGN84M3jt4r8YedVOg0Jneoc_MHhLUgNaLHgczcrIht5yvx7WF4nZ4k_MoQdZTtF1zfwtklxsBqboHZOqDt7l6xR5gS9v0cFy8KrnouelwxmazyUKJpyq98m8Yzh-2XmMI5SckY9TKfuMMNVcE1UtVT6uw16V9uXe1Ya2s5m20rV30B-o55IR4U54yTXnio06H9xWp-uZbyk6DYyI"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-md text-label-md text-on-surface font-bold truncate">王宇轩</span>
+<span class="font-label-sm text-label-sm text-tertiary px-2 py-0.5 bg-tertiary-container/20 rounded-full">英语</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate mb-2">定语从句结构分析</p>
+<div class="flex items-center space-x-2">
+<span class="font-label-sm text-label-sm text-primary px-2 py-0.5 bg-primary-container/10 rounded-full flex items-center">
+<span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>已解析
+                             </span>
+<span class="font-label-sm text-label-sm text-primary-container px-2 py-0.5 bg-primary-container/20 rounded-full">已掌握</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface dark:bg-inverse-surface border-t border-outline-variant dark:border-outline flat no shadows flex justify-around items-center h-16 pb-safe px-2 w-full md:hidden">
+<button class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:bg-surface-variant/50 active:scale-90 transition-all duration-200 p-2 rounded-lg group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors" style="font-variation-settings: 'FILL' 0;">today</span>
+<span class="font-label-md text-label-md font-display text-display group-hover:text-primary transition-colors">今日</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:bg-surface-variant/50 active:scale-90 transition-all duration-200 p-2 rounded-lg group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors" style="font-variation-settings: 'FILL' 0;">calendar_month</span>
+<span class="font-label-md text-label-md font-display text-display group-hover:text-primary transition-colors">课表</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:bg-surface-variant/50 active:scale-90 transition-all duration-200 p-2 rounded-lg group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-md text-label-md font-display text-display group-hover:text-primary transition-colors">学员</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary dark:text-tertiary-fixed font-bold hover:bg-surface-variant/50 active:scale-90 transition-all duration-200 p-2 rounded-lg">
+<span class="material-symbols-outlined mb-1 text-primary" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="font-label-md text-label-md font-display text-display text-primary">错题本</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:bg-surface-variant/50 active:scale-90 transition-all duration-200 p-2 rounded-lg group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-md text-label-md font-display text-display group-hover:text-primary transition-colors">我的</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>错题详情</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#d6e5ed",
+                        "surface-container-low": "#e7f6fe",
+                        "on-primary-container": "#a4f2d4",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#e4f3fb",
+                        "secondary-fixed": "#c2ebde",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#00201a",
+                        "surface-tint": "#166b53",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "on-primary-fixed": "#002117",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#a4f2d4",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#c2ebde",
+                        "primary-fixed-dim": "#88d6b9",
+                        "outline-variant": "#bec9c3",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#1f7159",
+                        "on-tertiary-fixed": "#002114",
+                        "on-surface": "#0f1d23",
+                        "secondary": "#40655b",
+                        "primary": "#005842",
+                        "on-secondary-container": "#466c61",
+                        "surface-dim": "#cddce4",
+                        "inverse-surface": "#243239",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#8cf7c7",
+                        "surface-container-highest": "#d6e5ed",
+                        "outline": "#6f7974",
+                        "background": "#f3faff",
+                        "tertiary-container": "#007351",
+                        "on-background": "#0f1d23",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-primary-fixed-variant": "#00513d",
+                        "inverse-primary": "#88d6b9",
+                        "surface": "#f3faff",
+                        "surface-container-high": "#dbebf3",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-bright": "#f3faff",
+                        "tertiary": "#00583d",
+                        "on-surface-variant": "#3f4944",
+                        "surface-container": "#e1f0f8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_lg": "24px",
+                        "gutter": "12px",
+                        "page_margin": "14px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- Detail Header (Suppressed Main Nav, using specific task header) -->
+<header class="sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/50 h-14 w-full flex items-center justify-between px-page_margin transition-colors">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-start text-on-surface hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 500;">arrow_back_ios_new</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-on-surface absolute left-1/2 -translate-x-1/2 tracking-tight">错题详情</h1>
+<button aria-label="More options" class="w-10 h-10 flex items-center justify-end text-on-surface hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 500;">more_horiz</span>
+</button>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 flex flex-col pb-[120px]">
+<!-- Original Image Section -->
+<section class="mt-stack_sm px-page_margin">
+<div class="relative w-full h-48 rounded-xl overflow-hidden bg-surface-variant border border-outline-variant group cursor-zoom-in active:scale-[0.98] transition-transform duration-200 shadow-sm">
+<div class="w-full h-full bg-cover bg-center mix-blend-multiply opacity-90" data-alt="A clean, high-resolution digital scan of a high school mathematics exam question paper. The paper is bright white with clear black text and geometric diagrams. The lighting is even and flat, typical of a modern document scanner. The style is strictly educational, focused on clarity and precision. The overall aesthetic is minimalist and functional." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAwBEdQu3M5WJYA3G4cKDUuVIDoaA-Hk8byxpPRbtx2_tL1gjR5HK2XtnSle-KsSsrg20g5zDyvsPoQZdPLM_giBJrjzQQrNFY_95ySQxqdKrSrHd5qyg8uQ6NPHrhJrtxljk5r6mMulEHoPHpu8nbVzumLbpRvD6uSJ4hkU5gWEm38q1zKS0T2dgC9hPeM6gfKDBlWXqCXHOhxPqVZnDwIofdGA7qs3-3TqGV1gGJBE_tyHO74QewlowB4DIevi2TUJG9qB2DKPUY')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/30 to-transparent pointer-events-none"></div>
+<button class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-surface-container-lowest/90 backdrop-blur shadow text-primary flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-[18px]">zoom_in</span>
+</button>
+</div>
+</section>
+<!-- 1. Question Text Block -->
+<section class="mt-gutter px-page_margin">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-fixed-dim"></div>
+<h2 class="font-label-md text-label-md text-primary mb-2 flex items-center gap-1.5 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">description</span>
+                    题目文本
+                </h2>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                    已知在平面直角坐标系中，抛物线 $y = ax^2 + bx + c$ 与 $x$ 轴交于 $A(-1, 0)$ 和 $B(3, 0)$ 两点，且过点 $C(0, -3)$。求该抛物线的解析式并确定其顶点坐标。
+                </p>
+</div>
+</section>
+<!-- 2. Standard Answer Block -->
+<section class="mt-gutter px-page_margin">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
+<h2 class="font-label-md text-label-md text-tertiary mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                    标准答案
+                </h2>
+<div class="bg-tertiary-fixed/20 border border-tertiary-fixed-dim rounded-lg p-3">
+<p class="font-headline-sm text-headline-sm text-tertiary-container text-center font-bold">
+                        $y = x^2 - 2x - 3$，顶点坐标 $(1, -4)$
+                    </p>
+</div>
+</div>
+</section>
+<!-- 3. Solution Steps Block -->
+<section class="mt-gutter px-page_margin">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
+<h2 class="font-label-md text-label-md text-secondary mb-4 flex items-center gap-1.5 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">format_list_numbered</span>
+                    解题步骤
+                </h2>
+<div class="flex flex-col gap-4 relative">
+<!-- Vertical line connecting steps -->
+<div class="absolute left-3 top-2 bottom-2 w-px bg-outline-variant/50"></div>
+<div class="flex gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex-shrink-0 flex items-center justify-center font-label-sm text-label-sm shadow-sm ring-4 ring-surface-container-lowest">1</div>
+<div class="pt-0.5">
+<p class="font-body-md text-body-md text-on-surface">因为抛物线交 $x$ 轴于 $A(-1, 0), B(3, 0)$，可设交点式方程为 $y = a(x+1)(x-3)$。</p>
+</div>
+</div>
+<div class="flex gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex-shrink-0 flex items-center justify-center font-label-sm text-label-sm shadow-sm ring-4 ring-surface-container-lowest">2</div>
+<div class="pt-0.5">
+<p class="font-body-md text-body-md text-on-surface">将点 $C(0, -3)$ 代入方程，得 $-3 = a(0+1)(0-3)$，解得 $a = 1$。</p>
+</div>
+</div>
+<div class="flex gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex-shrink-0 flex items-center justify-center font-label-sm text-label-sm shadow-sm ring-4 ring-surface-container-lowest">3</div>
+<div class="pt-0.5">
+<p class="font-body-md text-body-md text-on-surface">展开方程得解析式为 $y = x^2 - 2x - 3$。配方得 $y = (x-1)^2 - 4$，因此顶点坐标为 $(1, -4)$。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Error Cause Analysis Block -->
+<section class="mt-gutter px-page_margin">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-error"></div>
+<h2 class="font-label-md text-label-md text-error mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">error</span>
+                    错因分析
+                </h2>
+<div class="bg-error-container/30 border border-error-container rounded-lg p-3 flex gap-3 items-start">
+<span class="material-symbols-outlined text-error mt-0.5 text-[20px]">lightbulb</span>
+<div>
+<h3 class="font-label-md text-label-md text-on-error-container mb-1">公式混淆</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                            在求抛物线解析式时，未能灵活应用交点式，而是使用了一般式列三元一次方程组，导致计算繁琐且在计算 $a$ 的值时出现符号错误。
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. Core Knowledge Points -->
+<section class="mt-gutter px-page_margin">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
+<h2 class="font-label-md text-label-md text-primary mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">local_offer</span>
+                    核心知识点
+                </h2>
+<div class="flex flex-wrap gap-2">
+<div class="bg-primary-container/10 text-primary-container border border-primary-container/20 px-3 py-1.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 transition-colors hover:bg-primary-container/20">
+<span class="material-symbols-outlined text-[14px]">function</span>
+                        二次函数解析式
+                    </div>
+<div class="bg-primary-container/10 text-primary-container border border-primary-container/20 px-3 py-1.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 transition-colors hover:bg-primary-container/20">
+<span class="material-symbols-outlined text-[14px]">polyline</span>
+                        交点式方程
+                    </div>
+<div class="bg-primary-container/10 text-primary-container border border-primary-container/20 px-3 py-1.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 transition-colors hover:bg-primary-container/20">
+<span class="material-symbols-outlined text-[14px]">calculate</span>
+                        配方法求顶点
+                    </div>
+</div>
+</div>
+</section>
+<!-- 6. Practice Suggestions -->
+<section class="mt-gutter px-page_margin mb-stack_lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
+<h2 class="font-label-md text-label-md text-primary mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">model_training</span>
+                    举一反三
+                </h2>
+<div class="flex flex-col gap-3">
+<button class="w-full text-left bg-surface-container hover:bg-surface-variant transition-colors rounded-lg p-3 flex items-center justify-between group active:scale-[0.98]">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface">相似题型训练（3题）</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">巩固交点式求解析式的方法</span>
+</div>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+</button>
+<button class="w-full text-left bg-surface-container hover:bg-surface-variant transition-colors rounded-lg p-3 flex items-center justify-between group active:scale-[0.98]">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface">视频讲解微课</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">二次函数的三种表达形式对比</span>
+</div>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">play_circle</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Bar -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant/50 p-page_margin pb-safe z-50 shadow-[0_-4px_16px_rgba(0,0,0,0.05)]">
+<div class="flex flex-col gap-3">
+<!-- Main Action -->
+<button class="w-full bg-primary-container text-on-primary hover:bg-primary-container/90 active:scale-[0.98] transition-all py-3.5 rounded-lg font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+                标为已掌握
+            </button>
+<!-- Secondary Actions -->
+<div class="flex gap-3">
+<button class="flex-1 bg-surface-container-lowest border border-outline hover:bg-surface-variant active:scale-[0.98] transition-all text-on-surface py-2.5 rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+                    编辑解析
+                </button>
+<button class="flex-1 bg-surface-container-lowest border border-primary text-primary hover:bg-primary/5 active:scale-[0.98] transition-all py-2.5 rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">share</span>
+                    分享给家长
+                </button>
+</div>
+</div>
+</div>
+</body></html>

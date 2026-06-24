@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Venue Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "surface-bright": "#f3faff",
+                      "surface": "#f3faff",
+                      "primary-fixed": "#a4f2d4",
+                      "surface-variant": "#d6e5ed",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#a7cfc2",
+                      "surface-container-highest": "#d6e5ed",
+                      "surface-dim": "#cddce4",
+                      "on-primary-fixed-variant": "#00513d",
+                      "surface-container-low": "#e7f6fe",
+                      "surface-container-high": "#dbebf3",
+                      "surface-container": "#e1f0f8",
+                      "on-surface-variant": "#3f4944",
+                      "primary": "#005842",
+                      "on-tertiary-fixed-variant": "#005138",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#007351",
+                      "primary-container": "#1f7159",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#c2ebde",
+                      "error-container": "#ffdad6",
+                      "primary-fixed-dim": "#88d6b9",
+                      "on-primary-container": "#a4f2d4",
+                      "on-secondary-fixed-variant": "#284d44",
+                      "on-tertiary-container": "#8cf7c7",
+                      "background": "#f3faff",
+                      "inverse-surface": "#243239",
+                      "on-tertiary-fixed": "#002114",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed": "#8cf7c7",
+                      "on-error-container": "#93000a",
+                      "outline-variant": "#bec9c3",
+                      "on-secondary-fixed": "#00201a",
+                      "tertiary": "#00583d",
+                      "on-surface": "#0f1d23",
+                      "on-secondary": "#ffffff",
+                      "on-background": "#0f1d23",
+                      "on-secondary-container": "#466c61",
+                      "secondary-container": "#c2ebde",
+                      "on-primary-fixed": "#002117",
+                      "secondary": "#40655b",
+                      "outline": "#6f7974",
+                      "surface-tint": "#166b53",
+                      "tertiary-fixed-dim": "#6fdaac",
+                      "inverse-primary": "#88d6b9",
+                      "inverse-on-surface": "#e4f3fb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack_md": "16px",
+                      "gutter": "12px",
+                      "stack_lg": "24px",
+                      "page_margin": "14px",
+                      "stack_sm": "8px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Be Vietnam Pro"
+                      ],
+                      "label-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-md": [
+                              "Be Vietnam Pro"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-md": [
+                              "Be Vietnam Pro"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "17px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f4f6f5; /* Theme specified background */
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Hide scrollbar for horizontal scrolling but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased text-on-surface pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-page_margin h-14 w-full bg-surface dark:bg-surface-dim border-b border-surface-variant dark:border-outline-variant docked full-width top-0 sticky z-40 shadow-sm transition-transform duration-200" style="background-color: #ffffff;">
+<button aria-label="Menu" class="p-2 -ml-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors flex items-center justify-center text-on-surface-variant dark:text-outline-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim">Venue Manager</h1>
+<button aria-label="Add Venue" class="p-2 -mr-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors flex items-center justify-center text-on-surface-variant dark:text-outline-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-3xl mx-auto pt-stack_sm">
+<!-- Date Selector -->
+<section class="px-page_margin mb-stack_md">
+<div class="flex overflow-x-auto hide-scrollbar gap-2 py-2 snap-x">
+<!-- Past Dates -->
+<button class="flex flex-col items-center justify-center w-14 h-16 rounded-lg bg-surface-container-lowest border border-[#e7ece9] shrink-0 snap-center transition-transform hover:bg-surface-container-low active:scale-95">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mon</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">12</span>
+</button>
+<button class="flex flex-col items-center justify-center w-14 h-16 rounded-lg bg-surface-container-lowest border border-[#e7ece9] shrink-0 snap-center transition-transform hover:bg-surface-container-low active:scale-95">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tue</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">13</span>
+</button>
+<!-- Active Date -->
+<button class="flex flex-col items-center justify-center w-14 h-16 rounded-lg bg-primary-container text-on-primary shadow-md shrink-0 snap-center transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm opacity-90">Wed</span>
+<span class="font-headline-sm text-headline-sm">14</span>
+</button>
+<!-- Future Dates -->
+<button class="flex flex-col items-center justify-center w-14 h-16 rounded-lg bg-surface-container-lowest border border-[#e7ece9] shrink-0 snap-center transition-transform hover:bg-surface-container-low active:scale-95">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Thu</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">15</span>
+</button>
+<button class="flex flex-col items-center justify-center w-14 h-16 rounded-lg bg-surface-container-lowest border border-[#e7ece9] shrink-0 snap-center transition-transform hover:bg-surface-container-low active:scale-95">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Fri</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">16</span>
+</button>
+<button class="flex flex-col items-center justify-center w-14 h-16 rounded-lg bg-surface-container-lowest border border-[#e7ece9] shrink-0 snap-center transition-transform hover:bg-surface-container-low active:scale-95">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sat</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">17</span>
+</button>
+<button class="flex flex-col items-center justify-center w-14 h-16 rounded-lg bg-surface-container-lowest border border-[#e7ece9] shrink-0 snap-center transition-transform hover:bg-surface-container-low active:scale-95">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sun</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">18</span>
+</button>
+</div>
+</section>
+<!-- Stats Section (Bento Grid Style) -->
+<section class="px-page_margin mb-stack_lg">
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Today Bookings -->
+<div class="bg-[#193f36] rounded-[9px] p-[14px] flex flex-col justify-between shadow-sm transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-[#8cf7c7]" style="font-variation-settings: 'FILL' 1;">event</span>
+<div class="bg-[#227253] text-[#e9f6ef] px-2 py-0.5 rounded-full font-label-sm text-label-sm flex items-center">
+<span class="material-symbols-outlined text-[10px] mr-1">trending_up</span> +2
+                        </div>
+</div>
+<div>
+<p class="font-display text-display text-white">12</p>
+<p class="font-label-md text-label-md text-[#a4f2d4] mt-1">Today Bookings</p>
+</div>
+</div>
+<!-- Available Slots -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-[8px] p-[14px] flex flex-col justify-between shadow-sm transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-display text-display text-on-surface">24</p>
+<p class="font-label-md text-label-md text-on-surface-variant mt-1">Available Slots</p>
+</div>
+</div>
+<!-- Pending Check-in -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-[8px] p-[14px] flex flex-col justify-between shadow-sm transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-[#d97706]" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<div>
+<p class="font-display text-display text-on-surface">5</p>
+<p class="font-label-md text-label-md text-on-surface-variant mt-1">Pending Check-in</p>
+</div>
+</div>
+<!-- Locked Venues -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-[8px] p-[14px] flex flex-col justify-between shadow-sm transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div>
+<p class="font-display text-display text-on-surface">2</p>
+<p class="font-label-md text-label-md text-on-surface-variant mt-1">Locked Venues</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Venue List -->
+<section class="px-page_margin mb-stack_lg">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack_sm">Venues</h2>
+<div class="flex flex-col gap-[12px]">
+<!-- Venue Card 1: Available/Idle -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-[8px] p-[14px] flex flex-col gap-3 shadow-sm transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">meeting_room</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">A101 Classroom</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">domain</span> North Campus
+                                </p>
+</div>
+</div>
+<div class="bg-[#e9f6ef] text-[#227253] px-3 py-1 rounded-full font-label-md text-label-md">
+                            Idle
+                        </div>
+</div>
+<div class="grid grid-cols-2 gap-4 bg-surface-bright rounded-lg p-3 border border-surface-variant">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Capacity</p>
+<p class="font-body-md text-body-md text-on-surface font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">groups</span> 40 Students
+                            </p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Today's Occupancy</p>
+<div class="flex items-center gap-2">
+<div class="h-1.5 flex-grow bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 25%"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">25%</span>
+</div>
+</div>
+</div>
+<div class="flex gap-2 mt-1">
+<button class="flex-1 h-[44px] bg-[#1f7159] text-white rounded-[8px] font-label-md text-label-md flex items-center justify-center transition-colors hover:bg-tertiary-container">Book</button>
+<button class="flex-1 h-[44px] bg-transparent border border-[#1f7159] text-[#1f7159] rounded-[8px] font-label-md text-label-md flex items-center justify-center transition-colors hover:bg-surface-container-low">Lock</button>
+<button aria-label="Details" class="w-[44px] h-[44px] bg-surface-container border border-surface-variant text-on-surface rounded-[8px] flex items-center justify-center transition-colors hover:bg-surface-container-high">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Venue Card 2: Booked -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-[8px] p-[14px] flex flex-col gap-3 shadow-sm transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">account_balance</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Main Hall</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">domain</span> South Campus
+                                </p>
+</div>
+</div>
+<div class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">schedule</span> Booked
+                        </div>
+</div>
+<div class="grid grid-cols-2 gap-4 bg-surface-bright rounded-lg p-3 border border-surface-variant">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Capacity</p>
+<p class="font-body-md text-body-md text-on-surface font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">groups</span> 250 Students
+                            </p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Today's Occupancy</p>
+<div class="flex items-center gap-2">
+<div class="h-1.5 flex-grow bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-[#d97706]" style="width: 80%"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">80%</span>
+</div>
+</div>
+</div>
+<div class="flex gap-2 mt-1">
+<button class="flex-1 h-[44px] bg-transparent border border-surface-variant text-on-surface-variant rounded-[8px] font-label-md text-label-md flex items-center justify-center opacity-50 cursor-not-allowed">Booked (10:00 - 14:00)</button>
+<button aria-label="Details" class="w-[44px] h-[44px] bg-surface-container border border-surface-variant text-on-surface rounded-[8px] flex items-center justify-center transition-colors hover:bg-surface-container-high">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Venue Card 3: Locked -->
+<div class="bg-surface-container-lowest border border-[#e7ece9] rounded-[8px] p-[14px] flex flex-col gap-3 shadow-sm transition-transform active:scale-[0.98] opacity-75">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="w-12 h-12 rounded-lg bg-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 0;">science</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-through decoration-error">Lab B302</h3>
+<p class="font-body-sm text-body-sm text-error flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">warning</span> Maintenance
+                                </p>
+</div>
+</div>
+<div class="bg-error-container text-on-error-container px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">lock</span> Locked
+                        </div>
+</div>
+<div class="flex gap-2 mt-1">
+<button class="flex-1 h-[44px] bg-transparent border border-[#1f7159] text-[#1f7159] rounded-[8px] font-label-md text-label-md flex items-center justify-center transition-colors hover:bg-surface-container-low">Unlock</button>
+<button aria-label="Details" class="w-[44px] h-[44px] bg-surface-container border border-surface-variant text-on-surface rounded-[8px] flex items-center justify-center transition-colors hover:bg-surface-container-high">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<!-- Displayed on mobile, hidden on larger screens if we were building a full responsive app, but adhering to prompt constraints to show it -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 bg-surface dark:bg-surface-container-lowest px-2 border-t border-surface-variant dark:border-outline-variant shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:hidden">
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-all duration-200" href="#" style="color: #74828a;">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">today</span>
+<span class="font-label-md text-label-md">Today</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-all duration-200" href="#" style="color: #74828a;">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">event_note</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-all duration-200" href="#" style="color: #74828a;">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-all duration-200" href="#" style="color: #74828a;">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">menu_book</span>
+<span class="font-label-md text-label-md">Error Book</span>
+</a>
+<!-- Active Tab: "Me" mapped to "Mine" intent -->
+<a class="flex flex-col items-center justify-center w-full h-full text-primary dark:text-primary-fixed-dim font-bold active:scale-95 transition-all duration-200" href="#" style="color: #018d71;">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md">Me</span>
+</a>
+</nav>
+<!-- Script for subtle interactions -->
+<script>
+        // Simple touch effect for buttons
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('touchstart', () => {
+                if(!el.classList.contains('cursor-not-allowed')) {
+                    el.style.transform = 'scale(0.98)';
+                }
+            });
+            el.addEventListener('touchend', () => {
+                 el.style.transform = '';
+            });
+            el.addEventListener('touchcancel', () => {
+                 el.style.transform = '';
+            });
+        });
+    </script>
+</body></html>

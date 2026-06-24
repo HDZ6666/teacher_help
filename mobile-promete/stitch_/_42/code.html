@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>添加学生</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#dbebf3",
+                      "secondary-container": "#c2ebde",
+                      "primary-fixed": "#a4f2d4",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#6fdaac",
+                      "outline": "#6f7974",
+                      "on-secondary-fixed": "#00201a",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#284d44",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-container": "#8cf7c7",
+                      "inverse-primary": "#88d6b9",
+                      "primary-fixed-dim": "#88d6b9",
+                      "surface-container-low": "#e7f6fe",
+                      "on-primary-fixed": "#002117",
+                      "primary": "#005842",
+                      "on-tertiary-fixed": "#002114",
+                      "background": "#f3faff",
+                      "on-secondary-container": "#466c61",
+                      "surface-variant": "#d6e5ed",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#00583d",
+                      "error": "#ba1a1a",
+                      "on-surface-variant": "#3f4944",
+                      "surface-tint": "#166b53",
+                      "secondary-fixed-dim": "#a7cfc2",
+                      "surface-container-highest": "#d6e5ed",
+                      "on-surface": "#0f1d23",
+                      "inverse-on-surface": "#e4f3fb",
+                      "surface-bright": "#f3faff",
+                      "secondary-fixed": "#c2ebde",
+                      "on-error": "#ffffff",
+                      "inverse-surface": "#243239",
+                      "surface-container": "#e1f0f8",
+                      "outline-variant": "#bec9c3",
+                      "tertiary-container": "#007351",
+                      "on-background": "#0f1d23",
+                      "on-secondary": "#ffffff",
+                      "surface-dim": "#cddce4",
+                      "on-primary-container": "#a4f2d4",
+                      "secondary": "#40655b",
+                      "on-tertiary-fixed-variant": "#005138",
+                      "on-primary-fixed-variant": "#00513d",
+                      "primary-container": "#1f7159",
+                      "tertiary-fixed": "#8cf7c7",
+                      "surface": "#f3faff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack_lg": "24px",
+                      "stack_md": "16px",
+                      "stack_sm": "8px",
+                      "page_margin": "14px",
+                      "gutter": "12px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-md": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-lg": [
+                              "Be Vietnam Pro"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-sm": [
+                              "17px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #f4f6f5; /* Theme Background */
+        }
+        /* Custom Checkbox */
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #bec9c3;
+            border-radius: 4px;
+            background-color: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease-in-out;
+        }
+        .custom-checkbox:checked {
+            background-color: #005842;
+            border-color: #005842;
+        }
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased pb-[80px]">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface text-primary border-b border-outline-variant transition-colors duration-200 flex items-center justify-between px-page_margin h-14">
+<button class="text-on-surface-variant hover:bg-surface-container-low active:opacity-80 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">添加学生</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-[72px] px-page_margin flex flex-col gap-stack_md">
+<!-- Search Bar -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant h-[44px] flex items-center px-3 sticky top-[64px] z-40 shadow-sm">
+<span class="material-symbols-outlined text-outline mr-2" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface font-body-md placeholder-outline-variant p-0 m-0 h-full" placeholder="搜索姓名或手机号" type="text"/>
+</div>
+<!-- Student List (Scrollable) -->
+<div class="flex flex-col gap-3">
+<!-- Student Card 1 (Checked) -->
+<label class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex items-center justify-between cursor-pointer active:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a young student, bright lighting, clean modern educational context, soft green background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_DAvydW2DgebSrIknfejMqekLzXJxKSVT-H8Ff0GM24LDdYX8vwCjADr0l3TFL1ag26V9utTVngBerjZQttbvdntXVsP8hpfDJj50_GV8zZyO7lppPjRwGhiZ-DnwOPoBBaq8sPaUJtzk5QoTPEhR5HOvagG3TRzz8jYjG0InRhDMQM1Sxy2Ta9Knu4NjOzrWcvFeeY-fwWbNOXqJ9u4pXNfBSdjx66OiaKDWPag86ERtTxNvNVLTt5-glH0BRXXArlcV6g-mb84"/>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface">张伟</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">138 0000 0001</div>
+</div>
+</div>
+<input checked="" class="custom-checkbox" type="checkbox"/>
+</label>
+<!-- Student Card 2 -->
+<label class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex items-center justify-between cursor-pointer active:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a female student, smiling gently, clean modern educational context, bright natural light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk9mFwOCix4kDsBw0tqTAdvkqq4NgwJQVF4nGBR2S4JC48BAZMGMlT7EvHvvKYOkjt1Lz1NdSY1pQzxbZL5EnNv1iI-3kDsQVJKRBT45YuVl1FAvPpFS2_aJYUO3h1dvCG1V3F9pR-B9KUyGP81gYVHK1W-jjqy--tmqjULJzQPA2rpQCdMQQKoou3EnC1DgsR5-LCiFSnDsm1B7Tmw_LSJWuvn1meDHW59W_N3W8X_OXb9ogbFabLxDJQ_0vWFyWBrqG-frZpqPs"/>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface">王芳</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">139 1234 5678</div>
+</div>
+</div>
+<input class="custom-checkbox" type="checkbox"/>
+</label>
+<!-- Student Card 3 (Checked) -->
+<label class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex items-center justify-between cursor-pointer active:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline-sm">李</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface">李娜</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">137 9876 5432</div>
+</div>
+</div>
+<input checked="" class="custom-checkbox" type="checkbox"/>
+</label>
+<!-- Student Card 4 -->
+<label class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex items-center justify-between cursor-pointer active:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-headline-sm">赵</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface">赵强</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">136 1111 2222</div>
+</div>
+</div>
+<input class="custom-checkbox" type="checkbox"/>
+</label>
+<!-- Student Card 5 (Checked) -->
+<label class="bg-surface-container-lowest rounded-lg border border-outline-variant p-3 flex items-center justify-between cursor-pointer active:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a male student, serious expression, clean modern educational context, studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlWIK00Ls45fwovOrVQTloZxEVbWfsRX2x7-X3KZK1hxxNl6Nq6UteRasXf_C7WTPyef2Kj1Q_hak9Fl0G5jUTqSqFsKHGcxDtGwtGFKbFnlL7gPsnNKG2miXb6Kqw3mtusz24X0TWk3CP8kb4lIhPLdKrR0LxyVw2alRTbYZuUQ9vlgs_0YANHlaMTxfmVTRA-ua9T3lYJgJu4RM2WCKk2958o8Z75BwZ0PlXcL-tlhqduCP0N0x4srzeGvYb0_P8F5-b-fQgBqw"/>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface">陈明</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">135 5555 6666</div>
+</div>
+</div>
+<input checked="" class="custom-checkbox" type="checkbox"/>
+</label>
+</div>
+</main>
+<!-- Fixed Bottom Bar -->
+<div class="fixed bottom-0 w-full z-50 bg-surface-container-lowest border-t border-outline-variant px-page_margin py-3 flex items-center justify-between">
+<div class="font-label-md text-label-md text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            已选 3 人
+        </div>
+<div class="flex gap-2">
+<button class="h-[44px] px-4 rounded-lg border border-primary-container text-primary-container font-headline-sm bg-transparent active:bg-surface-container-low transition-colors">
+                新增学员并加入
+            </button>
+<button class="h-[44px] px-6 rounded-lg bg-primary-container text-on-primary font-headline-sm active:opacity-90 transition-opacity">
+                确认添加
+            </button>
+</div>
+</div>
+</body></html>

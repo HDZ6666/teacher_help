@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>今日工作台 - 老师帮</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#e1f0f8",
+                    "on-tertiary-fixed-variant": "#005138",
+                    "inverse-surface": "#243239",
+                    "secondary-fixed-dim": "#a7cfc2",
+                    "primary": "#005842",
+                    "on-surface": "#0f1d23",
+                    "outline-variant": "#bec9c3",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#88d6b9",
+                    "tertiary": "#00583d",
+                    "surface": "#f3faff",
+                    "on-secondary-fixed": "#00201a",
+                    "error-container": "#ffdad6",
+                    "secondary": "#40655b",
+                    "secondary-fixed": "#c2ebde",
+                    "on-tertiary-container": "#8cf7c7",
+                    "on-surface-variant": "#3f4944",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#a4f2d4",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#002114",
+                    "on-primary-fixed-variant": "#00513d",
+                    "on-background": "#0f1d23",
+                    "surface-container-highest": "#d6e5ed",
+                    "surface-container-low": "#e7f6fe",
+                    "secondary-container": "#c2ebde",
+                    "primary-container": "#1f7159",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#007351",
+                    "surface-variant": "#d6e5ed",
+                    "on-primary-container": "#a4f2d4",
+                    "tertiary-fixed-dim": "#6fdaac",
+                    "surface-bright": "#f3faff",
+                    "on-secondary-container": "#466c61",
+                    "background": "#f3faff",
+                    "outline": "#6f7974",
+                    "surface-container-high": "#dbebf3",
+                    "inverse-on-surface": "#e4f3fb",
+                    "primary-fixed-dim": "#88d6b9",
+                    "surface-dim": "#cddce4",
+                    "on-secondary-fixed-variant": "#284d44",
+                    "tertiary-fixed": "#8cf7c7",
+                    "surface-tint": "#166b53",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#002117",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack_sm": "8px",
+                    "stack_md": "16px",
+                    "stack_lg": "24px",
+                    "gutter": "12px",
+                    "page_margin": "14px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Be Vietnam Pro"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Be Vietnam Pro"],
+                    "body-lg": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar hiding for cleaner look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary antialiased">
+<!-- TopAppBar Shared Component -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-page_margin h-14 bg-surface dark:bg-on-background border-b border-outline-variant flat no shadows transition-colors duration-200">
+<!-- Leading: Avatar -->
+<div class="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant">
+<img alt="Teacher Profile" class="w-full h-full object-cover" data-alt="A highly detailed close-up portrait of a professional educator, wearing modern minimalist corporate attire, smiling softly. The lighting is soft and natural, contributing to a bright, approachable, and authoritative modern light-mode aesthetic. Shot with a subtle shallow depth of field against a clean, light-colored abstract office background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrielLybv0ifUn9ckIjJ0p_5Bk7LgfzD7iKTqaXuDnlfEni8SPxsGib4tKEOX5ihyQZoWX_K_2wleZb0ybFAoCXpsLLxChHw4RYtlIkzgd-9CJV98N_jMOCHwDqqkP0I07vjzMZL2hlscF0SczuaoAV8spjVYRY6_cjmACTOYo6DyVBLFXYTRtQcMybF1kDISIPyehWPtF1o7ciB7apLhQYvA2L-8nV8QatgiusvuabbX0o4UfjsD4-Dh4GdihwYTxgmtYKrUyzes"/>
+</div>
+<!-- Headline -->
+<div class="font-headline-sm text-headline-sm-mobile font-bold text-primary dark:text-primary-fixed">
+            老师帮
+        </div>
+<!-- Trailing: Action -->
+<button class="font-label-md text-label-md text-primary dark:text-primary-fixed hover:bg-surface-container-low px-2 py-1 rounded-DEFAULT transition-colors duration-200">
+            切换校区
+        </button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 pt-[72px] pb-[80px] px-page_margin flex flex-col gap-stack_lg overflow-y-auto no-scrollbar">
+<!-- Page Title & Date Section -->
+<section class="flex flex-col gap-1 mt-2">
+<h1 class="font-display text-display text-on-surface">今日</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                6月23日 周二
+            </p>
+</section>
+<!-- Hero Stats Card (Level 2: High Emphasis) -->
+<section class="bg-primary text-on-primary rounded-xl p-5 shadow-sm relative overflow-hidden">
+<!-- Decorative subtle shape -->
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-on-primary opacity-5 rounded-full blur-xl"></div>
+<div class="grid grid-cols-2 gap-y-6 gap-x-4 relative z-10">
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-primary-fixed-dim opacity-90">今日课程</span>
+<span class="font-display text-display text-on-primary">8<span class="text-body-sm font-normal ml-1 opacity-70">节</span></span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-primary-fixed-dim opacity-90">待点名</span>
+<span class="font-display text-display text-error-container">3<span class="text-body-sm font-normal ml-1 opacity-70">节</span></span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-primary-fixed-dim opacity-90">已完成</span>
+<span class="font-headline-md text-headline-md text-on-primary">5</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-primary-fixed-dim opacity-90">待处理错题</span>
+<span class="font-headline-md text-headline-md text-secondary-fixed">12</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions Grid -->
+<section class="grid grid-cols-4 gap-2">
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-surface-container-low group-hover:bg-surface-container flex items-center justify-center text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[24px]">bolt</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">快速排课</span>
+</button>
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-surface-container-low group-hover:bg-surface-container flex items-center justify-center text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[24px]">fact_check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">快速点名</span>
+</button>
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-surface-container-low group-hover:bg-surface-container flex items-center justify-center text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[24px]">photo_camera</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">拍错题</span>
+</button>
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-surface-container-low group-hover:bg-surface-container flex items-center justify-center text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[24px]">person_add</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">新增学员</span>
+</button>
+</section>
+<!-- Today's Schedule List -->
+<section class="flex flex-col gap-gutter">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">今日课程</h2>
+<!-- Class Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">少儿数学提高班</h3>
+<div class="bg-error-container text-on-error-container font-label-sm text-label-sm px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">pending_actions</span>
+                        待点名
+                    </div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-1 border-t border-surface-variant pt-3">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="font-body-sm text-body-sm">14:00 - 15:30</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">meeting_room</span>
+<span class="font-body-sm text-body-sm">A区 201教室</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant col-span-2">
+<span class="material-symbols-outlined text-[16px]">group</span>
+<span class="font-body-sm text-body-sm">王老师 / 15人</span>
+</div>
+</div>
+<div class="mt-2 flex justify-end">
+<button class="h-[44px] bg-primary-container text-on-primary font-label-md text-label-md px-6 rounded-lg active:scale-95 transition-transform flex items-center justify-center shadow-sm">
+                        去点名
+                    </button>
+</div>
+</div>
+<!-- Additional Class Card (Completed Example) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col gap-3 opacity-80">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-through decoration-outline-variant">少儿英语启蒙班</h3>
+<div class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">check_circle</span>
+                        已完成
+                    </div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-1 border-t border-surface-variant pt-3">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="font-body-sm text-body-sm">09:00 - 10:30</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">meeting_room</span>
+<span class="font-body-sm text-body-sm">B区 105教室</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Compact Todo Area -->
+<section class="flex flex-col gap-stack_sm mt-2">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-1">待办事项</h2>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border-l-4 border-secondary">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">event_busy</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">请假待确认 (2)</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border-l-4 border-error">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-error-container text-on-error-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">排课冲突 (1)</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Shared Component -->
+<nav class="fixed bottom-0 w-full z-50 h-16 flex justify-around items-center px-2 bg-surface dark:bg-on-background border-t border-outline-variant flat no shadows">
+<!-- Active Tab: 今日 -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold hover:bg-surface-container-highest active:scale-95 transition-transform duration-150 w-full h-full rounded-lg">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">today</span>
+<span class="font-label-sm text-label-sm">今日</span>
+</button>
+<!-- Inactive Tab: 课表 -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-transform duration-150 w-full h-full rounded-lg">
+<span class="material-symbols-outlined mb-1">calendar_month</span>
+<span class="font-label-sm text-label-sm font-normal">课表</span>
+</button>
+<!-- Inactive Tab: 学员 -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-transform duration-150 w-full h-full rounded-lg">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-label-sm text-label-sm font-normal">学员</span>
+</button>
+<!-- Inactive Tab: 错题本 -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-transform duration-150 w-full h-full rounded-lg relative">
+<span class="material-symbols-outlined mb-1">edit_note</span>
+<span class="font-label-sm text-label-sm font-normal">错题本</span>
+<!-- Notification Dot -->
+<span class="absolute top-2 right-4 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<!-- Inactive Tab: 我的 -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-transform duration-150 w-full h-full rounded-lg">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm font-normal">我的</span>
+</button>
+</nav>
+</body></html>

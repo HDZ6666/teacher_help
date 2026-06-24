@@ -1,0 +1,325 @@
+<!DOCTYPE html><html class="light" lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>学员升班/结业</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#dbebf3",
+                        "secondary-container": "#c2ebde",
+                        "primary-fixed": "#a4f2d4",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "outline": "#6f7974",
+                        "on-secondary-fixed": "#00201a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#8cf7c7",
+                        "inverse-primary": "#88d6b9",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-container-low": "#e7f6fe",
+                        "on-primary-fixed": "#002117",
+                        "primary": "#005842",
+                        "on-tertiary-fixed": "#002114",
+                        "background": "#f3faff",
+                        "on-secondary-container": "#466c61",
+                        "surface-variant": "#d6e5ed",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#00583d",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#3f4944",
+                        "surface-tint": "#166b53",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "surface-container-highest": "#d6e5ed",
+                        "on-surface": "#0f1d23",
+                        "inverse-on-surface": "#e4f3fb",
+                        "surface-bright": "#f3faff",
+                        "secondary-fixed": "#c2ebde",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#243239",
+                        "surface-container": "#e1f0f8",
+                        "outline-variant": "#bec9c3",
+                        "tertiary-container": "#007351",
+                        "on-background": "#0f1d23",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#cddce4",
+                        "on-primary-container": "#a4f2d4",
+                        "secondary": "#40655b",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-primary-fixed-variant": "#00513d",
+                        "primary-container": "#1f7159",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface": "#f3faff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_lg": "24px",
+                        "stack_md": "16px",
+                        "stack_sm": "8px",
+                        "page_margin": "14px",
+                        "gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .student-checkbox:checked + div {
+            background-color: #1f7159; /* primary-container */
+            border-color: #1f7159;
+        }
+        .student-checkbox:checked + div span {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background flex items-center justify-between px-page_margin h-14 w-full shadow-sm">
+<button class="text-on-surface-variant flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200"><span class="material-symbols-outlined text-primary" style="font-variation-settings: &quot;FILL&quot; 0;">arrow_back</span></button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">学员结课与升班</h1>
+<button class="text-on-surface-variant flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200 opacity-0 pointer-events-none">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<main class="pt-20 px-page_margin space-y-stack_md">
+<!-- Step Indicator -->
+<div class="flex items-center justify-between px-4 py-2 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-md text-label-md mb-1">1</div>
+<span class="font-label-sm text-label-sm text-on-surface">选择学员</span>
+</div>
+<div class="flex-1 h-px bg-primary-container mx-2"></div>
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-md text-label-md mb-1">2</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">操作设置</span>
+</div>
+</div>
+<!-- Student Selection Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-4 shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">选择学员 <span class="font-body-sm text-body-sm text-on-surface-variant font-normal ml-2">已选 5 人</span></h2>
+<button class="font-label-md text-label-md text-primary">全选</button>
+</div>
+<div class="space-y-3">
+<!-- Student Item -->
+<label class="flex items-center p-3 rounded-lg border border-outline-variant/30 bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
+<input checked="" class="hidden student-checkbox" type="checkbox">
+<div class="w-5 h-5 rounded border-2 border-outline-variant flex items-center justify-center mr-3 transition-colors">
+<span class="material-symbols-outlined text-on-primary hidden text-[16px] leading-none">check</span>
+</div>
+<img class="w-10 h-10 rounded-full object-cover mr-3 border border-surface-variant" data-alt="A clean, professional avatar of a young student in a modern educational setting. Light mode aesthetic, soft lighting, solid light grey background. High resolution, clear facial features." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqlbDfBWqBtvfbZOi6e_w92pKFUi54qy6YGG17LbTc4AeQwnFRBdhBjwK8ucKMh7fQB6cy40eXQd4uT7hOKC7rjqLjgkTlT_a_CaGWlHrlXcQnvngm_KGLyq6zjthWE-7IamWe4Wfx_3BSXejowT3NieuXww3BggIULhY0diDNl2JF47GRq9DtS1zey7NJiHEX2inbBbpyGuWmbTlY4QP3g-S4r6PO7gnf7I-yYoWoEy2MbHQlaRhbesuJFAozHqXYddg1Xi5LvuM">
+<div class="flex-1">
+<div class="font-body-md text-body-md font-medium text-on-surface">张子涵</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">剩余课时: 2</div>
+</div>
+</label>
+<!-- Student Item -->
+<label class="flex items-center p-3 rounded-lg border border-outline-variant/30 bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
+<input checked="" class="hidden student-checkbox" type="checkbox">
+<div class="w-5 h-5 rounded border-2 border-outline-variant flex items-center justify-center mr-3 transition-colors">
+<span class="material-symbols-outlined text-on-primary hidden text-[16px] leading-none">check</span>
+</div>
+<img class="w-10 h-10 rounded-full object-cover mr-3 border border-surface-variant" data-alt="A clean, professional avatar of a young female student in a modern educational setting. Light mode aesthetic, soft lighting, solid light grey background. High resolution, clear facial features." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbxxfSsxYaBfulFGAoF1yf7G-jCU3_VVkjI2_5OcHB05RqNM0NPwJ10ZLlCxIRcTEjjGIG9J_fqwAtcWS05TMLN0LTyQL3ZbtHJjh3qJdiPx5Z3iUYxwDMRbzNv5jY0nmuO87-6u4_O_jivIDafVNA8D3XtU9b9PPBUHTP9nTCXZMPaG28zywVuaombbIg5T8lVYP9r4UxItWjRrskgYRCDy1yikWSKwM0dD6a0-aTbiL49VuRFPjUp52mODmyXAxy6Pi1KyV2NIg">
+<div class="flex-1">
+<div class="font-body-md text-body-md font-medium text-on-surface">李语桐</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">剩余课时: 0</div>
+</div>
+</label>
+<!-- Student Item -->
+<label class="flex items-center p-3 rounded-lg border border-outline-variant/30 bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
+<input checked="" class="hidden student-checkbox" type="checkbox">
+<div class="w-5 h-5 rounded border-2 border-outline-variant flex items-center justify-center mr-3 transition-colors">
+<span class="material-symbols-outlined text-on-primary hidden text-[16px] leading-none">check</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline-sm mr-3 border border-surface-variant">王</div>
+<div class="flex-1">
+<div class="font-body-md text-body-md font-medium text-on-surface">王浩宇</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">剩余课时: 1</div>
+</div>
+</label>
+</div>
+<button class="w-full mt-4 py-2 font-label-md text-label-md text-on-surface-variant flex items-center justify-center gap-1 hover:bg-surface-container rounded-lg transition-colors">
+                展开更多 <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+<!-- Action Selection Tabs -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm">
+<div class="flex border-b border-outline-variant/30">
+<button class="flex-1 py-3 text-center font-headline-sm text-headline-sm text-primary border-b-2 border-primary bg-surface" onclick="switchTab('upgrade')">
+                    学员升班
+                </button>
+<button class="flex-1 py-3 text-center font-headline-sm text-headline-sm text-on-surface-variant hover:bg-surface-container-low transition-colors" onclick="switchTab('graduate')">
+                    学员结业
+                </button>
+</div>
+<div class="p-4">
+<!-- Upgrade Section -->
+<div class="tab-content active space-y-4" id="upgrade-section">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">目标班级 <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full h-[44px] bg-surface border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+<option disabled="" selected="" value="">请选择升入的班级</option>
+<option value="1">少儿英语进阶A班 (周六 14:00)</option>
+<option value="2">少儿英语进阶B班 (周日 10:00)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">课时结转方式</label>
+<div class="flex gap-4">
+<label class="flex items-center cursor-pointer">
+<input checked="" class="form-radio text-primary focus:ring-primary border-outline-variant" name="transfer" type="radio">
+<span class="ml-2 font-body-md text-body-md text-on-surface">按比例折算</span>
+</label>
+<label class="flex items-center cursor-pointer">
+<input class="form-radio text-primary focus:ring-primary border-outline-variant" name="transfer" type="radio">
+<span class="ml-2 font-body-md text-body-md text-on-surface">1:1 平移</span>
+</label>
+</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg mt-2">
+<div class="flex items-start gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">info</span>
+<p class="font-body-sm text-body-sm">升班后，原班级剩余课时将按设置结转至新班级，学员将从原班级移出。</p>
+</div>
+</div>
+</div>
+<!-- Graduate Section -->
+<div class="tab-content space-y-4" id="graduate-section">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">结业日期 <span class="text-error">*</span></label>
+<div class="relative">
+<input class="w-full h-[44px] bg-surface border border-outline-variant rounded-lg px-3 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="date" value="2023-10-25">
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">结业评语 (可选)</label>
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-3 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary min-h-[80px]" placeholder="记录学员学习成果..."></textarea>
+</div>
+<div class="flex items-center justify-between p-3 border border-outline-variant/30 rounded-lg bg-surface">
+<span class="font-body-md text-body-md text-on-surface">结清剩余课时</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 w-full bg-surface-container-lowest border-t border-outline-variant/30 p-4 pb-safe z-40">
+<button class="w-full h-[46px] bg-primary-container text-on-primary rounded-lg font-headline-sm text-headline-sm font-bold hover:bg-primary-container/90 transition-colors shadow-sm" onclick="showModal()">
+            确认升班
+        </button>
+</div>
+<!-- Confirmation Modal Overlay -->
+<div class="fixed inset-0 z-[60] bg-on-background/50 hidden flex items-center justify-center px-page_margin opacity-0 transition-opacity duration-300" id="confirm-modal">
+<div class="bg-surface-container-lowest w-full max-w-sm rounded-xl shadow-lg transform scale-95 transition-transform duration-300">
+<div class="p-6">
+<div class="w-12 h-12 rounded-full bg-surface-container text-primary flex items-center justify-center mb-4 mx-auto">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-center mb-2">确认操作</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mb-6">确认将选中的 <strong class="text-primary font-bold">5</strong> 名学员升入【少儿英语进阶A班】吗？操作后学员将被移出当前班级。</p>
+<div class="flex gap-3">
+<button class="flex-1 h-[44px] rounded-lg border border-primary text-primary font-headline-sm text-headline-sm bg-transparent hover:bg-primary/5 transition-colors" onclick="hideModal()">
+                        取消
+                    </button>
+<button class="flex-1 h-[44px] rounded-lg bg-primary-container text-on-primary font-headline-sm text-headline-sm hover:bg-primary-container/90 transition-colors" onclick="hideModal()">
+                        确认
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        function switchTab(tabId) {
+            // Update buttons
+            const buttons = document.querySelectorAll('.bg-surface-container-lowest .flex button');
+            buttons.forEach(btn => {
+                btn.className = 'flex-1 py-3 text-center font-headline-sm text-headline-sm text-on-surface-variant hover:bg-surface-container-low transition-colors';
+            });
+            event.target.className = 'flex-1 py-3 text-center font-headline-sm text-headline-sm text-primary border-b-2 border-primary bg-surface';
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId + '-section').classList.add('active');
+            
+            // Update bottom button text
+            const actionBtn = document.querySelector('.fixed.bottom-0 button');
+            if(tabId === 'upgrade') {
+                actionBtn.textContent = '确认升班';
+            } else {
+                actionBtn.textContent = '确认结业';
+            }
+        }
+
+        const modal = document.getElementById('confirm-modal');
+        const modalContent = modal.querySelector('.bg-surface-container-lowest');
+
+        function showModal() {
+            modal.classList.remove('hidden');
+            // Trigger reflow
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }
+
+        function hideModal() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    </script>
+
+
+</body></html>

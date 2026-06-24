@@ -1,0 +1,249 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>班级详情</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#dbebf3",
+                        "secondary-container": "#c2ebde",
+                        "primary-fixed": "#a4f2d4",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "outline": "#6f7974",
+                        "on-secondary-fixed": "#00201a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#8cf7c7",
+                        "inverse-primary": "#88d6b9",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-container-low": "#e7f6fe",
+                        "on-primary-fixed": "#002117",
+                        "primary": "#005842",
+                        "on-tertiary-fixed": "#002114",
+                        "background": "#f3faff",
+                        "on-secondary-container": "#466c61",
+                        "surface-variant": "#d6e5ed",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#00583d",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#3f4944",
+                        "surface-tint": "#166b53",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "surface-container-highest": "#d6e5ed",
+                        "on-surface": "#0f1d23",
+                        "inverse-on-surface": "#e4f3fb",
+                        "surface-bright": "#f3faff",
+                        "secondary-fixed": "#c2ebde",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#243239",
+                        "surface-container": "#e1f0f8",
+                        "outline-variant": "#bec9c3",
+                        "tertiary-container": "#007351",
+                        "on-background": "#0f1d23",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#cddce4",
+                        "on-primary-container": "#a4f2d4",
+                        "secondary": "#40655b",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-primary-fixed-variant": "#00513d",
+                        "primary-container": "#1f7159",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface": "#f3faff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_lg": "24px",
+                        "stack_md": "16px",
+                        "stack_sm": "8px",
+                        "page_margin": "14px",
+                        "gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f4f6f5; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface antialiased bg-background pb-20">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface text-primary border-b border-outline-variant transition-colors duration-200 active:opacity-80 flex items-center justify-between px-page_margin h-14 w-full">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface">班级详情</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-14 px-page_margin space-y-stack_md mt-4 max-w-md mx-auto">
+<!-- Class Info Card (Bento Style) -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 space-y-4 shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-1">初二英语培优班 (秋季)</h2>
+<span class="inline-block bg-surface-container px-2 py-1 rounded font-label-sm text-label-sm text-on-surface-variant">常规班</span>
+</div>
+<div class="bg-primary-container/10 px-3 py-1 rounded-full text-primary font-label-md text-label-md">
+                    进行中
+                </div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-2">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">课程</p>
+<p class="font-body-md text-body-md text-on-surface mt-0.5">初中英语强化课程</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">人数/容量</p>
+<p class="font-body-md text-body-md text-on-surface mt-0.5"><span class="font-semibold text-primary">24</span> / 30</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">主教</p>
+<p class="font-body-md text-body-md text-on-surface mt-0.5 flex items-center gap-1">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="A small circular avatar portrait of a professional female teacher with a friendly smile, modern education setting background, light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtHym6N05vzXZwSZP384nBaQ_3okDhvphDkJ-K-xInBrCQUJt8MehA-6mCG8b2wad9disdBk1vl-6-ehafO7xO3vTvCUFDJ4LvRaNkpLjkI4_1ZXENb4F5JcVCOHzPIc2xCHSIJnafRF8KugOdO7eEmgGPvKwxr3EllMwx5hbRXnc5dmA0-wyteOFOOeJ_StkJqMxwS9ri7HcNsnERYVXD4DWlp5YCQhxTrek2HlgR6NVMgQWZwc38J5g3ho3KUH08EPb93dSdBkU">
+                        李晓明
+                    </p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">教室</p>
+<p class="font-body-md text-body-md text-on-surface mt-0.5">302 阶梯教室</p>
+</div>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="grid grid-cols-4 gap-2">
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl border border-outline-variant hover:bg-surface-container transition-colors">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">添加学员</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl border border-outline-variant hover:bg-surface-container transition-colors">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined" data-icon="calendar_add_on">calendar_add_on</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">新增排课</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl border border-outline-variant hover:bg-surface-container transition-colors">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">去点名</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl border border-outline-variant hover:bg-surface-container transition-colors">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined" data-icon="event_busy">event_busy</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">班级请假</span>
+</button>
+</section>
+<!-- Segmented Control / Tabs -->
+<nav class="flex overflow-x-auto hide-scrollbar border-b border-outline-variant pb-1">
+<button class="px-4 py-2 font-headline-sm text-headline-sm text-primary border-b-2 border-primary whitespace-nowrap">学员</button>
+<button class="px-4 py-2 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface whitespace-nowrap">课表</button>
+<button class="px-4 py-2 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface whitespace-nowrap">点名</button>
+<button class="px-4 py-2 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface whitespace-nowrap">请假</button>
+<button class="px-4 py-2 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface whitespace-nowrap">设置</button>
+</nav>
+<!-- Student List Content -->
+<section class="space-y-3">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant">共 24 名学员</span>
+<button class="text-primary font-label-md text-label-md flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1" data-icon="filter_list">filter_list</span> 筛选
+                </button>
+</div>
+<!-- Student Item 1 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of a male teenage student smiling slightly, wearing casual smart clothing, bright educational lighting, light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrS3poFja4PzecA2FJyQB6GpRYD4PxpqC2Vyc5rqi395gV2bUGh_hgTFi8XlUqy6m1Yptq-PJE9f1d3vc-bXliFU8QGWhEkyvRTT3oukUujZCutI4Q6YbI1Ai09GNFBDTeiKlhBCHui8iCFV_33XDV0Itqv9I2YzZTuEeZbNass5ISXeHe_ndnlrg8yJIeno1Zm12UZag9us3AZrNSz6vZdNgZI08gniEjIjCOck-RMXvc2k0kX5FfMrjPW_wi85yMpXfpbMKpWPg">
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface">张伟</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">剩余: <span class="text-on-surface font-semibold">12</span> 课时</p>
+</div>
+</div>
+<div class="text-right">
+<span class="inline-block bg-[#e9f6ef] text-[#227253] px-3 py-1 rounded-full font-label-sm text-label-sm">全勤</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">出勤率 100%</p>
+</div>
+</div>
+<!-- Student Item 2 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary font-headline-md text-headline-md">
+                        王
+                    </div>
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface">王芳</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">剩余: <span class="text-on-surface font-semibold">8</span> 课时</p>
+</div>
+</div>
+<div class="text-right">
+<span class="inline-block bg-surface-container text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm">缺勤 1</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">出勤率 92%</p>
+</div>
+</div>
+<!-- Student Item 3 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of a female teenage student looking attentive, bright educational lighting, clean minimal background, light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-C2oABhamzv3_8f9XtRmZcQqN9Z6jheRV6sME-jzk-t2RRNe3OOGSRzhFK4_EeuuX1lE9e2ZkTaVGh9H6-QSROxjeQD3gnn_mt2x0kW2Mrp_EbeyriqvdOw7c1ZVX27UwzXcvR_8n4nckJZ6Se35Aaj7TCwpFR3I9yOZnRWJ-4x07q8waf6AWRC_MEZJJvHed09tUJgcjLkRser8Y_JPYdJOuF1pXXnHZloR5nTViEGcjQkvkQ5Z_CAaad2oGGzbr8PgE-yzyyOo">
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-1">李娜 <span class="w-2 h-2 rounded-full bg-error inline-block" title="余额不足"></span></p>
+<p class="font-body-sm text-body-sm text-error mt-0.5">剩余: <span class="font-semibold">2</span> 课时</p>
+</div>
+</div>
+<div class="text-right">
+<span class="inline-block bg-[#e9f6ef] text-[#227253] px-3 py-1 rounded-full font-label-sm text-label-sm">全勤</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">出勤率 100%</p>
+</div>
+</div>
+<div class="text-center py-4">
+<button class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors">
+                    加载更多学员...
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Suppressed as this is a detail/sub-page with a back button) -->
+
+
+</body></html>

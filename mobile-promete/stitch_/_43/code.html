@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>学员请假</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#d6e5ed",
+                    "secondary-container": "#c2ebde",
+                    "inverse-primary": "#88d6b9",
+                    "on-tertiary-container": "#8cf7c7",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#e4f3fb",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#005138",
+                    "surface-bright": "#f3faff",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#8cf7c7",
+                    "on-primary-fixed": "#002117",
+                    "outline-variant": "#bec9c3",
+                    "tertiary": "#00583d",
+                    "on-surface": "#0f1d23",
+                    "tertiary-fixed-dim": "#6fdaac",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#a4f2d4",
+                    "on-primary-container": "#a4f2d4",
+                    "on-background": "#0f1d23",
+                    "surface-container-low": "#e7f6fe",
+                    "on-tertiary-fixed": "#002114",
+                    "on-secondary-fixed-variant": "#284d44",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#88d6b9",
+                    "on-surface-variant": "#3f4944",
+                    "surface-container-highest": "#d6e5ed",
+                    "surface": "#f3faff",
+                    "secondary": "#40655b",
+                    "primary": "#005842",
+                    "background": "#f3faff",
+                    "primary-container": "#1f7159",
+                    "on-primary-fixed-variant": "#00513d",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#166b53",
+                    "tertiary-container": "#007351",
+                    "surface-dim": "#cddce4",
+                    "surface-container": "#e1f0f8",
+                    "secondary-fixed-dim": "#a7cfc2",
+                    "on-secondary-fixed": "#00201a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#dbebf3",
+                    "secondary-fixed": "#c2ebde",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#243239",
+                    "outline": "#6f7974",
+                    "on-secondary-container": "#466c61"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "page_margin": "14px",
+                    "gutter": "12px",
+                    "stack_sm": "8px",
+                    "stack_md": "16px",
+                    "stack_lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-sm": ["Be Vietnam Pro"],
+                    "body-sm": ["Be Vietnam Pro"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-md": ["Be Vietnam Pro"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "headline-sm": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                    "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                    "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                    "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                    "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar hiding for cleaner mobile view */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col relative">
+<!-- Top App Bar (Task-Focused: Secondary Pattern) -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-page_margin h-14 bg-surface border-b border-outline-variant">
+<button class="w-10 h-10 flex items-center justify-start text-on-surface hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-on-surface flex-1 text-center">学员请假</h1>
+<div class="w-10"></div> <!-- Balancing Spacer -->
+</header>
+<!-- Main Content Canvas -->
+<!-- Added pt-14 for header space and pb-28 for fixed bottom action area -->
+<main class="flex-1 w-full max-w-[md] mx-auto pt-[68px] pb-[120px] px-page_margin flex flex-col gap-gutter">
+<!-- Form Section Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col shadow-sm">
+<!-- Student Name (Read Only) -->
+<div class="flex items-center justify-between py-3 border-b border-surface-container-high">
+<span class="font-body-md text-on-surface-variant flex-shrink-0 w-24">学员姓名</span>
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover border border-outline-variant" data-alt="A small, high-quality, professional headshot photo of a young elementary school student, smiling gently against a plain light grey background, clear lighting, modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnFzMrFs9T6j6ieQY6Y0PfQ0YCx8010mOYeMLUmK137XavxJ8TUM3DgXJoQjmJy2b7R6AJFVbjFsboZ6YYZsRwRC5LBbQXcpWMybAwtDrVYT-l_WAyYcdlwC26BHSlTzVMi0QDGJGZ3YIgGZUZyGmfjWP_ZYnuAofoSjTv7-MA2BIx42_pnWBLSOk91aFZgQ0odRHPXPd9ntALRJVlyFMTksasXB1Nqu-4LobUdCMCT0j44gHEHHVeWxHI6TtuYei32SIDYPFRZ44"/>
+<span class="font-body-md font-medium text-on-surface text-right">林小明</span>
+</div>
+</div>
+<!-- Leave Course Select -->
+<div class="flex items-center justify-between py-3 border-b border-surface-container-high cursor-pointer hover:bg-surface-container-low transition-colors rounded-sm -mx-2 px-2">
+<span class="font-body-md text-on-surface flex-shrink-0 w-24">请假课程</span>
+<div class="flex items-center gap-1 flex-1 justify-end overflow-hidden">
+<span class="font-body-md text-on-surface-variant truncate">少儿钢琴进阶班 (周三 16:00)</span>
+<span class="material-symbols-outlined text-outline text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Leave Date Select -->
+<div class="flex items-center justify-between py-3 border-b border-surface-container-high cursor-pointer hover:bg-surface-container-low transition-colors rounded-sm -mx-2 px-2">
+<span class="font-body-md text-on-surface flex-shrink-0 w-24">请假日期</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-[18px]">calendar_today</span>
+<span class="font-body-md text-on-surface-variant">2023-11-15</span>
+<span class="material-symbols-outlined text-outline text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Leave Reason Select -->
+<div class="flex items-center justify-between py-3 border-b border-surface-container-high cursor-pointer hover:bg-surface-container-low transition-colors rounded-sm -mx-2 px-2">
+<span class="font-body-md text-on-surface flex-shrink-0 w-24">请假原因</span>
+<div class="flex items-center gap-1">
+<span class="font-body-md text-on-surface-variant">病假</span>
+<span class="material-symbols-outlined text-outline text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Make-up Class Switch -->
+<div class="flex items-center justify-between py-3 border-b border-surface-container-high">
+<div class="flex flex-col">
+<span class="font-body-md text-on-surface">是否补课</span>
+<span class="font-label-sm text-outline mt-0.5">申请后需教务安排</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<!-- Switch Track -->
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:bg-primary transition-colors duration-200 ease-in-out"></div>
+<!-- Switch Thumb -->
+<div class="absolute left-[2px] top-[2px] bg-on-primary rounded-full h-5 w-5 transition-transform duration-200 ease-in-out peer-checked:translate-x-[20px] shadow-sm"></div>
+</label>
+</div>
+<!-- Remarks Textarea -->
+<div class="flex flex-col py-3 pt-4 gap-2">
+<span class="font-body-md text-on-surface">备注说明</span>
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-3 font-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none outline-none" placeholder="请输入详细的请假原因或其他需要老师注意的事项..." rows="3"></textarea>
+</div>
+</section>
+<!-- Status Flow Card (Pending Confirmation) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-[14px] flex flex-col shadow-sm mt-stack_sm">
+<h3 class="font-label-md text-on-surface-variant mb-4">审批流转</h3>
+<div class="flex flex-col relative ml-2">
+<!-- Step 1: Initiated (Complete) -->
+<div class="flex items-start gap-4 relative z-10">
+<div class="flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant fill">radio_button_checked</span>
+</div>
+<!-- Connecting Line -->
+<div class="w-[2px] h-8 bg-surface-variant absolute top-6 left-[11px] -z-10"></div>
+</div>
+<div class="flex flex-col pt-0.5">
+<span class="font-body-md text-on-surface">发起申请</span>
+<span class="font-label-sm text-outline">待提交</span>
+</div>
+</div>
+<!-- Step 2: Pending Confirmation (Active/Next Step) -->
+<div class="flex items-start gap-4 relative mt-6 z-10">
+<div class="flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-surface flex items-center justify-center border-2 border-primary-container">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+</div>
+<div class="flex flex-col pt-0.5">
+<span class="font-body-md text-primary-container font-medium">待确认</span>
+<span class="font-label-sm text-outline">需班主任/教务审核通过</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Fixed Actions -->
+<!-- Note: Suppressed standard BottomNavBar as per "Task-Focused" rule. Using specific transactional actions instead. -->
+<div class="fixed bottom-0 w-full bg-surface-container-lowest border-t border-outline-variant px-page_margin pt-3 pb-8 z-50 flex flex-col items-center shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+<button class="w-full h-[46px] bg-primary-container hover:bg-tertiary-container active:scale-[0.98] transition-all duration-200 text-on-primary-container rounded-lg font-body-md font-medium flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">send</span>
+            提交请假
+        </button>
+<a class="mt-4 font-label-md text-outline hover:text-on-surface transition-colors" href="#">
+            取消请假
+        </a>
+</div>
+</body></html>

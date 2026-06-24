@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>老师帮 - 登录</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#e1f0f8",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "inverse-surface": "#243239",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "primary": "#005842",
+                        "on-surface": "#0f1d23",
+                        "outline-variant": "#bec9c3",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#88d6b9",
+                        "tertiary": "#00583d",
+                        "surface": "#f3faff",
+                        "on-secondary-fixed": "#00201a",
+                        "error-container": "#ffdad6",
+                        "secondary": "#40655b",
+                        "secondary-fixed": "#c2ebde",
+                        "on-tertiary-container": "#8cf7c7",
+                        "on-surface-variant": "#3f4944",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#a4f2d4",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#002114",
+                        "on-primary-fixed-variant": "#00513d",
+                        "on-background": "#0f1d23",
+                        "surface-container-highest": "#d6e5ed",
+                        "surface-container-low": "#e7f6fe",
+                        "secondary-container": "#c2ebde",
+                        "primary-container": "#1f7159",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "surface-variant": "#d6e5ed",
+                        "on-primary-container": "#a4f2d4",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "surface-bright": "#f3faff",
+                        "on-secondary-container": "#466c61",
+                        "background": "#f4f6f5",
+                        "outline": "#6f7974",
+                        "surface-container-high": "#dbebf3",
+                        "inverse-on-surface": "#e4f3fb",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-dim": "#cddce4",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-tint": "#166b53",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#002117",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "stack_lg": "24px",
+                        "gutter": "12px",
+                        "page_margin": "14px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f4f6f5; /* Strict adherence to the background color requested */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased text-on-surface min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Decorative Top Accent (Subtle, professional) -->
+<div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary-fixed/20 to-transparent pointer-events-none"></div>
+<main class="w-full max-w-[375px] px-page_margin relative z-10 flex flex-col items-center">
+<!-- Header Section -->
+<header class="text-center mb-10 mt-12 w-full">
+<h1 class="font-display text-display text-primary mb-2 tracking-tight">老师帮</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">让上课、点名、排课更快一点</p>
+</header>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 w-full p-6 mb-8 shadow-sm">
+<form action="#" class="flex flex-col space-y-stack_md" method="POST">
+<!-- Campus Selection -->
+<button class="flex justify-between items-center w-full pb-3 mb-2 border-b border-outline-variant/50 group transition-colors" type="button">
+<span class="font-body-md text-body-md text-on-surface">选择校区</span>
+<div class="flex items-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="font-body-sm text-body-sm mr-1">杭州总校区</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</button>
+<!-- Phone Input -->
+<div class="relative">
+<label class="sr-only" for="phone">手机号</label>
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[20px] text-outline">smartphone</span>
+</div>
+<input class="w-full pl-10 pr-4 h-[44px] bg-surface rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md text-on-surface placeholder:text-outline transition-all duration-200" id="phone" name="phone" placeholder="请输入手机号" required="" type="tel"/>
+</div>
+<!-- Password Input -->
+<div class="relative">
+<label class="sr-only" for="password">密码</label>
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[20px] text-outline">lock</span>
+</div>
+<input class="w-full pl-10 pr-10 h-[44px] bg-surface rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md text-on-surface placeholder:text-outline transition-all duration-200" id="password" name="password" placeholder="请输入密码" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface focus:outline-none transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+<!-- Options Row -->
+<div class="flex justify-between items-center py-2">
+<label class="flex items-center space-x-2 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary rounded border-outline-variant focus:ring-primary focus:ring-offset-surface-container-lowest transition-colors cursor-pointer" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">记住登录</span>
+</label>
+<a class="font-body-sm text-body-sm text-primary hover:text-primary-container transition-colors" href="#">忘记密码?</a>
+</div>
+<!-- Actions -->
+<div class="flex flex-col space-y-stack_sm pt-2">
+<button class="w-full h-[46px] bg-primary-container hover:bg-tertiary-container active:scale-[0.98] text-on-primary font-headline-sm text-headline-sm rounded-lg transition-all duration-200 shadow-sm flex justify-center items-center" type="submit">
+                        登录
+                    </button>
+<button class="w-full h-[46px] bg-transparent border border-primary-container text-primary-container hover:bg-primary-container/5 active:scale-[0.98] font-headline-sm text-headline-sm rounded-lg transition-all duration-200 flex justify-center items-center" type="button">
+                        验证码登录
+                    </button>
+</div>
+</form>
+</div>
+<!-- Footer -->
+<footer class="mt-auto pb-8 text-center flex flex-col items-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant/70 mb-2 max-w-[280px]">
+                登录即代表同意 <a class="text-primary hover:underline" href="#">《用户服务协议》</a> 和 <a class="text-primary hover:underline" href="#">《隐私政策》</a>
+</p>
+<span class="font-label-sm text-label-sm text-outline">v1.2.0</span>
+</footer>
+</main>
+<script>
+        // Simple password toggle interaction
+        document.addEventListener('DOMContentLoaded', () => {
+            const togglePasswordBtn = document.querySelector('button[aria-label="Toggle password visibility"]') || document.querySelector('.relative button');
+            const passwordInput = document.getElementById('password');
+            const icon = togglePasswordBtn?.querySelector('.material-symbols-outlined');
+
+            if (togglePasswordBtn && passwordInput && icon) {
+                togglePasswordBtn.addEventListener('click', () => {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.textContent = 'visibility';
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.textContent = 'visibility_off';
+                    }
+                });
+            }
+        });
+    </script>
+</body></html>

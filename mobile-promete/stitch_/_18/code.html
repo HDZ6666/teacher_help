@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f3faff",
+                        "surface": "#f3faff",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-variant": "#d6e5ed",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "surface-container-highest": "#d6e5ed",
+                        "surface-dim": "#cddce4",
+                        "on-primary-fixed-variant": "#00513d",
+                        "surface-container-low": "#e7f6fe",
+                        "surface-container-high": "#dbebf3",
+                        "surface-container": "#e1f0f8",
+                        "on-surface-variant": "#3f4944",
+                        "primary": "#005842",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#007351",
+                        "primary-container": "#1f7159",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#c2ebde",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-primary-container": "#a4f2d4",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-tertiary-container": "#8cf7c7",
+                        "background": "#f3faff",
+                        "inverse-surface": "#243239",
+                        "on-tertiary-fixed": "#002114",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#8cf7c7",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bec9c3",
+                        "on-secondary-fixed": "#00201a",
+                        "tertiary": "#00583d",
+                        "on-surface": "#0f1d23",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#0f1d23",
+                        "on-secondary-container": "#466c61",
+                        "secondary-container": "#c2ebde",
+                        "on-primary-fixed": "#002117",
+                        "secondary": "#40655b",
+                        "outline": "#6f7974",
+                        "surface-tint": "#166b53",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "inverse-primary": "#88d6b9",
+                        "inverse-on-surface": "#e4f3fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_md": "16px",
+                        "gutter": "12px",
+                        "stack_lg": "24px",
+                        "page_margin": "14px",
+                        "stack_sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim font-headline-sm text-headline-sm docked full-width top-0 border-b border-surface-variant dark:border-outline-variant flat no shadows flex items-center justify-between px-page_margin h-14 w-full sticky z-50">
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-high dark:hover:bg-surface-container-highest p-2 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-display text-display text-primary dark:text-primary-fixed-dim text-center flex-1">Booking Details</h1>
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-high dark:hover:bg-surface-container-highest p-2 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<main class="px-page_margin py-stack_lg flex flex-col gap-stack_md pb-32">
+<!-- Status Chip -->
+<div class="flex justify-start">
+<div class="bg-[#e9f6ef] text-[#227253] font-label-md text-label-md px-3 py-1 rounded-full border border-[#227253]/20 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                Booked
+            </div>
+</div>
+<!-- Main Info Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin">
+<div class="flex items-center gap-4 mb-stack_md pb-stack_md border-b border-outline-variant">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-headline-md text-headline-md">
+                    Z
+                </div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Zhang San</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">phone_iphone</span>
+                        138 0013 8000
+                    </p>
+</div>
+<button class="ml-auto text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">call</span>
+</button>
+</div>
+<div class="flex flex-col gap-stack_sm">
+<div class="flex justify-between py-2 border-b border-surface-variant last:border-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Venue</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Room A - Main Building</span>
+</div>
+<div class="flex justify-between py-2 border-b border-surface-variant last:border-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Date &amp; Time</span>
+<span class="font-body-md text-body-md text-on-surface font-medium text-right">Oct 24, 2023<br/>14:00 - 15:30</span>
+</div>
+<div class="flex justify-between py-2 border-b border-surface-variant last:border-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Amount Paid</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">¥ 150.00</span>
+</div>
+<div class="flex justify-between py-2 border-b border-surface-variant last:border-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Source</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">App</span>
+</div>
+</div>
+</section>
+<!-- Check-in State Preview (Hidden by default, for demonstration) -->
+<!-- 
+        <section class="bg-surface-container-low border border-primary/20 rounded-lg p-page_margin mt-stack_sm">
+            <h3 class="font-headline-sm text-headline-sm text-primary mb-stack_sm flex items-center gap-2">
+                <span class="material-symbols-outlined">how_to_reg</span>
+                Check-in Details
+            </h3>
+            <div class="flex justify-between py-1">
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Check-in Time</span>
+                <span class="font-body-md text-body-md text-on-surface">13:45, Oct 24</span>
+            </div>
+            <div class="flex justify-between py-1">
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Operator</span>
+                <span class="font-body-md text-body-md text-on-surface">Admin (Li Si)</span>
+            </div>
+        </section>
+        -->
+<!-- Map / Location Visual -->
+<section class="rounded-lg overflow-hidden border border-outline-variant h-32 relative">
+<div class="bg-cover bg-center w-full h-full absolute inset-0" data-alt="A stylized, modern light-mode map illustration of a campus or corporate building location. The map uses soft mint greens, light greys, and a subtle dark green marker pin indicating the venue. Clean, professional, uncluttered aesthetic suitable for a corporate app interface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCElx-cL89Swe0Kc3sH2QvuR8IjWcFJOGGRLRH2tIM5gUQpC6GwHBfBr1-k44A513OkpAHy0HZ2UiATkI87Xj6LguxmIZmyKUrXdK0CHvBQSlql-oTwx354LWB14Aqy0UloEG8NsByMZ1G_bqznR9sNGExUh7wtq5Gk3OJCxr9kCeMJI3EQObRkhC0pBB93UE7xGsw5RRtCSrdy4XZ1JbiwDcrsiVb5zCX5_s37-ltsmEHl9fO1jYO2NfR4REzLuUwmpZKrNNABwxI')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest/80 to-transparent flex items-end p-3">
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1 bg-surface-container-lowest/90 px-2 py-1 rounded backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+                     View on map
+                 </span>
+</div>
+</section>
+</main>
+<!-- Bottom Actions -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant p-page_margin z-40 pb-safe">
+<div class="flex gap-gutter mb-stack_sm">
+<button class="flex-1 bg-transparent border border-primary-container text-primary-container font-label-md text-label-md h-11 rounded-lg flex items-center justify-center hover:bg-surface-container-low transition-colors">
+                Cancel Booking
+            </button>
+<button class="flex-1 bg-transparent border border-primary-container text-primary-container font-label-md text-label-md h-11 rounded-lg flex items-center justify-center hover:bg-surface-container-low transition-colors">
+                View Order
+            </button>
+</div>
+<button class="w-full bg-primary-container text-on-primary font-headline-sm text-headline-sm h-11 rounded-lg flex items-center justify-center hover:bg-tertiary-container transition-colors shadow-sm">
+            Check-in
+        </button>
+</div>
+</body></html>

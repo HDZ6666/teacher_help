@@ -74,6 +74,18 @@ export const customTabbarList: CustomTabBarItem[] = [
     icon: 'calendar',
   },
   {
+    pagePath: 'pages/student/index',
+    text: '学员',
+    iconType: 'uniUi',
+    icon: 'person',
+  },
+  {
+    pagePath: 'pages/wrong-question/index',
+    text: '错题本',
+    iconType: 'uniUi',
+    icon: 'images',
+  },
+  {
     pagePath: 'pages/me/me',
     text: '我的',
     iconType: 'uniUi',

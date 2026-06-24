@@ -1,0 +1,282 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>经营管理概览</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#002117",
+                      "tertiary": "#00583d",
+                      "surface-tint": "#166b53",
+                      "primary-fixed-dim": "#88d6b9",
+                      "surface-dim": "#cddce4",
+                      "on-tertiary-container": "#8cf7c7",
+                      "surface-container": "#e1f0f8",
+                      "secondary-fixed": "#c2ebde",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed-dim": "#6fdaac",
+                      "secondary-fixed-dim": "#a7cfc2",
+                      "primary": "#005842",
+                      "on-secondary-fixed": "#00201a",
+                      "on-tertiary-fixed-variant": "#005138",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#c2ebde",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-container": "#007351",
+                      "surface-container-low": "#e7f6fe",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#a4f2d4",
+                      "background": "#f3faff",
+                      "outline": "#6f7974",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed": "#002114",
+                      "on-surface": "#0f1d23",
+                      "inverse-surface": "#243239",
+                      "primary-container": "#1f7159",
+                      "tertiary-fixed": "#8cf7c7",
+                      "on-secondary-fixed-variant": "#284d44",
+                      "on-primary-fixed-variant": "#00513d",
+                      "inverse-primary": "#88d6b9",
+                      "surface-container-high": "#dbebf3",
+                      "on-surface-variant": "#3f4944",
+                      "on-error": "#ffffff",
+                      "surface-container-highest": "#d6e5ed",
+                      "on-secondary-container": "#466c61",
+                      "secondary": "#40655b",
+                      "inverse-on-surface": "#e4f3fb",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#f3faff",
+                      "on-primary-container": "#a4f2d4",
+                      "on-background": "#0f1d23",
+                      "surface-variant": "#d6e5ed",
+                      "surface": "#f3faff",
+                      "outline-variant": "#bec9c3"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack_lg": "24px",
+                      "stack_sm": "8px",
+                      "gutter": "12px",
+                      "page_margin": "14px",
+                      "stack_md": "16px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "body-lg": ["Be Vietnam Pro"],
+                      "label-md": ["Be Vietnam Pro"],
+                      "display": ["Plus Jakarta Sans"],
+                      "body-sm": ["Be Vietnam Pro"],
+                      "label-sm": ["Be Vietnam Pro"],
+                      "body-md": ["Be Vietnam Pro"]
+              },
+              "fontSize": {
+                      "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                      "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-[100px] flex justify-center w-full">
+<div class="w-full max-w-[375px] bg-background min-h-screen relative shadow-[0_0_20px_rgba(0,0,0,0.05)] border-x border-outline-variant/20">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-40 bg-background dark:bg-background">
+<div class="flex items-center justify-between px-page_margin h-[56px]">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 text-primary dark:text-primary-fixed"><span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span></button>
+<h1 class="font-display text-display text-primary dark:text-primary-fixed tracking-tight">经营管理概览</h1>
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<main class="px-page_margin py-stack_md flex flex-col gap-stack_lg">
+<!-- Section: 物品费用 -->
+<section class="flex flex-col gap-stack_sm">
+<div class="flex justify-between items-end mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">物品费用</h2>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> 新增
+                    </button>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Item Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-[14px] flex flex-col gap-2 relative overflow-hidden group">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[18px]" data-icon="inventory_2" data-weight="fill">inventory_2</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">在售商品</span>
+</div>
+<div class="font-display text-[28px] leading-[32px] font-bold text-on-surface mt-1">
+                            124
+                        </div>
+<div class="absolute -bottom-4 -right-4 w-16 h-16 bg-surface-container/50 rounded-full blur-xl group-hover:bg-primary-container/10 transition-colors"></div>
+</div>
+<!-- Item Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-[14px] flex flex-col gap-2 relative overflow-hidden group">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-tertiary-container/10 flex items-center justify-center text-tertiary-container">
+<span class="material-symbols-outlined text-[18px]" data-icon="payments" data-weight="fill">payments</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">今日收费</span>
+</div>
+<div class="font-display text-[28px] leading-[32px] font-bold text-on-surface mt-1 flex items-baseline">
+<span class="text-body-sm text-on-surface-variant mr-1">¥</span>2.4k
+                        </div>
+<div class="absolute -bottom-4 -right-4 w-16 h-16 bg-surface-container/50 rounded-full blur-xl group-hover:bg-tertiary-container/10 transition-colors"></div>
+</div>
+</div>
+</section>
+<!-- Section: 会员卡 -->
+<section class="flex flex-col gap-stack_sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-1">会员卡概况</h2>
+<div class="bg-[#193f36] text-white rounded-[9px] p-4 flex flex-col gap-4 shadow-sm relative overflow-hidden">
+<!-- Decorative element -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/4 pointer-events-none"></div>
+<div class="flex justify-between items-center z-10">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-white/70">总活跃会员</span>
+<span class="font-display text-[32px] leading-tight font-bold">1,842</span>
+</div>
+<div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm">
+<span class="material-symbols-outlined text-[24px] text-white" data-icon="card_membership">card_membership</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-white/10 my-1 z-10"></div>
+<div class="grid grid-cols-3 gap-2 z-10">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-white/60 mb-1">次卡</span>
+<span class="font-body-md font-semibold">856</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-white/60 mb-1">月卡/季卡</span>
+<span class="font-body-md font-semibold">420</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-white/60 mb-1">年卡</span>
+<span class="font-body-md font-semibold">566</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: 场地管理 -->
+<section class="flex flex-col gap-stack_sm">
+<div class="flex justify-between items-end mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">场地管理 (今日)</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">占用率 68%</span>
+</div>
+<div class="flex flex-col gap-[12px]">
+<!-- Room 1: Occupied -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-[14px] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="meeting_room">meeting_room</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">A区101 舞蹈室</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">容量: 20人</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<div class="bg-[#e9f6ef] text-[#227253] px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1 mb-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#227253]"></span> 使用中
+                            </div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">当前: 18人</span>
+</div>
+</div>
+<!-- Room 2: Available -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-[14px] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-outline" data-icon="meeting_room">meeting_room</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">A区201 钢琴房</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">容量: 2人</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<div class="bg-surface-container text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1 mb-1 border border-outline-variant/20">
+                                空闲
+                            </div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">下一节: 14:00</span>
+</div>
+</div>
+<!-- Room 3: Occupied -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-[14px] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="meeting_room">meeting_room</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">B区102 综合教室</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">容量: 30人</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<div class="bg-[#e9f6ef] text-[#227253] px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1 mb-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#227253]"></span> 使用中
+                            </div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">当前: 25人</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full max-w-[375px] z-50 h-[80px] bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant/30 flex justify-around items-center px-4 pb-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="today">today</span>
+<span class="font-label-md text-label-md">首页</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-md text-label-md">排课</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="font-label-md text-label-md">学生</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_stories">auto_stories</span>
+<span class="font-label-md text-label-md">错题本</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed hover:bg-secondary-container/50 active:scale-90 transition-transform duration-200 w-16 h-12 rounded-lg bg-primary-container/10" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person" data-weight="fill">person</span>
+<span class="font-label-md text-label-md">我的</span>
+</a>
+</nav>
+</div>
+
+
+</body></html>

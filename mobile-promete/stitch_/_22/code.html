@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>课程详情</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#002114",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#466c61",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#00513d",
+                        "surface-container-highest": "#d6e5ed",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "surface-variant": "#d6e5ed",
+                        "surface-tint": "#166b53",
+                        "inverse-surface": "#243239",
+                        "tertiary-container": "#007351",
+                        "surface-container": "#e1f0f8",
+                        "on-error": "#ffffff",
+                        "surface": "#f3faff",
+                        "secondary-fixed": "#c2ebde",
+                        "primary": "#005842",
+                        "surface-container-low": "#e7f6fe",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "primary-container": "#1f7159",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#88d6b9",
+                        "secondary": "#40655b",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "outline": "#6f7974",
+                        "on-primary": "#ffffff",
+                        "background": "#f3faff",
+                        "on-primary-fixed": "#002117",
+                        "on-background": "#0f1d23",
+                        "secondary-container": "#c2ebde",
+                        "on-surface-variant": "#3f4944",
+                        "on-surface": "#0f1d23",
+                        "on-tertiary-container": "#8cf7c7",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a4f2d4",
+                        "surface-bright": "#f3faff",
+                        "on-primary-container": "#a4f2d4",
+                        "surface-container-high": "#dbebf3",
+                        "tertiary": "#00583d",
+                        "primary-fixed-dim": "#88d6b9",
+                        "on-secondary-fixed": "#00201a",
+                        "inverse-on-surface": "#e4f3fb",
+                        "tertiary-fixed": "#8cf7c7",
+                        "outline-variant": "#bec9c3",
+                        "surface-dim": "#cddce4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "12px",
+                        "stack_lg": "24px",
+                        "stack_md": "16px",
+                        "stack_sm": "8px",
+                        "page_margin": "14px"
+                    },
+                    "fontFamily": {
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-sm": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-sm": ["17px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased pb-24">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background border-b border-outline-variant dark:border-outline flat no shadows flex items-center justify-between px-page_margin h-14 w-full">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">课程详情</h1>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="mt-14 px-page_margin pt-stack_md space-y-stack_md max-w-3xl mx-auto">
+<!-- Course Header Card -->
+<section class="bg-primary-container text-on-primary rounded-xl p-4 shadow-sm relative overflow-hidden">
+<!-- Decorative Background Element -->
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-primary rounded-full opacity-50"></div>
+<div class="relative z-10 flex flex-col gap-stack_sm">
+<div class="flex justify-between items-start">
+<h2 class="font-headline-md text-headline-md">少儿数学提高班</h2>
+<span class="bg-surface-container-lowest text-primary text-label-sm px-3 py-1 rounded-full font-label-md">进行中</span>
+</div>
+<div class="grid grid-cols-2 gap-y-2 gap-x-4 mt-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] opacity-80">calendar_today</span>
+<span class="font-body-sm">6月23日 14:00-15:30</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] opacity-80">group</span>
+<span class="font-body-sm">精英A班</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] opacity-80">person</span>
+<span class="font-body-sm">王老师</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] opacity-80">meeting_room</span>
+<span class="font-body-sm">A区201</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Attendance Stats (Bento Grid Style) -->
+<section class="grid grid-cols-4 gap-gutter">
+<div class="bg-surface-container-lowest rounded-lg p-3 border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-body-sm text-on-surface-variant mb-1">应到</span>
+<span class="font-headline-sm text-primary">15</span>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-3 border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-body-sm text-on-surface-variant mb-1">已到</span>
+<span class="font-headline-sm text-tertiary">12</span>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-3 border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-body-sm text-on-surface-variant mb-1">请假</span>
+<span class="font-headline-sm text-secondary">2</span>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-3 border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-body-sm text-on-surface-variant mb-1">缺勤</span>
+<span class="font-headline-sm text-error">1</span>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="flex flex-col gap-3">
+<button class="w-full bg-primary-container text-on-primary h-[44px] rounded-lg font-label-md flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[20px] fill-icon">how_to_reg</span>
+                去点名
+            </button>
+<div class="flex gap-3">
+<button class="flex-1 bg-surface-container-lowest border border-primary-container text-primary-container h-[44px] rounded-lg font-label-md flex items-center justify-center gap-2 active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+                    调课
+                </button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant h-[44px] rounded-lg font-label-md flex items-center justify-center gap-2 active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+                    取消课次
+                </button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant h-[44px] rounded-lg font-label-md flex items-center justify-center gap-2 active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+                    复制排课
+                </button>
+</div>
+</section>
+<!-- Student List Preview -->
+<section class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface">
+<h3 class="font-headline-sm text-on-surface">学员名单</h3>
+<button class="text-primary font-label-md flex items-center">
+                    查看全部 <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+<div class="divide-y divide-outline-variant">
+<div class="flex justify-between items-center p-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-label-md">张</div>
+<span class="font-body-md text-on-surface">张三</span>
+</div>
+<span class="px-2 py-1 bg-tertiary-container/10 text-tertiary rounded-full text-[10px] font-label-sm">已到</span>
+</div>
+<div class="flex justify-between items-center p-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-label-md">李</div>
+<span class="font-body-md text-on-surface">李四</span>
+</div>
+<span class="px-2 py-1 bg-tertiary-container/10 text-tertiary rounded-full text-[10px] font-label-sm">已到</span>
+</div>
+<div class="flex justify-between items-center p-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-label-md">王</div>
+<span class="font-body-md text-on-surface">王五</span>
+</div>
+<span class="px-2 py-1 bg-secondary-container/30 text-secondary rounded-full text-[10px] font-label-sm">请假</span>
+</div>
+</div>
+</section>
+</main>
+</body></html>

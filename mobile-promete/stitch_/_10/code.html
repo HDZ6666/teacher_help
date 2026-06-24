@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>创建班级</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS with Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#dbebf3",
+                        "secondary-container": "#c2ebde",
+                        "primary-fixed": "#a4f2d4",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "outline": "#6f7974",
+                        "on-secondary-fixed": "#00201a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#8cf7c7",
+                        "inverse-primary": "#88d6b9",
+                        "primary-fixed-dim": "#88d6b9",
+                        "surface-container-low": "#e7f6fe",
+                        "on-primary-fixed": "#002117",
+                        "primary": "#005842",
+                        "on-tertiary-fixed": "#002114",
+                        "background": "#f3faff",
+                        "on-secondary-container": "#466c61",
+                        "surface-variant": "#d6e5ed",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#00583d",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#3f4944",
+                        "surface-tint": "#166b53",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "surface-container-highest": "#d6e5ed",
+                        "on-surface": "#0f1d23",
+                        "inverse-on-surface": "#e4f3fb",
+                        "surface-bright": "#f3faff",
+                        "secondary-fixed": "#c2ebde",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#243239",
+                        "surface-container": "#e1f0f8",
+                        "outline-variant": "#bec9c3",
+                        "tertiary-container": "#007351",
+                        "on-background": "#0f1d23",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#cddce4",
+                        "on-primary-container": "#a4f2d4",
+                        "secondary": "#40655b",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-primary-fixed-variant": "#00513d",
+                        "primary-container": "#1f7159",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface": "#f3faff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_lg": "24px",
+                        "stack_md": "16px",
+                        "stack_sm": "8px",
+                        "page_margin": "14px",
+                        "gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro", "sans-serif"],
+                        "body-sm": ["Be Vietnam Pro", "sans-serif"],
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+                        "label-sm": ["Be Vietnam Pro", "sans-serif"],
+                        "body-md": ["Be Vietnam Pro", "sans-serif"],
+                        "body-lg": ["Be Vietnam Pro", "sans-serif"],
+                        "headline-md": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom Select Arrow Styling */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7974' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+        }
+        
+        /* Hidden Checkbox for Toggle */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #1f7159;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #1f7159;
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen flex flex-col overflow-hidden antialiased selection:bg-primary-container selection:text-on-primary">
+<!-- Top App Bar (Adapted for Sub-page: Back button, no bottom nav) -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex items-center justify-between px-page_margin h-14 transition-colors duration-200">
+<button class="text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:opacity-80 flex items-center justify-center -ml-2">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface absolute left-1/2 -translate-x-1/2">创建班级</h1>
+<div class="w-10"></div> <!-- Spacer for center alignment -->
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto pt-14 pb-[88px]">
+<div class="p-page_margin flex flex-col gap-stack_md">
+<!-- Section 1: Basic Info -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin shadow-sm">
+<!-- Class Name -->
+<div class="mb-stack_md">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">班级名称 <span class="text-error">*</span></label>
+<input class="w-full h-11 px-3 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow" placeholder="例如：春季冲刺A班" type="text">
+</div>
+<!-- Class Type Segmented Control -->
+<div class="mb-stack_md">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">班级类型</label>
+<div class="flex bg-surface-container-high rounded-lg p-1">
+<button class="flex-1 h-8 flex items-center justify-center font-label-md text-label-md rounded bg-surface-container-lowest text-primary shadow-sm transition-all">
+                            班课
+                        </button>
+<button class="flex-1 h-8 flex items-center justify-center font-label-md text-label-md rounded text-on-surface-variant hover:text-on-surface transition-all">
+                            一对一
+                        </button>
+</div>
+</div>
+<!-- Associated Course -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">关联课程</label>
+<select class="w-full h-11 pl-3 pr-10 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow">
+<option class="text-outline-variant" disabled="" selected="" value="">请选择课程体系</option>
+<option value="math_adv">高阶数学思维</option>
+<option value="eng_sp">英语口语特训</option>
+<option value="phy_exp">物理实验基础</option>
+</select>
+</div>
+</section>
+<!-- Section 2: Capacity & Scheduling -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin shadow-sm">
+<!-- Capacity & Over-capacity Toggle -->
+<div class="flex items-center justify-between mb-stack_md border-b border-outline-variant pb-stack_md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">容纳人数</label>
+<div class="flex items-center border border-outline-variant rounded-lg overflow-hidden h-9 w-32 bg-surface">
+<button class="w-10 h-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container active:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<input class="flex-1 h-full w-full text-center border-none p-0 font-body-md text-body-md text-on-surface focus:ring-0 bg-transparent" type="number" value="15">
+<button class="w-10 h-full flex items-center justify-center text-primary hover:bg-surface-container active:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">允许超额</label>
+<!-- Custom Tailwind Toggle -->
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-on-primary border-4 appearance-none cursor-pointer border-outline-variant top-0 bottom-0 m-auto z-10 transition-all duration-300 ease-in-out" id="toggle" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle"></label>
+</div>
+</div>
+</div>
+<!-- Teacher -->
+<div class="mb-stack_md">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">授课教师</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline-variant text-[20px]">person</span>
+</div>
+<select class="w-full h-11 pl-10 pr-10 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow">
+<option disabled="" selected="" value="">选择主讲教师</option>
+<option value="t1">张老师 (数学)</option>
+<option value="t2">李老师 (英语)</option>
+</select>
+</div>
+</div>
+<!-- Default Room -->
+<div class="mb-stack_md">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">默认教室</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline-variant text-[20px]">meeting_room</span>
+</div>
+<select class="w-full h-11 pl-10 pr-10 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow">
+<option disabled="" selected="" value="">选择上课地点</option>
+<option value="r101">A栋 101室</option>
+<option value="r102">A栋 102室</option>
+<option value="r201">B栋 201室</option>
+</select>
+</div>
+</div>
+<!-- Start Date -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">开课日期</label>
+<div class="relative">
+<input class="w-full h-11 px-3 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow" type="date">
+</div>
+</div>
+</section>
+<!-- Section 3: Additional Info -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-page_margin shadow-sm mb-4">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">备注信息</label>
+<textarea class="w-full p-3 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow resize-none" placeholder="添加其他说明事项..." rows="3"></textarea>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Fixed Action Bar -->
+<div class="fixed bottom-0 w-full z-50 bg-surface-container-lowest border-t border-outline-variant p-page_margin pb-[max(14px,env(safe-area-inset-bottom))] flex gap-gutter">
+<button class="flex-1 h-[44px] rounded-lg border border-primary text-primary bg-transparent font-headline-sm text-headline-sm flex items-center justify-center hover:bg-surface-container-low active:bg-surface-container transition-colors">
+            保存
+        </button>
+<button class="flex-1 h-[44px] rounded-lg bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center hover:bg-primary-container active:scale-[0.98] transition-all">
+            保存并排课
+        </button>
+</div>
+
+
+</body></html>

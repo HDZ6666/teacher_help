@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>拍照上传</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-variant": "#d6e5ed",
+                        "surface-container-low": "#e7f6fe",
+                        "on-primary-container": "#a4f2d4",
+                        "on-secondary-fixed-variant": "#284d44",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#e4f3fb",
+                        "secondary-fixed": "#c2ebde",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#00201a",
+                        "surface-tint": "#166b53",
+                        "secondary-fixed-dim": "#a7cfc2",
+                        "on-primary-fixed": "#002117",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#a4f2d4",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#c2ebde",
+                        "primary-fixed-dim": "#88d6b9",
+                        "outline-variant": "#bec9c3",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#1f7159",
+                        "on-tertiary-fixed": "#002114",
+                        "on-surface": "#0f1d23",
+                        "secondary": "#40655b",
+                        "primary": "#005842",
+                        "on-secondary-container": "#466c61",
+                        "surface-dim": "#cddce4",
+                        "inverse-surface": "#243239",
+                        "tertiary-fixed-dim": "#6fdaac",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#8cf7c7",
+                        "surface-container-highest": "#d6e5ed",
+                        "outline": "#6f7974",
+                        "background": "#f3faff",
+                        "tertiary-container": "#007351",
+                        "on-background": "#0f1d23",
+                        "on-tertiary-fixed-variant": "#005138",
+                        "on-primary-fixed-variant": "#00513d",
+                        "inverse-primary": "#88d6b9",
+                        "surface": "#f3faff",
+                        "surface-container-high": "#dbebf3",
+                        "tertiary-fixed": "#8cf7c7",
+                        "surface-bright": "#f3faff",
+                        "tertiary": "#00583d",
+                        "on-surface-variant": "#3f4944",
+                        "surface-container": "#e1f0f8"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "stack_lg": "24px",
+                        "gutter": "12px",
+                        "page_margin": "14px",
+                        "stack_sm": "8px",
+                        "stack_md": "16px"
+                    },
+                    fontFamily: {
+                        "label-sm": ["Be Vietnam Pro"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"]
+                    },
+                    fontSize: {
+                        "label-sm": ["11px", { lineHeight: "14px", fontWeight: "500" }],
+                        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "headline-sm": ["17px", { lineHeight: "24px", fontWeight: "600" }],
+                        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }],
+                        "display": ["24px", { lineHeight: "32px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+<!-- Top App Bar (Task-focused, suppressed main nav) -->
+<header class="sticky top-0 z-50 bg-surface w-full h-14 flex items-center px-page_margin">
+<button aria-label="返回" class="w-10 h-10 flex items-center justify-center text-on-surface active:scale-95 transition-transform">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center font-headline-md text-headline-md text-on-surface pr-10">拍照上传</h1>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col px-page_margin pb-[100px] gap-stack_md pt-2">
+<!-- Image Preview Area -->
+<section class="flex flex-col gap-stack_sm">
+<!-- Large Image Preview -->
+<div class="relative w-full aspect-[3/4] bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant shadow-sm">
+<div class="w-full h-full bg-cover bg-center" data-alt="A top-down, high-quality, realistic photograph of a student's handwritten math worksheet resting on a clean wooden study desk. The paper features complex algebraic equations and geometric diagrams drawn in blue ink. Soft, natural daylight from a nearby window illuminates the scene, casting subtle shadows and highlighting the texture of the paper. The overall mood is focused, academic, and calm, utilizing a balanced light-mode color palette." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCrHnwWV3DOGV-0kWZTFqhotgHfevSobuFqgsaedWJnAE_OB2ogeeVjdyV1eqpqGOa0U8-ozC4GtcVKM3Dys4oVrkILpwhbdczubvdw5NIiAQrtYuYe4eSHfcqBQ-V2UQ8J0eDzLydrBxgwdw7G5zn3NTRwvKl06J7LBzaemi0T74zi8BmVdZ7fnYWYBlcdjidMm36ver53LcSUDZ-K7PEMhmuc_R1PuwPFzDxgb4f6XTvAhrV7fnmgE5aHejbbZ9zAP0d4gisTo5Q')"></div>
+<!-- Overlay Grids / Scanning effect hint (Optional aesthetic) -->
+<div class="absolute inset-0 border border-primary/20 m-4 rounded-lg pointer-events-none">
+<div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primary"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primary"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary"></div>
+</div>
+</div>
+<!-- Image Actions -->
+<div class="flex items-center justify-center gap-stack_lg py-2">
+<button class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-primary active:scale-95 transition-all">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined">crop</span>
+</div>
+<span class="font-label-md text-label-md">裁剪</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-primary active:scale-95 transition-all">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined">replay</span>
+</div>
+<span class="font-label-md text-label-md">重新拍照</span>
+</button>
+</div>
+</section>
+<!-- Form Area -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant px-page_margin py-2 shadow-sm">
+<!-- Selector: Associated Student -->
+<div class="flex items-center justify-between py-3 border-b border-surface-variant cursor-pointer active:bg-surface-container-low transition-colors -mx-page_margin px-page_margin">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
+<span class="font-body-md text-body-md text-on-surface">关联学员</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="font-body-sm text-body-sm">请选择</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Selector: Subject -->
+<div class="flex items-center justify-between py-3 border-b border-surface-variant cursor-pointer active:bg-surface-container-low transition-colors -mx-page_margin px-page_margin">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">menu_book</span>
+<span class="font-body-md text-body-md text-on-surface">科目</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="font-body-sm text-body-sm">数学</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Selector: Grade -->
+<div class="flex items-center justify-between py-3 border-b border-surface-variant cursor-pointer active:bg-surface-container-low transition-colors -mx-page_margin px-page_margin">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">school</span>
+<span class="font-body-md text-body-md text-on-surface">年级</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="font-body-sm text-body-sm">八年级</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Source Selection -->
+<div class="py-4">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">source</span>
+<span class="font-body-md text-body-md text-on-surface">来源</span>
+</div>
+<div class="flex flex-wrap gap-gutter">
+<!-- Selected Chip -->
+<button class="px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md transition-colors border border-transparent">
+                        作业
+                    </button>
+<!-- Unselected Chips -->
+<button class="px-4 py-2 rounded-full bg-surface text-on-surface-variant border border-outline-variant font-label-md text-label-md active:bg-surface-variant transition-colors">
+                        课堂
+                    </button>
+<button class="px-4 py-2 rounded-full bg-surface text-on-surface-variant border border-outline-variant font-label-md text-label-md active:bg-surface-variant transition-colors">
+                        考试
+                    </button>
+<button class="px-4 py-2 rounded-full bg-surface text-on-surface-variant border border-outline-variant font-label-md text-label-md active:bg-surface-variant transition-colors">
+                        其他
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Fixed Action Area -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant px-page_margin py-3 pb-safe z-50">
+<button class="w-full h-[48px] bg-primary-container text-on-primary font-headline-sm text-headline-sm rounded-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-sm">
+<span class="material-symbols-outlined icon-fill">auto_awesome</span>
+            开始 AI 分析
+        </button>
+</div>
+</body></html>

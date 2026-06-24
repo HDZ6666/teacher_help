@@ -1,0 +1,403 @@
+<!DOCTYPE html><html lang="zh-CN" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>新增/编辑课程 - 老师帮</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#40655b",
+                      "tertiary-fixed-dim": "#6fdaac",
+                      "on-tertiary-container": "#8cf7c7",
+                      "on-surface-variant": "#3f4944",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#c2ebde",
+                      "primary-fixed": "#a4f2d4",
+                      "on-secondary-fixed": "#00201a",
+                      "on-primary-container": "#a4f2d4",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#007351",
+                      "surface-container": "#e1f0f8",
+                      "on-surface": "#0f1d23",
+                      "on-primary-fixed": "#002117",
+                      "on-tertiary-fixed-variant": "#005138",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#f3faff",
+                      "surface": "#f3faff",
+                      "inverse-on-surface": "#e4f3fb",
+                      "background": "#f3faff",
+                      "surface-variant": "#d6e5ed",
+                      "on-tertiary": "#ffffff",
+                      "outline-variant": "#bec9c3",
+                      "on-primary-fixed-variant": "#00513d",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#a7cfc2",
+                      "secondary-container": "#c2ebde",
+                      "outline": "#6f7974",
+                      "on-tertiary-fixed": "#002114",
+                      "on-secondary-fixed-variant": "#284d44",
+                      "tertiary-fixed": "#8cf7c7",
+                      "surface-container-high": "#dbebf3",
+                      "on-secondary": "#ffffff",
+                      "surface-dim": "#cddce4",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#d6e5ed",
+                      "primary": "#005842",
+                      "primary-container": "#1f7159",
+                      "inverse-surface": "#243239",
+                      "tertiary": "#00583d",
+                      "primary-fixed-dim": "#88d6b9",
+                      "on-secondary-container": "#466c61",
+                      "on-error-container": "#93000a",
+                      "surface-container-low": "#e7f6fe",
+                      "on-background": "#0f1d23",
+                      "surface-tint": "#166b53",
+                      "inverse-primary": "#88d6b9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack_sm": "8px",
+                      "stack_lg": "24px",
+                      "gutter": "12px",
+                      "stack_md": "16px",
+                      "page_margin": "14px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-lg": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-md": [
+                              "Be Vietnam Pro"
+                      ],
+                      "label-md": [
+                              "Be Vietnam Pro"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-sm": [
+                              "17px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Custom Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #1f7159;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #1f7159;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 3rem;
+            height: 1.5rem;
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+            transition: all 0.3s;
+        }
+        .toggle-circle {
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 0.125rem;
+            left: 0.125rem;
+            transition: all 0.3s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .toggle-checkbox:checked ~ .toggle-circle {
+            transform: translateX(1.5rem);
+        }
+        
+        /* Form Element Styles */
+        input[type="text"], input[type="number"], textarea, select {
+            border: 1px solid #bec9c3;
+            border-radius: 0.5rem;
+            padding: 10px 12px;
+            width: 100%;
+            height: 44px;
+            background-color: #ffffff;
+            color: #0f1d23;
+            transition: border-color 0.2s;
+        }
+        textarea {
+            height: auto;
+            min-height: 80px;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1f7159;
+            box-shadow: 0 0 0 1px #1f7159;
+        }
+        
+        /* Custom Radio Buttons */
+        .custom-radio input[type="radio"] {
+            display: none;
+        }
+        .custom-radio label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border: 1px solid #bec9c3;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #3f4944;
+            background-color: #ffffff;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .custom-radio input[type="radio"]:checked + label {
+            background-color: #e7f6fe;
+            border-color: #1f7159;
+            color: #1f7159;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg pb-24 h-screen flex flex-col relative overflow-x-hidden">
+<!-- Top App Bar (Task-Focused: Suppressed global navigation) -->
+<header class="flex justify-between items-center px-page_margin h-14 w-full bg-surface border-b border-outline-variant fixed top-0 z-50">
+<button aria-label="返回" class="w-10 h-10 flex items-center justify-start text-primary"><span class="material-symbols-outlined font-headline-md text-primary cursor-pointer">arrow_back</span></button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 text-center pr-10">新增/编辑课程</h1>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto mt-14 pt-4 px-page_margin flex flex-col gap-stack_md">
+<!-- Basic Info Card -->
+<section class="bg-surface-container-lowest rounded-lg border border-outline-variant p-4">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-4">基本信息</h2>
+<div class="flex flex-col gap-4">
+<!-- Course Name -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
+                        课程名称 <span class="text-error">*</span>
+</label>
+<input class="font-body-md text-body-md" placeholder="请输入课程名称" required="" type="text">
+</div>
+<!-- Course Type -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
+                        课程类型 <span class="text-error">*</span>
+</label>
+<div class="flex gap-3 custom-radio">
+<div>
+<input checked="" id="type_one_to_many" name="course_type" type="radio">
+<label for="type_one_to_many" class="">一对多</label>
+</div>
+<div>
+<input id="type_one_to_one" name="course_type" type="radio">
+<label for="type_one_to_one" class="">一对一</label>
+</div>
+</div>
+</div>
+<!-- Display Color -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">展示颜色</label>
+<div class="flex gap-3">
+<button aria-label="Red" class="w-8 h-8 rounded-full bg-[#E57373] ring-2 ring-offset-2 ring-[#E57373] relative flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+<button aria-label="Green" class="w-8 h-8 rounded-full bg-[#81C784] border border-outline-variant"></button>
+<button aria-label="Blue" class="w-8 h-8 rounded-full bg-[#64B5F6] border border-outline-variant"></button>
+<button aria-label="Orange" class="w-8 h-8 rounded-full bg-[#FFB74D] border border-outline-variant"></button>
+<button aria-label="Purple" class="w-8 h-8 rounded-full bg-[#BA68C8] border border-outline-variant"></button>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Rules Card -->
+<section class="bg-surface-container-lowest rounded-lg border border-outline-variant p-4">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">收费标准</h2>
+<button class="font-label-md text-label-md text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">add</span> 添加标准
+                </button>
+</div>
+<div class="bg-surface p-3 rounded-lg border border-outline-variant flex flex-col gap-3">
+<!-- Billing Method -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">收费方式</label>
+<div class="flex gap-2 custom-radio">
+<div>
+<input checked="" id="billing_time" name="billing_method" type="radio">
+<label class="!px-3 !py-1" for="billing_time">按课时</label>
+</div>
+<div>
+<input id="billing_month" name="billing_method" type="radio">
+<label class="!px-3 !py-1" for="billing_month">按月</label>
+</div>
+<div>
+<input id="billing_count" name="billing_method" type="radio">
+<label class="!px-3 !py-1" for="billing_count">按次</label>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<!-- Price Name -->
+<div class="flex flex-col gap-2 col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant">价格名称</label>
+<input class="font-body-md text-body-md" placeholder="如：春季常规班" type="text">
+</div>
+<!-- Quantity -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">包含课时</label>
+<div class="relative">
+<input class="font-body-md text-body-md pr-8" placeholder="0" type="number">
+<span class="absolute right-3 top-1/2 -translate-y-1/2 font-body-sm text-on-surface-variant">节</span>
+</div>
+</div>
+<!-- Unit Price -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">单价</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 font-body-sm text-on-surface-variant">¥</span>
+<input class="font-body-md text-body-md pl-6" placeholder="0.00" type="number">
+</div>
+</div>
+<!-- Total Price -->
+<div class="flex flex-col gap-2 col-span-2">
+<label class="font-label-md text-label-md text-on-surface-variant">总价</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 font-body-sm text-on-surface-variant">¥</span>
+<input class="font-body-md text-body-md pl-6 font-headline-sm text-primary" placeholder="0.00" type="number">
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Settings & Notes Card -->
+<section class="bg-surface-container-lowest rounded-lg border border-outline-variant p-4">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-4">设置与备注</h2>
+<div class="flex flex-col gap-4">
+<!-- Enable Toggle -->
+<div class="flex justify-between items-center py-2 border-b border-outline-variant">
+<span class="font-body-md text-body-md text-on-surface">是否启用</span>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle_enable" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="toggle_enable"></label>
+<div class="toggle-circle"></div>
+</div>
+</div>
+<!-- Online Selling Toggle -->
+<div class="flex justify-between items-center py-2 border-b border-outline-variant">
+<span class="font-body-md text-body-md text-on-surface">是否线上售卖</span>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle_online" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="toggle_online"></label>
+<div class="toggle-circle"></div>
+</div>
+</div>
+<!-- Remarks -->
+<div class="flex flex-col gap-2 pt-2">
+<label class="font-label-md text-label-md text-on-surface-variant">备注</label>
+<textarea class="font-body-md text-body-md resize-none" placeholder="添加课程备注信息..." rows="3"></textarea>
+</div>
+</div>
+</section>
+<!-- Bottom padding for fixed action bar -->
+<div class="h-6"></div>
+</main>
+<!-- Bottom Action Bar (Fixed) -->
+<footer class="fixed bottom-0 w-full bg-surface border-t border-outline-variant p-4 z-50 flex gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<button class="flex-1 h-[44px] rounded-lg border border-primary-container text-primary-container bg-transparent font-headline-sm text-headline-sm font-bold flex items-center justify-center hover:bg-surface-container-low transition-colors">
+            保存
+        </button>
+<button class="flex-[2] h-[44px] rounded-lg bg-primary-container text-white font-headline-sm text-headline-sm font-bold flex items-center justify-center shadow-sm hover:opacity-90 transition-opacity">
+            保存并建班
+        </button>
+</footer>
+
+
+</body></html>

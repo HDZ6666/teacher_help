@@ -1,0 +1,306 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>课程列表</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#40655b",
+                      "tertiary-fixed-dim": "#6fdaac",
+                      "on-tertiary-container": "#8cf7c7",
+                      "on-surface-variant": "#3f4944",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#c2ebde",
+                      "primary-fixed": "#a4f2d4",
+                      "on-secondary-fixed": "#00201a",
+                      "on-primary-container": "#a4f2d4",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#007351",
+                      "surface-container": "#e1f0f8",
+                      "on-surface": "#0f1d23",
+                      "on-primary-fixed": "#002117",
+                      "on-tertiary-fixed-variant": "#005138",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#f3faff",
+                      "surface": "#f3faff",
+                      "inverse-on-surface": "#e4f3fb",
+                      "background": "#f3faff",
+                      "surface-variant": "#d6e5ed",
+                      "on-tertiary": "#ffffff",
+                      "outline-variant": "#bec9c3",
+                      "on-primary-fixed-variant": "#00513d",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#a7cfc2",
+                      "secondary-container": "#c2ebde",
+                      "outline": "#6f7974",
+                      "on-tertiary-fixed": "#002114",
+                      "on-secondary-fixed-variant": "#284d44",
+                      "tertiary-fixed": "#8cf7c7",
+                      "surface-container-high": "#dbebf3",
+                      "on-secondary": "#ffffff",
+                      "surface-dim": "#cddce4",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#d6e5ed",
+                      "primary": "#005842",
+                      "primary-container": "#1f7159",
+                      "inverse-surface": "#243239",
+                      "tertiary": "#00583d",
+                      "primary-fixed-dim": "#88d6b9",
+                      "on-secondary-container": "#466c61",
+                      "on-error-container": "#93000a",
+                      "surface-container-low": "#e7f6fe",
+                      "on-background": "#0f1d23",
+                      "surface-tint": "#166b53",
+                      "inverse-primary": "#88d6b9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack_sm": "8px",
+                      "stack_lg": "24px",
+                      "gutter": "12px",
+                      "stack_md": "16px",
+                      "page_margin": "14px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-sm": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-lg": [
+                              "Be Vietnam Pro"
+                      ],
+                      "body-md": [
+                              "Be Vietnam Pro"
+                      ],
+                      "label-md": [
+                              "Be Vietnam Pro"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-sm": [
+                              "17px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-[#f4f6f5] text-on-surface font-body-md min-h-screen">
+<!-- TopAppBar (Customized for Sub-page context, no global shell) -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-page_margin h-14 bg-surface border-b border-outline-variant">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200 text-primary">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface">课程</h1>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200 text-primary">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="pt-[72px] pb-[88px] px-page_margin space-y-stack_md max-w-3xl mx-auto">
+<!-- Search Bar -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full h-[44px] pl-10 pr-4 bg-surface-container-lowest border border-[#e7ece9] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-body-md text-on-surface placeholder:text-on-surface-variant/60" placeholder="搜索课程名称" type="text">
+</div>
+<!-- Filter Tags -->
+<div class="flex overflow-x-auto pb-2 -mx-page_margin px-page_margin space-x-2 scrollbar-hide">
+<button class="px-3 py-1 rounded-full bg-primary text-on-primary font-label-md whitespace-nowrap shrink-0 transition-colors">全部</button>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest border border-[#e7ece9] text-on-surface-variant font-label-md whitespace-nowrap shrink-0 hover:bg-surface-container-low transition-colors">一对多</button>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest border border-[#e7ece9] text-on-surface-variant font-label-md whitespace-nowrap shrink-0 hover:bg-surface-container-low transition-colors">一对一</button>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest border border-[#e7ece9] text-on-surface-variant font-label-md whitespace-nowrap shrink-0 hover:bg-surface-container-low transition-colors">启用</button>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest border border-[#e7ece9] text-on-surface-variant font-label-md whitespace-nowrap shrink-0 hover:bg-surface-container-low transition-colors">停用</button>
+<button class="px-3 py-1 rounded-full bg-surface-container-lowest border border-[#e7ece9] text-on-surface-variant font-label-md whitespace-nowrap shrink-0 hover:bg-surface-container-low transition-colors">可售卖</button>
+</div>
+<!-- Course List -->
+<div class="space-y-gutter">
+<!-- Course Card 1 -->
+<article class="bg-surface-container-lowest rounded-lg border border-[#e7ece9] p-[14px] flex flex-col space-y-3">
+<div class="flex justify-between items-start">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 rounded-sm bg-[#5c9ce6] shrink-0"></div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">少儿英语进阶</h2>
+</div>
+<div class="flex space-x-1">
+<span class="px-2 py-0.5 rounded bg-[#e9f6ef] text-[#227253] font-label-sm">启用</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-primary font-label-sm">线上售卖</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-2 gap-x-4 text-on-surface-variant font-body-sm">
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="category">category</span>
+<span class="">类型: 一对多</span>
+</div>
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="payment">payment</span>
+<span class="">收费: 按课时</span>
+</div>
+<div class="flex items-center space-x-1 col-span-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="sell">sell</span>
+<span class="text-on-surface font-medium">￥2400 / 12节</span>
+</div>
+<div class="flex items-center space-x-1 col-span-2 text-[#74828a]">
+<span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span>
+<span class="">关联班级: 3个</span>
+</div>
+</div>
+<div class="pt-3 border-t border-[#e7ece9] flex justify-end space-x-3">
+<button class="font-label-md text-on-surface-variant hover:text-primary transition-colors">查看</button>
+<button class="font-label-md text-on-surface-variant hover:text-primary transition-colors">编辑</button>
+<button class="font-label-md text-primary transition-colors">排课</button>
+</div>
+</article>
+<!-- Course Card 2 -->
+<article class="bg-surface-container-lowest rounded-lg border border-[#e7ece9] p-[14px] flex flex-col space-y-3">
+<div class="flex justify-between items-start">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 rounded-sm bg-[#e68a5c] shrink-0"></div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">钢琴一对一VIP</h2>
+</div>
+<div class="flex space-x-1">
+<span class="px-2 py-0.5 rounded bg-[#e9f6ef] text-[#227253] font-label-sm">启用</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-2 gap-x-4 text-on-surface-variant font-body-sm">
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="category">category</span>
+<span class="">类型: 一对一</span>
+</div>
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="payment">payment</span>
+<span class="">收费: 按期</span>
+</div>
+<div class="flex items-center space-x-1 col-span-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="sell">sell</span>
+<span class="text-on-surface font-medium">￥5800 / 期</span>
+</div>
+<div class="flex items-center space-x-1 col-span-2 text-[#74828a]">
+<span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span>
+<span class="">关联班级: 12个</span>
+</div>
+</div>
+<div class="pt-3 border-t border-[#e7ece9] flex justify-end space-x-3">
+<button class="font-label-md text-on-surface-variant hover:text-primary transition-colors">查看</button>
+<button class="font-label-md text-on-surface-variant hover:text-primary transition-colors">编辑</button>
+<button class="font-label-md text-primary transition-colors">排课</button>
+</div>
+</article>
+<!-- Course Card 3 (Disabled) -->
+<article class="bg-surface-container-lowest rounded-lg border border-[#e7ece9] p-[14px] flex flex-col space-y-3 opacity-75">
+<div class="flex justify-between items-start">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 rounded-sm bg-[#9ca3af] shrink-0"></div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface-variant">硬笔书法基础</h2>
+</div>
+<div class="flex space-x-1">
+<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant font-label-sm">停用</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-2 gap-x-4 text-on-surface-variant font-body-sm">
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="category">category</span>
+<span class="">类型: 一对多</span>
+</div>
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="payment">payment</span>
+<span class="">收费: 按课时</span>
+</div>
+<div class="flex items-center space-x-1 col-span-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="sell">sell</span>
+<span class="font-medium">￥1200 / 16节</span>
+</div>
+<div class="flex items-center space-x-1 col-span-2 text-[#74828a]">
+<span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span>
+<span class="">关联班级: 0个</span>
+</div>
+</div>
+<div class="pt-3 border-t border-[#e7ece9] flex justify-end space-x-3">
+<button class="font-label-md text-on-surface-variant hover:text-primary transition-colors">查看</button>
+<button class="font-label-md text-on-surface-variant hover:text-primary transition-colors">启用</button>
+</div>
+</article>
+</div>
+</main>
+<!-- Intentionally omitting BottomNavBar as requested ("或不显示底部导航，因为是从更多工具进入的") to treat this as a sub-destination task screen -->
+
+
+</body></html>
