@@ -30,6 +30,7 @@ from module_teach.controller.teach_class_controller import teachClassController
 from module_teach.controller.teach_course_controller import teachCourseController
 from module_teach.controller.teach_schedule_event_controller import teachScheduleEventController
 from module_teach.controller.teach_schedule_attendance_controller import teachScheduleAttendanceController
+from module_teach.controller.teach_class_record_controller import teachClassRecordController
 from module_ast.controller.ast_item_controller import astItemController
 from module_ast.controller.ast_inventory_controller import astInventoryController
 from sub_applications.handle import handle_sub_applications
@@ -95,6 +96,7 @@ controller_list = [
     {'router': teachCourseController, 'tags': ['教学管理-课程管理']},
     {'router': teachScheduleEventController, 'tags': ['教学管理-排课管理']},
     {'router': teachScheduleAttendanceController, 'tags': ['教学管理-考勤管理']},
+    {'router': teachClassRecordController, 'tags': ['教学管理-上课记录']},
     {'router': astItemController, 'tags': ['物品费用管理-物品管理']},
     {'router': astInventoryController, 'tags': ['物品费用管理-出入库与费用']},
 ]
