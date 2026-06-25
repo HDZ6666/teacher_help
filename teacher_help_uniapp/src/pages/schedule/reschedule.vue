@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 defineOptions({
@@ -7,7 +6,8 @@ defineOptions({
 })
 definePage({
   style: {
-    navigationBarTitleText: '调课',
+    navigationStyle: 'custom',
+    navigationBarTitleText: '调课申请',
   },
 })
 
@@ -45,6 +45,10 @@ function checkConflict() {
   uni.navigateTo({ url: '/pages/schedule/conflict' })
 }
 
+function goBack() {
+  uni.navigateBack()
+}
+
 function confirm() {
   if (!form.value.date) {
     uni.showToast({ title: '请选择新日期', icon: 'none' })
@@ -54,11 +58,21 @@ function confirm() {
   setTimeout(() => uni.navigateBack(), 700)
 }
 
-onLoad(() => {})
 </script>
 
 <template>
   <view class="rs-page">
+    <view class="topbar">
+      <button class="back-btn" @click="goBack">
+        <uni-icons type="left" size="28" color="#1f7159" />
+      </button>
+      <view class="page-title">
+        调课申请
+      </view>
+      <view class="top-spacer" />
+    </view>
+
+    <scroll-view class="content-scroll" scroll-y>
     <view class="current-card">
       <view class="cur-title">
         当前课次
@@ -140,11 +154,12 @@ onLoad(() => {})
     <view class="form-card">
       <view class="row no-border">
         <text class="row-label">
-          通知家长
+          通知学员/家长
         </text>
         <switch :checked="form.notify" color="#1f7159" style="transform: scale(0.85)" @change="form.notify = $event.detail.value" />
       </view>
     </view>
+    </scroll-view>
 
     <view class="bottom-bar">
       <button class="ghost-btn" @click="checkConflict">
@@ -160,10 +175,48 @@ onLoad(() => {})
 <style lang="scss" scoped>
 .rs-page {
   min-height: 100vh;
-  box-sizing: border-box;
-  padding: 24rpx 28rpx 180rpx;
   color: #1f2d33;
   background: #f4f6f5;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 112rpx;
+  padding: 0 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #bec9c3;
+}
+
+.back-btn,
+.top-spacer {
+  width: 72rpx;
+  height: 72rpx;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.page-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #1f7159;
+}
+
+.content-scroll {
+  box-sizing: border-box;
+  height: calc(100vh - 112rpx);
+  padding: 28rpx 28rpx 180rpx;
 }
 
 .current-card {
@@ -296,7 +349,8 @@ onLoad(() => {})
 }
 
 .ghost-btn::after,
-.primary-btn::after {
+.primary-btn::after,
+.back-btn::after {
   border: 0;
 }
 </style>

@@ -1,49 +1,22 @@
 <script lang="ts" setup>
-import { onLoad, onUnload } from '@dcloudio/uni-app'
-import { computed, ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 
 defineOptions({
   name: 'WrongAnalyzing',
 })
+
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: 'AI 分析中',
   },
 })
 
 const steps = [
-  { key: 'upload', label: '上传图片' },
-  { key: 'ocr', label: 'OCR 识别题干' },
-  { key: 'understand', label: '题目理解' },
-  { key: 'parse', label: '生成解析' },
-  { key: 'reason', label: '整理错因' },
+  { label: '正在识别题目', state: 'done' },
+  { label: '正在分析解法', state: 'active' },
+  { label: '正在生成讲解', state: 'wait' },
 ]
-
-const currentStep = ref(0)
-let timer: any = null
-
-const progress = computed(() => Math.min(Math.round((currentStep.value / steps.length) * 100), 100))
-
-function stepState(index: number) {
-  if (index < currentStep.value)
-    return 'done'
-  if (index === currentStep.value)
-    return 'active'
-  return 'wait'
-}
-
-function runMock() {
-  timer = setInterval(() => {
-    if (currentStep.value >= steps.length) {
-      clearInterval(timer)
-      timer = null
-      // 分析完成 → 跳错题详情
-      uni.redirectTo({ url: '/pages/wrong-question/detail?id=1&from=analyze' })
-      return
-    }
-    currentStep.value += 1
-  }, 1200)
-}
 
 function backgroundRun() {
   uni.switchTab({ url: '/pages/wrong-question/index' })
@@ -62,56 +35,59 @@ function cancelAnalyze() {
   })
 }
 
-onLoad(() => {
-  runMock()
-})
-
-onUnload(() => {
-  if (timer)
-    clearInterval(timer)
-})
+onLoad(() => {})
 </script>
 
 <template>
-  <view class="ana-page">
-    <view class="ana-card">
-      <view class="thumb">
-        <uni-icons type="image" size="44" color="#c2cbce" />
-      </view>
-      <view class="ana-ring">
-        <text class="ring-num">{{ progress }}<text class="ring-unit">%</text></text>
-      </view>
-      <view class="ana-title">
-        AI 正在分析错题
-      </view>
-      <view class="ana-sub">
-        通常 5 到 15 秒，请稍候
-      </view>
-    </view>
-
-    <view class="step-card">
-      <view v-for="(s, idx) in steps" :key="s.key" class="step-row" :class="stepState(idx)">
-        <view class="step-dot">
-          <uni-icons v-if="stepState(idx) === 'done'" type="checkmarkempty" size="14" color="#ffffff" />
-          <view v-else-if="stepState(idx) === 'active'" class="dot-pulse" />
+  <view class="analyzing-page">
+    <view class="illustration-card">
+      <view class="paper-line short" />
+      <view class="paper-line long" />
+      <view class="paper-line mid" />
+      <view class="scan-badge">
+        <view class="scan-corner tl" />
+        <view class="scan-corner tr" />
+        <view class="scan-corner bl" />
+        <view class="scan-corner br" />
+        <view class="scan-doc">
+          <view />
+          <view />
+          <view />
         </view>
-        <text class="step-label">
-          {{ s.label }}
-        </text>
-        <text v-if="stepState(idx) === 'done'" class="step-tag">
-          完成
-        </text>
-        <text v-else-if="stepState(idx) === 'active'" class="step-tag ing">
-          进行中
-        </text>
+      </view>
+      <view class="answer-box">
+        Σ
       </view>
     </view>
 
-    <view class="bottom-bar">
-      <button class="ghost-btn" @click="backgroundRun">
+    <view class="step-list">
+      <view
+        v-for="(step, index) in steps"
+        :key="step.label"
+        class="step-row"
+        :class="step.state"
+      >
+        <view class="step-rail" :class="{ last: index === steps.length - 1 }" />
+        <view class="step-dot">
+          <uni-icons v-if="step.state === 'done'" type="checkmarkempty" size="20" color="#ffffff" />
+          <view v-else-if="step.state === 'active'" class="active-dot" />
+          <view v-else class="wait-dot" />
+        </view>
+        <view class="step-label">
+          {{ step.label }}
+        </view>
+      </view>
+    </view>
+
+    <view class="hint-text">
+      正在为您生成深度解析，您可以先处理其他事务，完成后将收到提醒。
+    </view>
+
+    <view class="bottom-actions">
+      <button class="primary-btn" @click="backgroundRun">
         后台处理
       </button>
-      <button class="danger-btn" @click="cancelAnalyze">
+      <button class="outline-btn" @click="cancelAnalyze">
         取消分析
       </button>
     </view>
@@ -119,167 +95,255 @@ onUnload(() => {
 </template>
 
 <style lang="scss" scoped>
-.ana-page {
+.analyzing-page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 40rpx 28rpx 180rpx;
-  color: #1f2d33;
-  background: #f4f6f5;
+  padding: 296rpx 40rpx 210rpx;
+  color: #0f1d23;
+  background: #f3faff;
 }
 
-.ana-card {
+.illustration-card {
+  position: relative;
+  width: 506rpx;
+  height: 286rpx;
+  margin: 0 auto;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f1fff8 0%, #ffffff 100%);
+  border: 2rpx solid #bec9c3;
+  border-radius: 18rpx;
+  box-shadow: 0 4rpx 10rpx rgba(15, 29, 35, 0.08);
+}
+
+.paper-line {
+  position: absolute;
+  left: 30rpx;
+  height: 20rpx;
+  background: #d8e8e3;
+  border-radius: 8rpx;
+}
+
+.paper-line.short {
+  top: 30rpx;
+  width: 150rpx;
+}
+
+.paper-line.long {
+  top: 74rpx;
+  width: 446rpx;
+}
+
+.paper-line.mid {
+  top: 118rpx;
+  width: 372rpx;
+  background: #dddddd;
+}
+
+.scan-badge {
+  position: absolute;
+  top: 86rpx;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 126rpx;
+  height: 126rpx;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 6rpx 18rpx rgba(15, 29, 35, 0.08);
+  transform: translateX(-50%);
+}
+
+.scan-corner {
+  position: absolute;
+  width: 18rpx;
+  height: 18rpx;
+  border-color: #005842;
+}
+
+.scan-corner.tl {
+  top: 42rpx;
+  left: 42rpx;
+  border-top: 4rpx solid #005842;
+  border-left: 4rpx solid #005842;
+}
+
+.scan-corner.tr {
+  top: 42rpx;
+  right: 42rpx;
+  border-top: 4rpx solid #005842;
+  border-right: 4rpx solid #005842;
+}
+
+.scan-corner.bl {
+  bottom: 42rpx;
+  left: 42rpx;
+  border-bottom: 4rpx solid #005842;
+  border-left: 4rpx solid #005842;
+}
+
+.scan-corner.br {
+  right: 42rpx;
+  bottom: 42rpx;
+  border-right: 4rpx solid #005842;
+  border-bottom: 4rpx solid #005842;
+}
+
+.scan-doc {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 50rpx 30rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 18rpx;
+  gap: 6rpx;
+  width: 36rpx;
+  height: 46rpx;
+  padding: 8rpx 6rpx;
+  border: 4rpx solid #005842;
+  border-radius: 4rpx;
 }
 
-.thumb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 160rpx;
-  height: 160rpx;
-  background: #f1f4f2;
-  border-radius: 16rpx;
+.scan-doc view {
+  height: 4rpx;
+  background: #005842;
+  border-radius: 999rpx;
 }
 
-.ana-ring {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 150rpx;
-  height: 150rpx;
-  margin-top: 34rpx;
-  border: 8rpx solid #e6f4ee;
-  border-top-color: #1f7159;
-  border-radius: 50%;
-}
-
-.ring-num {
-  font-size: 44rpx;
+.answer-box {
+  position: absolute;
+  right: 30rpx;
+  bottom: 30rpx;
+  left: 30rpx;
+  height: 78rpx;
+  font-size: 48rpx;
   font-weight: 700;
-  color: #1f7159;
+  line-height: 78rpx;
+  color: #d0d6d4;
+  text-align: center;
+  border: 4rpx dashed #d7ddda;
+  border-radius: 14rpx;
 }
 
-.ring-unit {
-  font-size: 24rpx;
-}
-
-.ana-title {
-  margin-top: 30rpx;
-  font-size: 32rpx;
-  font-weight: 700;
-}
-
-.ana-sub {
-  margin-top: 12rpx;
-  font-size: 25rpx;
-  color: #718088;
-}
-
-.step-card {
-  margin-top: 22rpx;
-  padding: 12rpx 26rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
+.step-list {
+  width: 320rpx;
+  margin: 76rpx auto 0;
 }
 
 .step-row {
+  position: relative;
   display: flex;
-  gap: 18rpx;
   align-items: center;
-  height: 92rpx;
-  border-bottom: 1rpx solid #edf1ef;
+  gap: 34rpx;
+  min-height: 102rpx;
 }
 
-.step-row:last-child {
-  border-bottom: 0;
+.step-rail {
+  position: absolute;
+  top: 48rpx;
+  left: 20rpx;
+  width: 4rpx;
+  height: 100rpx;
+  background: #bec9c3;
+}
+
+.step-row.done .step-rail {
+  background: #1f7159;
+}
+
+.step-rail.last {
+  display: none;
 }
 
 .step-dot {
+  z-index: 1;
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 40rpx;
-  height: 40rpx;
-  background: #eef2f0;
+  width: 42rpx;
+  height: 42rpx;
+  background: #e7f6fe;
   border-radius: 50%;
 }
 
 .step-row.done .step-dot {
-  background: #1f7159;
+  background: #005842;
 }
 
 .step-row.active .step-dot {
-  background: #dff4eb;
+  background: #e7f6fe;
+  border: 6rpx solid #005842;
 }
 
-.dot-pulse {
-  width: 16rpx;
-  height: 16rpx;
-  background: #1f7159;
+.step-row.wait .step-dot {
+  border: 4rpx solid #bec9c3;
+}
+
+.active-dot {
+  width: 14rpx;
+  height: 14rpx;
+  background: #005842;
+  border-radius: 50%;
+}
+
+.wait-dot {
+  width: 12rpx;
+  height: 12rpx;
+  background: #bec9c3;
   border-radius: 50%;
 }
 
 .step-label {
-  flex: 1;
-  font-size: 27rpx;
-  color: #9aa5aa;
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #8a9691;
+  white-space: nowrap;
 }
 
 .step-row.done .step-label,
 .step-row.active .step-label {
-  color: #1f2d33;
+  color: #005842;
 }
 
-.step-tag {
-  font-size: 22rpx;
-  color: #227253;
+.hint-text {
+  margin-top: 38rpx;
+  font-size: 29rpx;
+  line-height: 1.7;
+  color: #0f1d23;
+  text-align: center;
 }
 
-.step-tag.ing {
-  color: #1f7159;
-}
-
-.bottom-bar {
+.bottom-actions {
   position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  right: 40rpx;
+  bottom: calc(48rpx + env(safe-area-inset-bottom));
+  left: 40rpx;
   display: flex;
-  gap: 16rpx;
-  padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
-  border-top: 1rpx solid #eef1ef;
+  flex-direction: column;
+  gap: 24rpx;
 }
 
-.ghost-btn,
-.danger-btn {
-  flex: 1;
+.primary-btn,
+.outline-btn {
+  height: 80rpx;
+  padding: 0;
   margin: 0;
   font-size: 28rpx;
-  line-height: 88rpx;
-  border-radius: 16rpx;
+  font-weight: 800;
+  line-height: 80rpx;
+  border-radius: 14rpx;
 }
 
-.ghost-btn {
-  color: #1f7159;
-  background: #e6f4ee;
-}
-
-.danger-btn {
-  color: #a4423a;
-  background: #ffeceb;
-}
-
-.ghost-btn::after,
-.danger-btn::after {
+.primary-btn::after,
+.outline-btn::after {
   border: 0;
+}
+
+.primary-btn {
+  color: #ffffff;
+  background: #1f7159;
+}
+
+.outline-btn {
+  color: #1f7159;
+  background: #f3faff;
+  border: 2rpx solid #1f7159;
 }
 </style>

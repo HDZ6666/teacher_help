@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 defineOptions({
   name: 'WrongQuestion',
 })
+
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '错题本',
-    enablePullDownRefresh: true,
   },
 })
 
@@ -15,79 +16,69 @@ interface WrongItem {
   id: number
   student: string
   subject: string
-  point: string
-  mastery: '未掌握' | '已了解' | '已掌握'
-  aiStatus: 'analyzing' | 'pending' | 'done' | 'failed'
-  updateTime: string
+  title: string
+  status: '已解析' | '分析中'
+  mastery: '未掌握' | '部分掌握' | '已掌握'
+  thumb: 'phone' | 'board' | 'paper'
 }
 
 const keyword = ref('')
-const activeFilter = ref('all')
 
 const stats = [
-  { key: 'pending-ai', label: '待解析', value: 3, tone: 'warn' },
-  { key: 'pending', label: '待确认', value: 5, tone: 'info' },
-  { key: 'unmastered', label: '未掌握', value: 12, tone: 'danger' },
-  { key: 'mastered', label: '已掌握', value: 48, tone: 'success' },
+  { label: '今日新增', value: '24', tone: 'primary', icon: 'plusempty' },
+  { label: '待分析', value: '8', tone: 'plain', icon: 'loop' },
+  { label: '已解析', value: '156', tone: 'plain', icon: 'checkmarkempty' },
+  { label: '已掌握', value: '89%', tone: 'mint', icon: 'star' },
 ]
 
-const filterOptions = [
-  { label: '全部', value: 'all' },
-  { label: '待解析', value: 'analyzing' },
-  { label: '待确认', value: 'pending' },
-  { label: '未掌握', value: 'unmastered' },
-  { label: '已掌握', value: 'mastered' },
-  { label: '本周新增', value: 'week' },
-]
-
-const aiStatusMap = {
-  analyzing: { text: '识别中', cls: 'info' },
-  pending: { text: '待确认', cls: 'warn' },
-  done: { text: '已完成', cls: 'success' },
-  failed: { text: '识别失败', cls: 'danger' },
-}
-
-const list = ref<WrongItem[]>([
-  { id: 1, student: '李明轩', subject: '数学', point: '分数应用题', mastery: '未掌握', aiStatus: 'done', updateTime: '10分钟前' },
-  { id: 2, student: '王诗涵', subject: '英语', point: '现在完成时', mastery: '已了解', aiStatus: 'pending', updateTime: '1小时前' },
-  { id: 3, student: '张子墨', subject: '物理', point: '受力分析', mastery: '未掌握', aiStatus: 'analyzing', updateTime: '刚刚' },
-  { id: 4, student: '陈嘉怡', subject: '语文', point: '修辞手法', mastery: '已掌握', aiStatus: 'done', updateTime: '昨天' },
-  { id: 5, student: '刘梓萱', subject: '数学', point: '二次函数', mastery: '未掌握', aiStatus: 'failed', updateTime: '昨天' },
+const wrongList = ref<WrongItem[]>([
+  {
+    id: 1,
+    student: '张子涵',
+    subject: '数学',
+    title: '一元二次方程根的判别式',
+    status: '已解析',
+    mastery: '未掌握',
+    thumb: 'phone',
+  },
+  {
+    id: 2,
+    student: '李心怡',
+    subject: '物理',
+    title: '牛顿第二定律综合应用',
+    status: '分析中',
+    mastery: '部分掌握',
+    thumb: 'board',
+  },
+  {
+    id: 3,
+    student: '王宇轩',
+    subject: '英语',
+    title: '定语从句结构分析',
+    status: '已解析',
+    mastery: '已掌握',
+    thumb: 'paper',
+  },
 ])
-
-const filteredList = computed(() => {
-  return list.value.filter((item) => {
-    const matchKeyword = !keyword.value
-      || item.student.includes(keyword.value)
-      || item.subject.includes(keyword.value)
-      || item.point.includes(keyword.value)
-    let matchFilter = true
-    if (activeFilter.value === 'analyzing')
-      matchFilter = item.aiStatus === 'analyzing'
-    else if (activeFilter.value === 'pending')
-      matchFilter = item.aiStatus === 'pending'
-    else if (activeFilter.value === 'unmastered')
-      matchFilter = item.mastery === '未掌握'
-    else if (activeFilter.value === 'mastered')
-      matchFilter = item.mastery === '已掌握'
-    return matchKeyword && matchFilter
-  })
-})
-
-function masteryClass(m: string) {
-  if (m === '未掌握')
-    return 'danger'
-  if (m === '已了解')
-    return 'warn'
-  return 'success'
-}
 
 function openUpload() {
   uni.navigateTo({ url: '/pages/wrong-question/upload' })
 }
 
+function openAlbum() {
+  uni.navigateTo({ url: '/pages/wrong-question/upload?source=album' })
+}
+
+function openSearch() {
+  uni.showToast({ title: '搜索错题', icon: 'none' })
+}
+
+function openMenu() {
+  uni.showToast({ title: '筛选菜单', icon: 'none' })
+}
+
 function openDetail(item: WrongItem) {
-  if (item.aiStatus === 'analyzing') {
+  if (item.status === '分析中') {
     uni.navigateTo({ url: '/pages/wrong-question/analyzing' })
     return
   }
@@ -96,336 +87,479 @@ function openDetail(item: WrongItem) {
 </script>
 
 <template>
-  <view class="wq-page">
-    <view class="search-bar">
-      <view class="search-input">
-        <uni-icons type="search" size="18" color="#8a969d" />
-        <input v-model="keyword" class="search-field" placeholder="搜索学生 / 题目 / 知识点" placeholder-class="search-ph">
+  <view class="wrong-page">
+    <view class="top-bar">
+      <button class="icon-btn" @click="openMenu">
+        <uni-icons type="list" size="30" color="#005842" />
+      </button>
+      <view class="page-title">
+        错题本
       </view>
-      <button class="cam-btn" @click="openUpload">
-        <uni-icons type="camera" size="20" color="#ffffff" />
+      <button class="icon-btn right" @click="openSearch">
+        <uni-icons type="search" size="34" color="#005842" />
       </button>
     </view>
 
-    <view class="stat-grid">
-      <view v-for="s in stats" :key="s.key" class="stat-item">
-        <view class="stat-value" :class="s.tone">
-          {{ s.value }}
-        </view>
-        <view class="stat-label">
-          {{ s.label }}
+    <view class="page-body">
+      <view class="search-box">
+        <uni-icons type="search" size="32" color="#6f7974" />
+        <input
+          v-model="keyword"
+          class="search-input"
+          placeholder="搜索题目、知识点、学员..."
+          placeholder-class="search-placeholder"
+        >
+      </view>
+
+      <view class="stats-grid">
+        <view
+          v-for="item in stats"
+          :key="item.label"
+          class="stat-card"
+          :class="item.tone"
+        >
+          <view class="stat-mark">
+            <uni-icons
+              :type="item.icon"
+              size="58"
+              :color="item.tone === 'primary' ? '#a4f2d4' : item.tone === 'mint' ? '#466c61' : '#1f7159'"
+            />
+          </view>
+          <view class="stat-label">
+            {{ item.label }}
+          </view>
+          <view class="stat-value">
+            {{ item.value }}
+          </view>
         </view>
       </view>
-    </view>
 
-    <scroll-view class="filter-scroll" scroll-x>
-      <view class="filter-row">
-        <button
-          v-for="item in filterOptions"
-          :key="item.value"
-          class="filter-btn"
-          :class="{ active: activeFilter === item.value }"
-          @click="activeFilter = item.value"
-        >
-          {{ item.label }}
+      <view class="action-row">
+        <button class="upload-btn primary" @click="openUpload">
+          <uni-icons type="camera" size="30" color="#ffffff" />
+          <text>拍照上传</text>
+        </button>
+        <button class="upload-btn outline" @click="openAlbum">
+          <uni-icons type="image" size="30" color="#1f7159" />
+          <text>相册选择</text>
         </button>
       </view>
-    </scroll-view>
 
-    <view v-if="!filteredList.length" class="state-box">
-      暂无错题
-    </view>
-    <view v-else class="wq-list">
-      <view v-for="item in filteredList" :key="item.id" class="wq-card" @click="openDetail(item)">
-        <view class="wq-thumb">
-          <uni-icons type="image" size="28" color="#9aa5aa" />
-        </view>
-        <view class="wq-main">
-          <view class="wq-title-line">
-            <text class="wq-title">
-              {{ item.subject }} · {{ item.point }}
-            </text>
-            <text class="ai-pill" :class="aiStatusMap[item.aiStatus].cls">
-              {{ aiStatusMap[item.aiStatus].text }}
-            </text>
+      <view class="section-title">
+        最近错题
+      </view>
+
+      <view class="wrong-list">
+        <view
+          v-for="item in wrongList"
+          :key="item.id"
+          class="wrong-card"
+          @click="openDetail(item)"
+        >
+          <view class="thumb" :class="item.thumb">
+            <view class="phone-shape" />
+            <view class="paper-shape" />
+            <view class="diagram-shape" />
           </view>
-          <view class="wq-sub">
-            {{ item.student }} · {{ item.updateTime }}
-          </view>
-          <view class="wq-foot">
-            <text class="mastery" :class="masteryClass(item.mastery)">
-              {{ item.mastery }}
-            </text>
+          <view class="wrong-main">
+            <view class="card-top">
+              <view class="student-name">
+                {{ item.student }}
+              </view>
+              <view class="subject-pill">
+                {{ item.subject }}
+              </view>
+            </view>
+            <view class="wrong-title">
+              {{ item.title }}
+            </view>
+            <view class="tag-row">
+              <view class="status-pill" :class="{ loading: item.status === '分析中' }">
+                <uni-icons
+                  :type="item.status === '已解析' ? 'checkbox' : 'loop'"
+                  size="16"
+                  :color="item.status === '已解析' ? '#005842' : '#6f7974'"
+                />
+                <text>{{ item.status }}</text>
+              </view>
+              <view class="mastery-pill" :class="item.mastery === '未掌握' ? 'danger' : item.mastery === '部分掌握' ? 'partial' : 'success'">
+                {{ item.mastery }}
+              </view>
+            </view>
           </view>
         </view>
       </view>
-    </view>
-
-    <view class="float-btn" @click="openUpload">
-      <uni-icons type="camera-filled" size="24" color="#ffffff" />
-      <text>拍错题</text>
     </view>
   </view>
 </template>
 
 <style lang="scss" scoped>
-.wq-page {
-  position: relative;
+.wrong-page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 24rpx 28rpx 150rpx;
-  color: #1f2d33;
-  background: #f4f6f5;
+  padding-bottom: 150rpx;
+  color: #0f1d23;
+  background: #f3faff;
 }
 
-.search-bar {
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 96rpx 1fr 96rpx;
+  align-items: center;
+  height: 100rpx;
+  padding: 0 26rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #bec9c3;
+}
+
+.icon-btn,
+.upload-btn {
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.icon-btn::after,
+.upload-btn::after {
+  border: 0;
+}
+
+.icon-btn {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  justify-content: flex-start;
+  width: 72rpx;
+  height: 72rpx;
+  background: transparent;
+}
+
+.icon-btn.right {
+  justify-content: flex-end;
+  justify-self: end;
+}
+
+.page-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #005842;
+  text-align: center;
+}
+
+.page-body {
+  padding: 18rpx 26rpx 0;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  height: 78rpx;
+  padding: 0 24rpx;
+  background: #ffffff;
+  border: 2rpx solid #bec9c3;
+  border-radius: 14rpx;
 }
 
 .search-input {
-  display: flex;
   flex: 1;
-  align-items: center;
-  gap: 12rpx;
   height: 76rpx;
-  padding: 0 24rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 999rpx;
+  font-size: 29rpx;
+  color: #0f1d23;
 }
 
-.search-field {
-  flex: 1;
-  font-size: 27rpx;
-  color: #1f2d33;
+.search-placeholder {
+  color: #6f7974;
 }
 
-.search-ph {
-  color: #9aa5aa;
-}
-
-.cam-btn {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 76rpx;
-  height: 76rpx;
-  padding: 0;
-  margin: 0;
-  background: #1f7159;
-  border-radius: 50%;
-}
-
-.cam-btn::after {
-  border: 0;
-}
-
-.stat-grid {
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12rpx;
-  margin-top: 22rpx;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22rpx;
+  margin-top: 44rpx;
 }
 
-.stat-item {
-  padding: 22rpx 8rpx;
-  text-align: center;
+.stat-card {
+  position: relative;
+  min-height: 158rpx;
+  box-sizing: border-box;
+  padding: 28rpx 30rpx;
+  overflow: hidden;
   background: #ffffff;
-  border: 1rpx solid #e7ece9;
+  border: 2rpx solid #bec9c3;
   border-radius: 14rpx;
+  box-shadow: 0 4rpx 10rpx rgba(31, 45, 51, 0.05);
 }
 
-.stat-value {
-  font-size: 38rpx;
-  font-weight: 700;
+.stat-card.primary {
+  color: #a4f2d4;
+  background: #1f7159;
+  border-color: #1f7159;
 }
 
-.stat-value.warn {
-  color: #8a671b;
+.stat-card.mint {
+  color: #466c61;
+  background: #c2ebde;
+  border-color: #c2ebde;
 }
 
-.stat-value.info {
-  color: #335d9a;
-}
-
-.stat-value.danger {
-  color: #9a3b33;
-}
-
-.stat-value.success {
-  color: #227253;
+.stat-mark {
+  position: absolute;
+  top: -8rpx;
+  right: -6rpx;
+  line-height: 1;
+  opacity: 0.2;
 }
 
 .stat-label {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #718088;
-}
-
-.filter-scroll {
-  margin: 22rpx -28rpx 18rpx;
-  white-space: nowrap;
-}
-
-.filter-row {
-  display: flex;
-  gap: 14rpx;
-  padding: 0 28rpx;
-}
-
-.filter-btn {
-  padding: 16rpx 24rpx;
-  margin: 0;
+  position: relative;
+  z-index: 1;
   font-size: 25rpx;
-  line-height: 1;
-  color: #67757c;
-  background: #ffffff;
-  border: 1rpx solid #e2e8e5;
-  border-radius: 999rpx;
+  font-weight: 700;
+  color: inherit;
+  opacity: 0.82;
 }
 
-.filter-btn::after {
-  border: 0;
+.stat-card.plain .stat-label {
+  color: #3f4944;
 }
 
-.filter-btn.active {
-  color: #1e7259;
-  background: #e6f4ee;
-  border-color: #b8dccc;
+.stat-value {
+  position: relative;
+  z-index: 1;
+  margin-top: 26rpx;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #0f1d23;
 }
 
-.state-box {
-  padding: 90rpx 0;
-  font-size: 28rpx;
-  color: #7a858b;
-  text-align: center;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
+.stat-card.primary .stat-value,
+.stat-card.mint .stat-value {
+  color: inherit;
 }
 
-.wq-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-}
-
-.wq-card {
-  display: flex;
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 22rpx;
-  padding: 22rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
+  margin-top: 44rpx;
 }
 
-.wq-thumb {
+.upload-btn {
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 120rpx;
-  height: 120rpx;
-  background: #f1f4f2;
+  gap: 16rpx;
+  height: 80rpx;
+  font-size: 29rpx;
+  font-weight: 700;
   border-radius: 14rpx;
 }
 
-.wq-main {
+.upload-btn.primary {
+  color: #ffffff;
+  background: #1f7159;
+}
+
+.upload-btn.outline {
+  color: #1f7159;
+  background: transparent;
+  border: 2rpx solid #1f7159;
+}
+
+.section-title {
+  margin-top: 50rpx;
+  margin-bottom: 28rpx;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.wrong-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.wrong-card {
+  display: flex;
+  gap: 22rpx;
+  padding: 26rpx;
+  background: #ffffff;
+  border: 2rpx solid #bec9c3;
+  border-radius: 14rpx;
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 144rpx;
+  height: 144rpx;
+  overflow: hidden;
+  background: #d6e5ed;
+  border-radius: 8rpx;
+}
+
+.thumb.phone {
+  background: linear-gradient(145deg, #193f36, #2f5d53);
+}
+
+.thumb.board {
+  background: linear-gradient(145deg, #d9f0ef, #eef7f2);
+}
+
+.thumb.paper {
+  background: linear-gradient(145deg, #edf7f4, #ffffff);
+}
+
+.phone-shape {
+  position: absolute;
+  top: 28rpx;
+  left: 46rpx;
+  width: 48rpx;
+  height: 88rpx;
+  background: #0f1d23;
+  border: 4rpx solid #4c8c7a;
+  border-radius: 10rpx;
+  transform: rotate(-14deg);
+}
+
+.phone-shape::after {
+  position: absolute;
+  top: 14rpx;
+  left: 8rpx;
+  width: 28rpx;
+  height: 46rpx;
+  background: #ffffff;
+  border-radius: 3rpx;
+  content: '';
+}
+
+.paper-shape {
+  position: absolute;
+  right: 28rpx;
+  bottom: 24rpx;
+  width: 64rpx;
+  height: 82rpx;
+  background: #ffffff;
+  border-radius: 4rpx;
+  box-shadow: 0 12rpx 20rpx rgba(15, 29, 35, 0.18);
+  transform: rotate(-8deg);
+}
+
+.paper-shape::before,
+.paper-shape::after {
+  position: absolute;
+  left: 12rpx;
+  width: 40rpx;
+  height: 4rpx;
+  background: #c2ebde;
+  border-radius: 999rpx;
+  content: '';
+}
+
+.paper-shape::before {
+  top: 20rpx;
+}
+
+.paper-shape::after {
+  top: 34rpx;
+}
+
+.diagram-shape {
+  position: absolute;
+  top: 38rpx;
+  left: 32rpx;
+  width: 82rpx;
+  height: 62rpx;
+  border: 4rpx solid #ffffff;
+  border-left-color: #8ebbb0;
+  border-bottom-color: #8ebbb0;
+}
+
+.thumb.phone .paper-shape,
+.thumb.phone .diagram-shape,
+.thumb.board .phone-shape,
+.thumb.board .paper-shape,
+.thumb.paper .phone-shape,
+.thumb.paper .diagram-shape {
+  display: none;
+}
+
+.wrong-main {
   flex: 1;
   min-width: 0;
 }
 
-.wq-title-line {
+.card-top {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  justify-content: space-between;
+  gap: 14rpx;
 }
 
-.wq-title {
-  flex: 1;
+.student-name {
   overflow: hidden;
   font-size: 30rpx;
-  font-weight: 700;
+  font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ai-pill {
+.subject-pill {
   flex-shrink: 0;
-  padding: 6rpx 14rpx;
-  font-size: 21rpx;
-  border-radius: 999rpx;
-}
-
-.ai-pill.info {
-  color: #335d9a;
-  background: #eaf1ff;
-}
-
-.ai-pill.warn {
-  color: #8a671b;
-  background: #fff5d8;
-}
-
-.ai-pill.success {
-  color: #227253;
-  background: #e9f6ef;
-}
-
-.ai-pill.danger {
-  color: #9a3b33;
-  background: #ffeceb;
-}
-
-.wq-sub {
-  margin-top: 12rpx;
+  padding: 8rpx 20rpx;
   font-size: 24rpx;
-  color: #75838a;
-}
-
-.wq-foot {
-  margin-top: 16rpx;
-}
-
-.mastery {
-  padding: 6rpx 16rpx;
-  font-size: 22rpx;
+  font-weight: 700;
+  color: #00583d;
+  background: rgba(194, 235, 222, 0.82);
   border-radius: 999rpx;
 }
 
-.mastery.danger {
-  color: #9a3b33;
-  background: #ffeceb;
+.wrong-title {
+  overflow: hidden;
+  margin-top: 18rpx;
+  font-size: 28rpx;
+  line-height: 1.35;
+  color: #0f1d23;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.mastery.warn {
-  color: #8a671b;
-  background: #fff5d8;
-}
-
-.mastery.success {
-  color: #227253;
-  background: #e9f6ef;
-}
-
-.float-btn {
-  position: fixed;
-  right: 36rpx;
-  bottom: 180rpx;
-  z-index: 20;
+.tag-row {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.status-pill,
+.mastery-pill {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 120rpx;
-  height: 120rpx;
-  font-size: 20rpx;
-  color: #ffffff;
-  background: #1f7159;
-  border-radius: 50%;
-  box-shadow: 0 12rpx 30rpx rgba(31, 113, 89, 0.36);
+  gap: 6rpx;
+  min-height: 40rpx;
+  padding: 0 16rpx;
+  font-size: 23rpx;
+  color: #005842;
+  background: rgba(194, 235, 222, 0.5);
+  border-radius: 999rpx;
+}
+
+.status-pill.loading {
+  color: #6f7974;
+  background: #d6e5ed;
+}
+
+.mastery-pill.danger {
+  color: #ba1a1a;
+  background: rgba(255, 218, 214, 0.6);
+}
+
+.mastery-pill.partial,
+.mastery-pill.success {
+  color: #00583d;
+  background: rgba(194, 235, 222, 0.72);
 }
 </style>

@@ -1,271 +1,272 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
-
 defineOptions({
   name: 'ScheduleConflict',
 })
+
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '排课冲突',
   },
 })
 
-const conflicts = ref([
+const conflicts = [
   {
-    id: 1,
-    type: '老师时间冲突',
-    time: '06月25日 18:30-20:00',
-    target: '王老师',
-    existing: '英语精读B班',
-    tone: 'danger',
+    type: '老师冲突',
+    icon: 'person',
+    lesson: '第 3 节课次',
+    title: '王老师在 14:00 已有课程',
+    desc: '原计划：2023-10-25 14:00 - 15:30 · 高一数学强化班',
+    actions: ['更换老师', '修改时间'],
   },
   {
-    id: 2,
-    type: '教室时间冲突',
-    time: '06月25日 18:30-20:00',
-    target: '301教室',
-    existing: '物理基础班',
-    tone: 'warn',
+    type: '教室占用',
+    icon: 'home',
+    lesson: '第 5 节课次',
+    title: 'A区201 已被占用',
+    desc: '原计划：2023-10-26 10:00 - 11:30 · 物理实验课',
+    actions: ['更换教室'],
   },
-])
+]
 
-function backEdit() {
+function goBack() {
   uni.navigateBack()
 }
 
-function changeTeacher() {
-  uni.showToast({ title: '选择其他老师', icon: 'none' })
+function handleAction(label: string) {
+  uni.showToast({ title: label, icon: 'none' })
 }
 
-function changeRoom() {
-  uni.showToast({ title: '选择其他教室', icon: 'none' })
+function skipConflict() {
+  uni.showToast({ title: '已跳过冲突课次', icon: 'none' })
 }
 
-function changeTime() {
-  uni.showToast({ title: '调整时间', icon: 'none' })
-}
-
-function ignoreConflict() {
+function forceSave() {
   uni.showModal({
-    title: '忽略冲突继续排课',
-    content: '存在 2 个冲突，强行排课可能造成老师/教室占用重叠。确认继续？',
-    confirmText: '确认继续',
-    confirmColor: '#c0392b',
-    success: (res) => {
-      if (res.confirm) {
-        uni.showToast({ title: '已生成排课', icon: 'success' })
-        setTimeout(() => uni.navigateBack({ delta: 2 }), 700)
-      }
-    },
+    title: '仍然保存',
+    content: '存在排课冲突，仍然保存可能造成老师或教室占用重叠。确认保存？',
+    confirmText: '仍然保存',
+    confirmColor: '#1f7159',
   })
 }
 </script>
 
 <template>
-  <view class="cf-page">
-    <view class="alert-bar">
-      <uni-icons type="info-filled" size="18" color="#9a3b33" />
-      <text>检测到 {{ conflicts.length }} 个排课冲突，请调整后再生成</text>
-    </view>
-
-    <view class="summary-row">
-      <view class="summary-item">
-        <view class="summary-num">
-          {{ conflicts.length }}
-        </view>
-        <view class="summary-label">
-          当前冲突
-        </view>
-      </view>
-      <view class="summary-item">
-        <view class="summary-num">
-          2
-        </view>
-        <view class="summary-label">
-          已有课次
-        </view>
+  <view class="conflict-page">
+    <view class="topbar">
+      <button class="back-btn" @click="goBack">
+        <uni-icons type="left" size="28" color="#0f1d23" />
+      </button>
+      <view class="page-title">
+        排课冲突
       </view>
     </view>
 
-    <view class="conflict-list">
-      <view v-for="c in conflicts" :key="c.id" class="conflict-card">
-        <view class="cc-head">
-          <text class="cc-type" :class="c.tone">
-            {{ c.type }}
-          </text>
-        </view>
-        <view class="cc-row">
-          <text class="cc-label">
-            冲突时间
-          </text>
-          <text class="cc-value danger-text">
-            {{ c.time }}
-          </text>
-        </view>
-        <view class="cc-row">
-          <text class="cc-label">
-            冲突对象
-          </text>
-          <text class="cc-value danger-text">
-            {{ c.target }}
-          </text>
-        </view>
-        <view class="cc-row">
-          <text class="cc-label">
-            已存在课程
-          </text>
-          <text class="cc-value">
-            {{ c.existing }}
-          </text>
+    <scroll-view class="content-scroll" scroll-y>
+      <view class="alert-card">
+        <uni-icons type="info-filled" size="30" color="#8a671b" />
+        <view class="alert-main">
+          <view class="alert-title">
+            发现 2 个排课冲突
+          </view>
+          <view class="alert-desc">
+            请处理以下冲突以完成排课。您也可以选择跳过这些有冲突的课次。
+          </view>
         </view>
       </view>
-    </view>
 
-    <view class="fix-grid">
-      <button class="fix-btn" @click="changeTeacher">
-        换老师
-      </button>
-      <button class="fix-btn" @click="changeRoom">
-        换教室
-      </button>
-      <button class="fix-btn" @click="changeTime">
-        调整时间
-      </button>
-    </view>
+      <view
+        v-for="item in conflicts"
+        :key="item.title"
+        class="conflict-card"
+      >
+        <view class="conflict-head">
+          <view class="tag-row">
+            <view class="conflict-tag">
+              <uni-icons :type="item.icon" size="16" color="#8a671b" />
+              <text>{{ item.type }}</text>
+            </view>
+            <text class="lesson-tag">{{ item.lesson }}</text>
+          </view>
+          <view class="conflict-title">
+            {{ item.title }}
+          </view>
+          <view class="conflict-desc">
+            {{ item.desc }}
+          </view>
+        </view>
+
+        <view class="card-actions">
+          <button
+            v-for="action in item.actions"
+            :key="action"
+            class="action-btn"
+            @click="handleAction(action)"
+          >
+            <uni-icons
+              :type="action.includes('时间') ? 'calendar' : action.includes('教室') ? 'location' : 'loop'"
+              size="22"
+              color="#1f7159"
+            />
+            <text>{{ action }}</text>
+          </button>
+        </view>
+      </view>
+    </scroll-view>
 
     <view class="bottom-bar">
-      <button class="ghost-btn" @click="backEdit">
-        返回修改
+      <button class="skip-btn" @click="skipConflict">
+        跳过冲突课次
       </button>
-      <button class="danger-btn" @click="ignoreConflict">
-        忽略冲突继续
+      <button class="save-btn" @click="forceSave">
+        仍然保存
       </button>
     </view>
   </view>
 </template>
 
 <style lang="scss" scoped>
-.cf-page {
+.conflict-page {
   min-height: 100vh;
-  box-sizing: border-box;
-  padding: 24rpx 28rpx 180rpx;
-  color: #1f2d33;
+  color: #0f1d23;
   background: #f4f6f5;
 }
 
-.alert-bar {
+.topbar {
   display: flex;
-  gap: 12rpx;
+  gap: 24rpx;
   align-items: center;
-  padding: 22rpx 24rpx;
-  font-size: 26rpx;
-  color: #9a3b33;
-  background: #ffeceb;
-  border: 1rpx solid #f6d6d2;
-  border-radius: 14rpx;
+  height: 112rpx;
+  padding: 0 28rpx;
+  background: #f4f6f5;
 }
 
-.summary-row {
+.back-btn {
   display: flex;
-  gap: 12rpx;
-  margin-top: 18rpx;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 80rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: 50%;
 }
 
-.summary-item {
+.page-title {
   flex: 1;
-  padding: 24rpx 0;
-  text-align: center;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
+  font-size: 48rpx;
+  font-weight: 800;
 }
 
-.summary-num {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #9a3b33;
+.content-scroll {
+  box-sizing: border-box;
+  height: calc(100vh - 112rpx);
+  padding: 0 28rpx 146rpx;
 }
 
-.summary-label {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #718088;
-}
-
-.conflict-list {
+.alert-card {
   display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-  margin-top: 18rpx;
-}
-
-.conflict-card {
-  padding: 26rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
+  gap: 20rpx;
+  align-items: flex-start;
+  padding: 28rpx;
+  background: #fff5d8;
+  border: 1rpx solid rgba(138, 103, 27, 0.24);
   border-radius: 16rpx;
 }
 
-.cc-head {
+.alert-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  margin-bottom: 8rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #8a671b;
+}
+
+.alert-desc {
+  font-size: 26rpx;
+  line-height: 1.5;
+  color: rgba(138, 103, 27, 0.82);
+}
+
+.conflict-card {
+  margin-top: 24rpx;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1rpx solid #e7ece9;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 10rpx rgba(15, 29, 35, 0.04);
+}
+
+.conflict-head {
+  padding: 32rpx;
+  background: rgba(243, 250, 255, 0.36);
+  border-bottom: 1rpx solid #e7ece9;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  align-items: center;
   margin-bottom: 18rpx;
 }
 
-.cc-type {
-  padding: 8rpx 18rpx;
-  font-size: 23rpx;
-  font-weight: 600;
+.conflict-tag {
+  display: flex;
+  gap: 6rpx;
+  align-items: center;
+  padding: 6rpx 14rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #8a671b;
+  background: #fff5d8;
   border-radius: 999rpx;
 }
 
-.cc-type.danger {
-  color: #9a3b33;
-  background: #ffeceb;
+.lesson-tag {
+  font-size: 24rpx;
+  color: #3f4944;
 }
 
-.cc-type.warn {
-  color: #8a671b;
-  background: #fff5d8;
+.conflict-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
-.cc-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12rpx 0;
-}
-
-.cc-label {
-  font-size: 25rpx;
-  color: #75838a;
-}
-
-.cc-value {
+.conflict-desc {
+  margin-top: 8rpx;
   font-size: 26rpx;
-  font-weight: 600;
+  line-height: 1.5;
+  color: #3f4944;
 }
 
-.danger-text {
-  color: #c0392b;
-}
-
-.fix-grid {
+.card-actions {
   display: flex;
-  gap: 12rpx;
-  margin-top: 18rpx;
+  gap: 18rpx;
+  padding: 28rpx;
 }
 
-.fix-btn {
+.action-btn {
+  display: flex;
   flex: 1;
+  gap: 10rpx;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0;
   margin: 0;
   font-size: 26rpx;
-  line-height: 80rpx;
+  font-weight: 700;
   color: #1f7159;
-  background: #e6f4ee;
-  border-radius: 14rpx;
-}
-
-.fix-btn::after {
-  border: 0;
+  background: #ffffff;
+  border: 1rpx solid #1f7159;
+  border-radius: 16rpx;
 }
 
 .bottom-bar {
@@ -273,35 +274,41 @@ function ignoreConflict() {
   right: 0;
   bottom: 0;
   left: 0;
+  z-index: 30;
   display: flex;
-  gap: 16rpx;
-  padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
+  gap: 20rpx;
+  padding: 24rpx 28rpx calc(24rpx + env(safe-area-inset-bottom));
   background: #ffffff;
-  border-top: 1rpx solid #eef1ef;
+  border-top: 1rpx solid #e7ece9;
 }
 
-.ghost-btn,
-.danger-btn {
+.skip-btn,
+.save-btn {
   flex: 1;
+  height: 92rpx;
+  padding: 0;
   margin: 0;
-  font-size: 30rpx;
-  line-height: 90rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 92rpx;
   border-radius: 16rpx;
 }
 
-.ghost-btn {
-  color: #1f7159;
-  background: #e6f4ee;
+.skip-btn {
+  color: #3f4944;
+  background: #ffffff;
+  border: 1rpx solid #6f7974;
 }
 
-.danger-btn {
-  font-weight: 600;
+.save-btn {
   color: #ffffff;
-  background: #c0392b;
+  background: #1f7159;
 }
 
-.ghost-btn::after,
-.danger-btn::after {
+.back-btn::after,
+.action-btn::after,
+.skip-btn::after,
+.save-btn::after {
   border: 0;
 }
 </style>

@@ -6,6 +6,7 @@ defineOptions({
 })
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '学员',
     enablePullDownRefresh: true,
   },
@@ -14,13 +15,14 @@ definePage({
 interface StudentItem {
   id: number
   name: string
+  gender: 'male' | 'female'
+  age: string
   grade: string
-  school: string
-  phone: string
   className: string
   remaining: number
-  tags: string[]
-  status: 'studying' | 'low' | 'absent' | 'follow' | 'unbound'
+  lastLesson: string
+  status: 'studying' | 'renew' | 'stopped' | 'today' | 'leave'
+  avatar?: string
 }
 
 const keyword = ref('')
@@ -29,76 +31,86 @@ const activeFilter = ref('all')
 const filterOptions = [
   { label: '全部', value: 'all' },
   { label: '在读', value: 'studying' },
-  { label: '课时不足', value: 'low' },
-  { label: '近期缺勤', value: 'absent' },
-  { label: '待跟进', value: 'follow' },
-  { label: '未绑定微信', value: 'unbound' },
+  { label: '待续费', value: 'renew' },
+  { label: '已停课', value: 'stopped' },
+  { label: '今日有课', value: 'today' },
+  { label: '请假中', value: 'leave' },
 ]
 
-// 静态 mock 数据
 const students = ref<StudentItem[]>([
-  { id: 1, name: '李明轩', grade: '三年级', school: '实验小学', phone: '138****2046', className: '数学提高A班', remaining: 2, tags: ['课时不足', '待跟进'], status: 'low' },
-  { id: 2, name: '王诗涵', grade: '五年级', school: '育才小学', phone: '139****7781', className: '英语精读B班', remaining: 18, tags: ['在读'], status: 'studying' },
-  { id: 3, name: '张子墨', grade: '初一', school: '第三中学', phone: '137****5520', className: '物理基础班', remaining: 6, tags: ['近期缺勤'], status: 'absent' },
-  { id: 4, name: '陈嘉怡', grade: '四年级', school: '阳光小学', phone: '135****9013', className: '作文兴趣班', remaining: 12, tags: ['未绑定'], status: 'unbound' },
-  { id: 5, name: '刘梓萱', grade: '初二', school: '外国语学校', phone: '136****3344', className: '数学冲刺班', remaining: 1, tags: ['课时不足'], status: 'low' },
-  { id: 6, name: '赵奕辰', grade: '六年级', school: '中心小学', phone: '188****6677', className: '英语口语班', remaining: 24, tags: ['在读'], status: 'studying' },
+  { id: 1, name: '张小明', gender: 'male', age: '12岁', grade: '初一', className: '英语进阶班', remaining: 24, lastLesson: '2023-10-27', status: 'studying' },
+  { id: 2, name: '李思思', gender: 'female', age: '10岁', grade: '小学四年级', className: '数学思维班', remaining: 2, lastLesson: '2023-10-25', status: 'renew', avatar: '/static/images/avatar.jpg' },
+  { id: 3, name: '王强', gender: 'male', age: '15岁', grade: '高一', className: '物理集训营', remaining: 12, lastLesson: '2023-09-10', status: 'stopped' },
 ])
 
 const filteredStudents = computed(() => {
   return students.value.filter((item) => {
     const matchKeyword = !keyword.value
       || item.name.includes(keyword.value)
-      || item.phone.includes(keyword.value)
       || item.className.includes(keyword.value)
+      || item.grade.includes(keyword.value)
     const matchFilter = activeFilter.value === 'all' || item.status === activeFilter.value
     return matchKeyword && matchFilter
   })
 })
 
-function tagClass(tag: string) {
-  if (tag.includes('不足'))
-    return 'warn'
-  if (tag.includes('缺勤'))
-    return 'danger'
-  if (tag.includes('跟进'))
-    return 'info'
-  if (tag.includes('未绑定'))
-    return 'muted'
-  return 'success'
+function statusText(status: StudentItem['status']) {
+  const map = {
+    studying: '在读',
+    renew: '待续费',
+    stopped: '已停课',
+    today: '今日有课',
+    leave: '请假中',
+  }
+  return map[status]
 }
 
 function openDetail(item: StudentItem) {
   uni.navigateTo({ url: `/pages/student/detail?id=${item.id}` })
 }
 
+function openLeave(item: StudentItem) {
+  uni.navigateTo({ url: `/pages/student/leave?name=${encodeURIComponent(item.name)}` })
+}
+
 function contactStudent(item: StudentItem) {
-  uni.showToast({ title: `联系 ${item.name} 家长`, icon: 'none' })
-}
-
-function openEnroll(item: StudentItem) {
-  uni.showToast({ title: `${item.name} 报名续费`, icon: 'none' })
-}
-
-function openWrong(item: StudentItem) {
-  uni.switchTab({ url: '/pages/wrong-question/index' })
+  uni.showActionSheet({
+    itemList: ['打电话', '复制手机号', '发消息', '添加跟进记录'],
+    success: () => uni.showToast({ title: `联系 ${item.name}`, icon: 'none' }),
+  })
 }
 
 function addStudent() {
-  uni.showToast({ title: '新增学员', icon: 'none' })
+  uni.navigateTo({ url: '/pages/student/add' })
 }
 </script>
 
 <template>
   <view class="student-page">
-    <view class="search-bar">
-      <view class="search-input">
-        <uni-icons type="search" size="18" color="#8a969d" />
-        <input v-model="keyword" class="search-field" placeholder="搜索姓名 / 手机号 / 班级" placeholder-class="search-ph">
+    <view class="top-bar">
+      <view class="brand">
+        <image src="/static/images/avatar.jpg" mode="aspectFill" class="teacher-avatar" />
+        <text class="brand-text">
+          老师帮
+        </text>
       </view>
-      <button class="add-btn" @click="addStudent">
-        <uni-icons type="plusempty" size="18" color="#ffffff" />
+      <button class="campus-btn">
+        切换校区
       </button>
+    </view>
+
+    <view class="title-row">
+      <text class="page-title">
+        学员
+      </text>
+      <button class="add-round" @click="addStudent">
+        <uni-icons type="personadd" size="24" color="#00684f" />
+      </button>
+    </view>
+
+    <view class="search-box">
+      <uni-icons type="search" size="23" color="#34433d" />
+      <input v-model="keyword" class="search-input" placeholder="搜索姓名、手机号、班级" placeholder-class="placeholder">
     </view>
 
     <scroll-view class="filter-scroll" scroll-x>
@@ -106,7 +118,7 @@ function addStudent() {
         <button
           v-for="item in filterOptions"
           :key="item.value"
-          class="filter-btn"
+          class="filter-chip"
           :class="{ active: activeFilter === item.value }"
           @click="activeFilter = item.value"
         >
@@ -115,54 +127,69 @@ function addStudent() {
       </view>
     </scroll-view>
 
-    <view v-if="!filteredStudents.length" class="state-box">
-      暂无学员
-    </view>
-    <view v-else class="student-list">
-      <view v-for="item in filteredStudents" :key="item.id" class="student-card" @click="openDetail(item)">
+    <view class="student-list">
+      <view
+        v-for="item in filteredStudents"
+        :key="item.id"
+        class="student-card"
+        :class="{ disabled: item.status === 'stopped' }"
+        @click="openDetail(item)"
+      >
         <view class="card-head">
-          <view class="avatar">
+          <image v-if="item.avatar" :src="item.avatar" mode="aspectFill" class="avatar-img" />
+          <view v-else class="avatar-text">
             {{ item.name.slice(0, 1) }}
           </view>
-          <view class="head-main">
+          <view class="student-main">
             <view class="name-line">
-              <text class="name">
+              <text class="student-name">
                 {{ item.name }}
               </text>
-              <text class="meta">
-                {{ item.grade }} · {{ item.school }}
+              <text class="gender" :class="item.gender">
+                {{ item.gender === 'male' ? '♂' : '♀' }}
               </text>
             </view>
-            <view class="sub-line">
-              {{ item.className }} · {{ item.phone }}
-            </view>
-            <view class="tag-line">
-              <text v-for="tag in item.tags" :key="tag" class="tag" :class="tagClass(tag)">
-                {{ tag }}
-              </text>
+            <view class="student-meta">
+              {{ item.age }} · {{ item.grade }} · {{ item.className }}
             </view>
           </view>
-          <view class="remaining" :class="{ low: item.remaining <= 3 }">
-            <view class="remaining-num">
-              {{ item.remaining }}
-            </view>
-            <view class="remaining-label">
+          <text class="status-pill" :class="item.status">
+            {{ statusText(item.status) }}
+          </text>
+        </view>
+
+        <view class="stat-panel">
+          <view class="stat-block">
+            <text class="stat-label">
               剩余课时
+            </text>
+            <view class="stat-value" :class="{ danger: item.remaining <= 3 }">
+              {{ item.remaining }} <text>节</text>
+            </view>
+          </view>
+          <view class="stat-divider" />
+          <view class="stat-block">
+            <text class="stat-label">
+              最近上课
+            </text>
+            <view class="stat-date">
+              {{ item.lastLesson }}
             </view>
           </view>
         </view>
+
         <view class="card-actions" @click.stop>
-          <button class="act-btn" @click="openDetail(item)">
-            详情
+          <button class="action-btn" @click="contactStudent(item)">
+            <uni-icons type="phone" size="18" color="#00684f" />
+            <text>联系</text>
           </button>
-          <button class="act-btn" @click="contactStudent(item)">
-            联系
+          <button class="action-btn" :disabled="item.status === 'stopped'" @click="openLeave(item)">
+            <uni-icons type="calendar" size="18" color="#00684f" />
+            <text>请假</text>
           </button>
-          <button class="act-btn" @click="openEnroll(item)">
-            续费
-          </button>
-          <button class="act-btn" @click="openWrong(item)">
-            错题
+          <button class="action-btn" @click="openDetail(item)">
+            <uni-icons type="eye" size="18" color="#00684f" />
+            <text>详情</text>
           </button>
         </view>
       </view>
@@ -174,245 +201,314 @@ function addStudent() {
 .student-page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 24rpx 28rpx 150rpx;
-  color: #1f2d33;
+  padding: 0 28rpx 160rpx;
+  color: #101f26;
   background: #f4f6f5;
 }
 
-.search-bar {
+.top-bar {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  justify-content: space-between;
+  height: 104rpx;
+  margin: 0 -28rpx;
+  padding: 0 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #c9d5d0;
 }
 
-.search-input {
+.brand {
   display: flex;
-  flex: 1;
   align-items: center;
-  gap: 12rpx;
-  height: 76rpx;
-  padding: 0 24rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 999rpx;
+  gap: 20rpx;
 }
 
-.search-field {
-  flex: 1;
-  font-size: 27rpx;
-  color: #1f2d33;
-}
-
-.search-ph {
-  color: #9aa5aa;
-}
-
-.add-btn {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 76rpx;
-  height: 76rpx;
-  padding: 0;
-  margin: 0;
-  background: #1f7159;
+.teacher-avatar {
+  width: 58rpx;
+  height: 58rpx;
+  border: 2rpx solid #76988b;
   border-radius: 50%;
 }
 
-.add-btn::after {
+.brand-text {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #00684f;
+}
+
+.campus-btn {
+  padding: 0;
+  margin: 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 56rpx;
+  color: #00684f;
+  background: transparent;
+}
+
+.campus-btn::after,
+.add-round::after,
+.filter-chip::after,
+.action-btn::after {
   border: 0;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 50rpx;
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: 800;
+  color: #101f26;
+}
+
+.add-round {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 74rpx;
+  height: 74rpx;
+  padding: 0;
+  margin: 0;
+  background: #e1f0f8;
+  border-radius: 50%;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  height: 82rpx;
+  margin-top: 38rpx;
+  padding: 0 28rpx;
+  background: #ffffff;
+  border: 1rpx solid #b8c6c0;
+  border-radius: 14rpx;
+  box-shadow: 0 2rpx 4rpx rgba(16, 31, 38, 0.06);
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.placeholder {
+  color: #8a969d;
+}
+
 .filter-scroll {
-  margin: 22rpx -28rpx 18rpx;
+  margin: 32rpx -28rpx 26rpx;
   white-space: nowrap;
 }
 
 .filter-row {
   display: flex;
-  gap: 14rpx;
+  gap: 16rpx;
   padding: 0 28rpx;
 }
 
-.filter-btn {
-  padding: 16rpx 24rpx;
+.filter-chip {
+  height: 58rpx;
+  padding: 0 30rpx;
   margin: 0;
-  font-size: 25rpx;
-  line-height: 1;
-  color: #67757c;
-  background: #ffffff;
-  border: 1rpx solid #e2e8e5;
+  font-size: 28rpx;
+  line-height: 58rpx;
+  color: #34433d;
+  background: #e7f6fe;
+  border: 1rpx solid #b8c6c0;
   border-radius: 999rpx;
 }
 
-.filter-btn::after {
-  border: 0;
-}
-
-.filter-btn.active {
-  color: #1e7259;
-  background: #e6f4ee;
-  border-color: #b8dccc;
-}
-
-.state-box {
-  padding: 90rpx 0;
-  font-size: 28rpx;
-  color: #7a858b;
-  text-align: center;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
+.filter-chip.active {
+  color: #ffffff;
+  background: #1f7159;
+  border-color: #1f7159;
 }
 
 .student-list {
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 24rpx;
 }
 
 .student-card {
   padding: 26rpx;
   background: #ffffff;
-  border: 1rpx solid #e7ece9;
+  border: 1rpx solid #c9d5d0;
   border-radius: 16rpx;
+}
+
+.student-card.disabled {
+  opacity: 0.68;
 }
 
 .card-head {
   display: flex;
-  gap: 20rpx;
   align-items: flex-start;
+  gap: 22rpx;
 }
 
-.avatar {
+.avatar-img,
+.avatar-text {
+  width: 74rpx;
+  height: 74rpx;
+  border-radius: 50%;
+}
+
+.avatar-img {
+  border: 1rpx solid #c9d5d0;
+}
+
+.avatar-text {
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 84rpx;
-  height: 84rpx;
-  font-size: 32rpx;
-  font-weight: 700;
+  font-size: 30rpx;
+  font-weight: 800;
   color: #1f7159;
-  background: #e6f4ee;
-  border-radius: 20rpx;
+  background: #c2ebde;
 }
 
-.head-main {
+.student-main {
   flex: 1;
   min-width: 0;
 }
 
 .name-line {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12rpx;
 }
 
-.name {
-  font-size: 32rpx;
+.student-name {
+  font-size: 31rpx;
+  font-weight: 800;
+}
+
+.gender {
+  font-size: 26rpx;
   font-weight: 700;
 }
 
-.meta {
-  overflow: hidden;
-  font-size: 23rpx;
-  color: #839099;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.gender.male {
+  color: #00684f;
 }
 
-.sub-line {
-  margin-top: 10rpx;
-  overflow: hidden;
-  font-size: 25rpx;
-  color: #75838a;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.gender.female {
+  color: #cc1b1b;
 }
 
-.tag-line {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-  margin-top: 14rpx;
+.student-meta {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  line-height: 38rpx;
+  color: #27343b;
 }
 
-.tag {
-  padding: 6rpx 14rpx;
-  font-size: 22rpx;
-  border-radius: 999rpx;
+.status-pill {
+  flex-shrink: 0;
+  padding: 10rpx 18rpx;
+  font-size: 27rpx;
+  font-weight: 800;
+  border-radius: 8rpx;
 }
 
-.tag.success {
-  color: #227253;
-  background: #e9f6ef;
+.status-pill.studying,
+.status-pill.today,
+.status-pill.leave {
+  color: #1f7159;
+  background: #dff4ec;
+  border: 1rpx solid #aadac9;
 }
 
-.tag.warn {
-  color: #8a671b;
-  background: #fff5d8;
+.status-pill.renew {
+  color: #ffffff;
+  background: #007f5f;
 }
 
-.tag.danger {
-  color: #9a3b33;
-  background: #ffeceb;
-}
-
-.tag.info {
-  color: #335d9a;
-  background: #eaf1ff;
-}
-
-.tag.muted {
+.status-pill.stopped {
   color: #5d6a70;
   background: #eef2f0;
+  border: 1rpx solid #c9d5d0;
 }
 
-.remaining {
-  flex-shrink: 0;
-  min-width: 110rpx;
-  padding: 12rpx 0;
-  text-align: center;
+.stat-panel {
+  display: flex;
+  align-items: center;
+  margin: 28rpx 0;
+  padding: 24rpx;
+  background: #e7f6fe;
+  border: 1rpx solid #cce3ec;
+  border-radius: 10rpx;
 }
 
-.remaining-num {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #183a34;
+.stat-block {
+  flex: 1;
 }
 
-.remaining.low .remaining-num {
-  color: #c0392b;
+.stat-label {
+  font-size: 24rpx;
+  color: #5d6a70;
 }
 
-.remaining-label {
-  margin-top: 4rpx;
-  font-size: 22rpx;
-  color: #718088;
+.stat-value,
+.stat-date {
+  margin-top: 12rpx;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #101f26;
+}
+
+.stat-value {
+  color: #00684f;
+}
+
+.stat-value.danger {
+  color: #ba1a1a;
+}
+
+.stat-value text {
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 58rpx;
+  margin: 0 36rpx;
+  background: #c9d5d0;
 }
 
 .card-actions {
-  display: flex;
-  gap: 12rpx;
-  margin-top: 22rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
   padding-top: 22rpx;
-  border-top: 1rpx solid #edf1ef;
+  border-top: 1rpx solid #c9d5d0;
 }
 
-.act-btn {
-  flex: 1;
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 62rpx;
   padding: 0;
   margin: 0;
-  font-size: 25rpx;
-  line-height: 64rpx;
-  color: #1f7159;
-  background: #e6f4ee;
-  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 62rpx;
+  color: #00684f;
+  background: #e7f6fe;
+  border-radius: 10rpx;
 }
 
-.act-btn::after {
-  border: 0;
+.action-btn[disabled] {
+  color: #5d6a70;
+  background: #eef2f0;
 }
 </style>

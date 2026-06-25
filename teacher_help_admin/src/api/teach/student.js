@@ -44,10 +44,11 @@ export function delStudent(studentIds) {
 }
 
 // 查询家长列表（用于学生关联）
-export function listParents() {
+export function listParents(query) {
   return request({
     url: '/teach/parent/list',
-    method: 'get'
+    method: 'get',
+    params: query
   })
 }
 

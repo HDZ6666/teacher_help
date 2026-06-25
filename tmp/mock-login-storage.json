@@ -1,0 +1,22 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://127.0.0.1:9000",
+      "localStorage": [
+        {
+          "name": "app-tabbar-index",
+          "value": "{\"type\":\"number\",\"data\":0}"
+        },
+        {
+          "name": "accessTokenExpireTime",
+          "value": "{\"type\":\"number\",\"data\":4102416000000}"
+        },
+        {
+          "name": "token",
+          "value": "{\"type\":\"string\",\"data\":\"{\\\"tokenInfo\\\":{\\\"token\\\":\\\"mock-static-token\\\",\\\"expiresIn\\\":315360000}}\"}"
+        }
+      ]
+    }
+  ]
+}

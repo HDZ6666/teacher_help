@@ -1,260 +1,330 @@
 <script lang="ts" setup>
-import type { ICaptcha } from '@/api/types/login'
-import { onLoad } from '@dcloudio/uni-app'
-import { reactive, ref } from 'vue'
-import { getCode } from '@/api/login'
-import { useTokenStore } from '@/store/token'
-import { tabbarList } from '@/tabbar/config'
-import { isPageTabbar } from '@/tabbar/store'
-import { ensureDecodeURIComponent } from '@/utils'
-import { parseUrlToObj } from '@/utils/index'
+import { ref } from 'vue'
+
+defineOptions({
+  name: 'Login',
+})
 
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '登录',
   },
 })
 
-const tokenStore = useTokenStore()
-const loading = ref(false)
-const captchaLoading = ref(false)
-const redirectUrl = ref('')
-const captcha = ref<ICaptcha>({
-  captchaEnabled: true,
-  uuid: '',
-  image: '',
-})
-const form = reactive({
-  username: '',
-  password: '',
-  code: '',
-  uuid: '',
-})
+const campus = ref('杭州总校区')
+const phone = ref('')
+const password = ref('')
+const remember = ref(true)
+const showPassword = ref(false)
 
-onLoad((options) => {
-  redirectUrl.value = options.redirect ? ensureDecodeURIComponent(options.redirect) : tabbarList[0].pagePath
-  loadCaptcha()
-})
-
-async function loadCaptcha() {
-  captchaLoading.value = true
-  try {
-    const res = await getCode()
-    captcha.value = res.data
-    form.uuid = res.data.uuid
-    form.code = ''
-  }
-  finally {
-    captchaLoading.value = false
-  }
+function chooseCampus() {
+  uni.showActionSheet({
+    itemList: ['杭州总校区', '滨江校区', '西湖校区'],
+    success: (res) => {
+      campus.value = ['杭州总校区', '滨江校区', '西湖校区'][res.tapIndex]
+    },
+  })
 }
 
-function validateForm() {
-  if (!form.username.trim()) {
-    uni.showToast({ title: '请输入手机号', icon: 'none' })
-    return false
-  }
-  if (!form.password) {
-    uni.showToast({ title: '请输入密码', icon: 'none' })
-    return false
-  }
-  if (captcha.value.captchaEnabled && !form.code.trim()) {
-    uni.showToast({ title: '请输入验证码', icon: 'none' })
-    return false
-  }
-  return true
+function login() {
+  uni.showToast({ title: '登录成功', icon: 'success' })
+  setTimeout(() => {
+    uni.switchTab({ url: '/pages/index/index' })
+  }, 500)
 }
 
-function redirectAfterLogin() {
-  let path = redirectUrl.value || tabbarList[0].pagePath
-  if (!path.startsWith('/')) {
-    path = `/${path}`
-  }
-  const { path: purePath } = parseUrlToObj(path)
-  if (isPageTabbar(purePath)) {
-    uni.switchTab({ url: purePath })
-  }
-  else {
-    uni.redirectTo({ url: path })
-  }
+function smsLogin() {
+  uni.showToast({ title: '验证码登录', icon: 'none' })
 }
 
-async function doLogin() {
-  if (tokenStore.hasLogin) {
-    redirectAfterLogin()
-    return
-  }
-  if (!validateForm())
-    return
-  loading.value = true
-  try {
-    await tokenStore.login({
-      username: form.username.trim(),
-      password: form.password,
-      code: form.code.trim(),
-      uuid: form.uuid,
-    })
-    redirectAfterLogin()
-  }
-  catch {
-    loadCaptcha()
-  }
-  finally {
-    loading.value = false
-  }
+function forgotPassword() {
+  uni.showToast({ title: '忘记密码', icon: 'none' })
 }
 </script>
 
 <template>
   <view class="login-page">
-    <view class="brand-block">
-      <view class="brand-mark">
-        帮
-      </view>
-      <view>
+    <view class="top-glow" />
+
+    <view class="login-wrap">
+      <view class="brand">
         <view class="brand-title">
           老师帮
         </view>
-        <view class="brand-sub">
-          上课前后，把点名和课时处理干净
+        <view class="brand-subtitle">
+          让上课、点名、排课更快一点
         </view>
       </view>
-    </view>
 
-    <view class="form-box">
-      <view class="field">
-        <text class="field-label">手机号</text>
-        <input v-model="form.username" class="field-input" placeholder="请输入老师手机号" type="number" confirm-type="next">
-      </view>
-      <view class="field">
-        <text class="field-label">密码</text>
-        <input v-model="form.password" class="field-input" placeholder="请输入密码" password confirm-type="done" @confirm="doLogin">
-      </view>
-      <view v-if="captcha.captchaEnabled" class="field captcha-field">
-        <view class="captcha-input">
-          <text class="field-label">验证码</text>
-          <input v-model="form.code" class="field-input" placeholder="请输入验证码" confirm-type="done" @confirm="doLogin">
+      <view class="login-card">
+        <button class="campus-row" @click="chooseCampus">
+          <text>选择校区</text>
+          <view class="campus-value">
+            <text>{{ campus }}</text>
+            <uni-icons type="right" size="18" color="#6f7974" />
+          </view>
+        </button>
+
+        <view class="input-wrap">
+          <uni-icons type="phone" size="22" color="#6f7974" />
+          <input
+            v-model="phone"
+            class="field-input"
+            placeholder="请输入手机号"
+            placeholder-class="placeholder"
+            type="number"
+          >
         </view>
-        <view class="captcha-img" @click="loadCaptcha">
-          <image v-if="captcha.image" :src="captcha.image" mode="aspectFit" />
-          <text v-else>{{ captchaLoading ? '刷新中' : '刷新' }}</text>
+
+        <view class="input-wrap">
+          <uni-icons type="locked" size="22" color="#6f7974" />
+          <input
+            v-model="password"
+            class="field-input"
+            placeholder="请输入密码"
+            placeholder-class="placeholder"
+            :password="!showPassword"
+          >
+          <button class="eye-btn" @click="showPassword = !showPassword">
+            <uni-icons :type="showPassword ? 'eye-filled' : 'eye-slash-filled'" size="22" color="#6f7974" />
+          </button>
+        </view>
+
+        <view class="option-row">
+          <view class="remember" @click="remember = !remember">
+            <view class="check-box" :class="{ active: remember }">
+              <uni-icons v-if="remember" type="checkmarkempty" size="16" color="#ffffff" />
+            </view>
+            <text>记住登录</text>
+          </view>
+          <button class="link-btn" @click="forgotPassword">
+            忘记密码?
+          </button>
+        </view>
+
+        <button class="login-btn" @click="login">
+          登录
+        </button>
+        <button class="sms-btn" @click="smsLogin">
+          验证码登录
+        </button>
+      </view>
+
+      <view class="footer">
+        <view class="agreement">
+          登录即代表同意 <text>《用户服务协议》</text> 和 <text>《隐私政策》</text>
+        </view>
+        <view class="version">
+          v1.2.0
         </view>
       </view>
-      <button class="login-btn" :disabled="loading" @click="doLogin">
-        {{ loading ? '登录中...' : '登录' }}
-      </button>
     </view>
   </view>
 </template>
 
 <style lang="scss" scoped>
 .login-page {
+  position: relative;
   min-height: 100vh;
-  box-sizing: border-box;
-  padding: 96rpx 36rpx 40rpx;
-  color: #1f2d33;
+  overflow: hidden;
+  color: #0f1d23;
   background: #f4f6f5;
 }
 
-.brand-block {
-  display: flex;
-  align-items: center;
-  gap: 22rpx;
-  margin-bottom: 54rpx;
+.top-glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 260rpx;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(164, 242, 212, 0.28), rgba(244, 246, 245, 0));
 }
 
-.brand-mark {
+.login-wrap {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  width: 88rpx;
-  height: 88rpx;
-  font-size: 38rpx;
-  font-weight: 800;
-  color: #ffffff;
-  background: #193f36;
-  border-radius: 20rpx;
+  min-height: 100vh;
+  padding: 96rpx 28rpx 56rpx;
+}
+
+.brand {
+  margin: 40rpx 0 80rpx;
+  text-align: center;
 }
 
 .brand-title {
-  font-size: 44rpx;
+  margin-bottom: 16rpx;
+  font-size: 48rpx;
   font-weight: 800;
+  color: #1f7159;
 }
 
-.brand-sub {
-  margin-top: 8rpx;
-  font-size: 25rpx;
-  color: #6f7e85;
+.brand-subtitle {
+  font-size: 28rpx;
+  line-height: 1.45;
+  color: #3f4944;
 }
 
-.form-box {
-  display: flex;
-  flex-direction: column;
-  gap: 20rpx;
-}
-
-.field {
-  padding: 22rpx 24rpx;
+.login-card {
+  padding: 48rpx;
   background: #ffffff;
-  border: 1rpx solid #e3e9e6;
-  border-radius: 16rpx;
+  border: 1rpx solid rgba(190, 201, 195, 0.7);
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 22rpx rgba(15, 29, 35, 0.04);
 }
 
-.field-label {
-  display: block;
-  margin-bottom: 12rpx;
-  font-size: 24rpx;
-  color: #65747b;
+.campus-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 0 24rpx;
+  margin: 0 0 28rpx;
+  font-size: 28rpx;
+  color: #0f1d23;
+  background: transparent;
+  border-bottom: 1rpx solid rgba(190, 201, 195, 0.55);
+}
+
+.campus-value {
+  display: flex;
+  gap: 4rpx;
+  align-items: center;
+  font-size: 25rpx;
+  color: #3f4944;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 22rpx;
+  margin-top: 24rpx;
+  background: #f3faff;
+  border: 1rpx solid #bec9c3;
+  border-radius: 16rpx;
 }
 
 .field-input {
-  height: 48rpx;
-  font-size: 31rpx;
-  color: #1f2d33;
-}
-
-.captcha-field {
-  display: flex;
-  align-items: center;
-  gap: 18rpx;
-}
-
-.captcha-input {
   flex: 1;
-  min-width: 0;
+  height: 88rpx;
+  padding-left: 16rpx;
+  font-size: 28rpx;
+  color: #0f1d23;
 }
 
-.captcha-img {
+.placeholder {
+  color: #6f7974;
+}
+
+.eye-btn {
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 190rpx;
-  height: 74rpx;
-  overflow: hidden;
-  font-size: 24rpx;
-  color: #1f7159;
-  background: #edf5f1;
-  border-radius: 12rpx;
+  width: 48rpx;
+  height: 48rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
 }
 
-.captcha-img image {
-  width: 100%;
-  height: 100%;
+.option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0 20rpx;
 }
 
-.login-btn {
-  height: 92rpx;
-  margin-top: 16rpx;
-  font-size: 32rpx;
-  font-weight: 750;
-  line-height: 92rpx;
-  color: #ffffff;
+.remember {
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+  font-size: 25rpx;
+  color: #3f4944;
+}
+
+.check-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32rpx;
+  height: 32rpx;
+  background: #ffffff;
+  border: 2rpx solid #bec9c3;
+  border-radius: 8rpx;
+}
+
+.check-box.active {
   background: #1f7159;
+  border-color: #1f7159;
+}
+
+.link-btn {
+  padding: 0;
+  margin: 0;
+  font-size: 25rpx;
+  color: #1f7159;
+  background: transparent;
+}
+
+.login-btn,
+.sms-btn {
+  width: 100%;
+  height: 92rpx;
+  padding: 0;
+  margin: 16rpx 0 0;
+  font-size: 34rpx;
+  font-weight: 700;
   border-radius: 16rpx;
 }
 
-.login-btn::after {
+.login-btn {
+  color: #ffffff;
+  background: #1f7159;
+  box-shadow: 0 6rpx 16rpx rgba(31, 113, 89, 0.16);
+}
+
+.sms-btn {
+  color: #1f7159;
+  background: transparent;
+  border: 2rpx solid #1f7159;
+}
+
+.footer {
+  margin-top: auto;
+  padding-top: 64rpx;
+  text-align: center;
+}
+
+.agreement {
+  max-width: 560rpx;
+  margin: 0 auto;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: rgba(63, 73, 68, 0.7);
+}
+
+.agreement text {
+  color: #1f7159;
+}
+
+.version {
+  margin-top: 14rpx;
+  font-size: 22rpx;
+  color: #6f7974;
+}
+
+.campus-row::after,
+.eye-btn::after,
+.link-btn::after,
+.login-btn::after,
+.sms-btn::after {
   border: 0;
 }
 </style>

@@ -4,143 +4,174 @@ import { ref } from 'vue'
 defineOptions({
   name: 'WrongUpload',
 })
+
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '拍照上传',
   },
 })
 
-const imageList = ref<string[]>([])
 const student = ref('')
-const subject = ref('')
-const course = ref('')
+const subject = ref('数学')
+const grade = ref('八年级')
+const source = ref('作业')
 
-const subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物']
-const subjectIndex = ref(-1)
+const sourceOptions = ['作业', '课堂', '考试', '其他']
 
-function chooseImage(source: 'camera' | 'album') {
+function chooseImage() {
   uni.chooseImage({
     count: 1,
-    sourceType: source === 'camera' ? ['camera'] : ['album'],
-    success: (res: any) => {
-      imageList.value = res.tempFilePaths
-    },
+    sourceType: ['camera'],
     fail: () => {
-      // 原型：无图时放一张占位
-      imageList.value = ['placeholder']
+      uni.showToast({ title: '已保留示例图片', icon: 'none' })
     },
   })
 }
 
-function removeImage() {
-  imageList.value = []
-}
-
-function onSubjectChange(e: any) {
-  subjectIndex.value = e.detail.value
-  subject.value = subjectOptions[e.detail.value]
+function cropImage() {
+  uni.showToast({ title: '裁剪图片', icon: 'none' })
 }
 
 function pickStudent() {
   uni.showActionSheet({
-    itemList: ['李明轩', '王诗涵', '张子墨', '陈嘉怡'],
+    itemList: ['张子涵', '李心怡', '王宇轩'],
     success: (res) => {
-      student.value = ['李明轩', '王诗涵', '张子墨', '陈嘉怡'][res.tapIndex]
+      student.value = ['张子涵', '李心怡', '王宇轩'][res.tapIndex]
+    },
+  })
+}
+
+function pickSubject() {
+  uni.showActionSheet({
+    itemList: ['数学', '物理', '英语'],
+    success: (res) => {
+      subject.value = ['数学', '物理', '英语'][res.tapIndex]
+    },
+  })
+}
+
+function pickGrade() {
+  uni.showActionSheet({
+    itemList: ['七年级', '八年级', '九年级'],
+    success: (res) => {
+      grade.value = ['七年级', '八年级', '九年级'][res.tapIndex]
     },
   })
 }
 
 function startAnalyze() {
-  if (!imageList.value.length) {
-    uni.showToast({ title: '请先拍照或选择图片', icon: 'none' })
-    return
-  }
-  if (!student.value) {
-    uni.showToast({ title: '请关联学生', icon: 'none' })
-    return
-  }
   uni.navigateTo({ url: '/pages/wrong-question/analyzing' })
+}
+
+function goBack() {
+  uni.navigateBack()
 }
 </script>
 
 <template>
   <view class="upload-page">
-    <view class="tip-bar">
-      <uni-icons type="info" size="16" color="#1f7159" />
-      <text>拍清题目区域，尽量避免阴影和反光</text>
-    </view>
-
-    <view class="shot-area">
-      <view v-if="!imageList.length" class="shot-empty" @click="chooseImage('camera')">
-        <uni-icons type="camera" size="40" color="#9aa5aa" />
-        <text class="shot-empty-text">
-          点击拍摄题目
-        </text>
-      </view>
-      <view v-else class="shot-preview">
-        <view class="preview-img">
-          <uni-icons type="image" size="60" color="#c2cbce" />
-          <text class="preview-hint">
-            题目图片预览
-          </text>
-        </view>
-        <view class="preview-tools">
-          <button class="tool-btn" @click="chooseImage('camera')">
-            重新拍摄
-          </button>
-          <button class="tool-btn" @click="removeImage">
-            删除
-          </button>
-        </view>
-      </view>
-    </view>
-
-    <view class="shot-actions">
-      <button class="ghost-btn" @click="chooseImage('camera')">
-        <uni-icons type="camera" size="18" color="#1f7159" />
-        <text>拍照</text>
+    <view class="top-bar">
+      <button class="back-btn" @click="goBack">
+        <uni-icons type="left" size="30" color="#0f1d23" />
       </button>
-      <button class="ghost-btn" @click="chooseImage('album')">
-        <uni-icons type="image" size="18" color="#1f7159" />
-        <text>从相册选</text>
-      </button>
+      <view class="page-title">
+        拍照上传
+      </view>
+      <view class="top-placeholder" />
     </view>
 
-    <view class="form-card">
-      <view class="form-row" @click="pickStudent">
-        <text class="form-label">
-          关联学生
-        </text>
-        <view class="form-value" :class="{ ph: !student }">
-          {{ student || '请选择学生' }}
-          <uni-icons type="right" size="15" color="#9aa5aa" />
-        </view>
-      </view>
-      <picker :value="subjectIndex" :range="subjectOptions" @change="onSubjectChange">
-        <view class="form-row">
-          <text class="form-label">
-            学科
-          </text>
-          <view class="form-value" :class="{ ph: !subject }">
-            {{ subject || '请选择学科' }}
-            <uni-icons type="right" size="15" color="#9aa5aa" />
+    <scroll-view class="content-scroll" scroll-y>
+      <view class="preview-card" @click="chooseImage">
+        <view class="desk-top" />
+        <view class="paper">
+          <view class="formula-lines left">
+            <view />
+            <view />
+            <view />
+            <view />
+          </view>
+          <view class="axis">
+            <view class="axis-x" />
+            <view class="axis-y" />
+            <view class="curve one" />
+            <view class="curve two" />
           </view>
         </view>
-      </picker>
-      <view class="form-row no-border" @click="course = '数学提高A班 · 06-23'">
-        <text class="form-label">
-          关联课程
-        </text>
-        <view class="form-value" :class="{ ph: !course }">
-          {{ course || '可选' }}
-          <uni-icons type="right" size="15" color="#9aa5aa" />
+        <view class="desk-bottom" />
+        <view class="corner tl" />
+        <view class="corner tr" />
+        <view class="corner bl" />
+        <view class="corner br" />
+      </view>
+
+      <view class="image-actions">
+        <button class="round-action" @click="cropImage">
+          <view class="round-icon crop-icon" />
+          <text>裁剪</text>
+        </button>
+        <button class="round-action" @click="chooseImage">
+          <uni-icons type="refresh" size="30" color="#34433d" />
+          <text>重新拍照</text>
+        </button>
+      </view>
+
+      <view class="form-card">
+        <view class="form-row" @click="pickStudent">
+          <view class="form-left">
+            <uni-icons type="person" size="24" color="#34433d" />
+            <text>关联学员</text>
+          </view>
+          <view class="form-value" :class="{ placeholder: !student }">
+            <text>{{ student || '请选择' }}</text>
+            <uni-icons type="right" size="20" color="#34433d" />
+          </view>
+        </view>
+        <view class="form-row" @click="pickSubject">
+          <view class="form-left">
+            <uni-icons type="list" size="24" color="#34433d" />
+            <text>科目</text>
+          </view>
+          <view class="form-value">
+            <text>{{ subject }}</text>
+            <uni-icons type="right" size="20" color="#34433d" />
+          </view>
+        </view>
+        <view class="form-row" @click="pickGrade">
+          <view class="form-left">
+            <view class="cap-icon" />
+            <text>年级</text>
+          </view>
+          <view class="form-value">
+            <text>{{ grade }}</text>
+            <uni-icons type="right" size="20" color="#34433d" />
+          </view>
+        </view>
+
+        <view class="source-block">
+          <view class="source-title">
+            <view class="source-icon" />
+            <text>来源</text>
+          </view>
+          <view class="source-row">
+            <button
+              v-for="item in sourceOptions"
+              :key="item"
+              class="source-chip"
+              :class="{ active: source === item }"
+              @click="source = item"
+            >
+              {{ item }}
+            </button>
+          </view>
         </view>
       </view>
-    </view>
+    </scroll-view>
 
     <view class="bottom-bar">
-      <button class="primary-btn" @click="startAnalyze">
-        开始 AI 分析
+      <button class="analyze-btn" @click="startAnalyze">
+        <text class="spark">✦</text>
+        <text>开始 AI 分析</text>
       </button>
     </view>
   </view>
@@ -149,146 +180,361 @@ function startAnalyze() {
 <style lang="scss" scoped>
 .upload-page {
   min-height: 100vh;
-  box-sizing: border-box;
-  padding: 24rpx 28rpx 180rpx;
-  color: #1f2d33;
-  background: #f4f6f5;
+  color: #0f1d23;
+  background: #f3faff;
 }
 
-.tip-bar {
-  display: flex;
-  gap: 10rpx;
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 88rpx 1fr 88rpx;
   align-items: center;
-  padding: 18rpx 22rpx;
-  font-size: 24rpx;
-  color: #1f7159;
-  background: #e6f4ee;
-  border-radius: 12rpx;
+  height: 104rpx;
+  padding: 0 26rpx;
+  background: #f3faff;
 }
 
-.shot-area {
-  margin-top: 22rpx;
+.back-btn,
+.round-action,
+.source-chip,
+.analyze-btn {
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
-.shot-empty {
+.back-btn::after,
+.round-action::after,
+.source-chip::after,
+.analyze-btn::after {
+  border: 0;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 72rpx;
+  height: 72rpx;
+  background: transparent;
+}
+
+.page-title {
+  font-size: 39rpx;
+  font-weight: 800;
+  text-align: center;
+}
+
+.top-placeholder {
+  width: 72rpx;
+}
+
+.content-scroll {
+  height: calc(100vh - 104rpx);
+  box-sizing: border-box;
+  padding: 0 24rpx 172rpx;
+}
+
+.preview-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #c7843e;
+  border: 2rpx solid #bec9c3;
+  border-radius: 18rpx;
+  box-shadow: 0 4rpx 12rpx rgba(15, 29, 35, 0.06);
+}
+
+.desk-top,
+.desk-bottom {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 17%;
+  background: linear-gradient(90deg, #b77335, #d89b5d, #bc7836);
+}
+
+.desk-top {
+  top: 0;
+}
+
+.desk-bottom {
+  bottom: 0;
+}
+
+.paper {
+  position: absolute;
+  top: 15%;
+  right: 0;
+  left: 0;
+  height: 70%;
+  background:
+    linear-gradient(rgba(121, 178, 210, 0.18) 1rpx, transparent 1rpx),
+    linear-gradient(90deg, rgba(121, 178, 210, 0.18) 1rpx, transparent 1rpx),
+    #fffdf7;
+  background-size: 26rpx 26rpx;
+  box-shadow: 0 10rpx 22rpx rgba(15, 29, 35, 0.22);
+}
+
+.formula-lines {
+  position: absolute;
+  top: 66rpx;
+  left: 74rpx;
   display: flex;
   flex-direction: column;
   gap: 18rpx;
-  align-items: center;
+  width: 190rpx;
+}
+
+.formula-lines view {
+  height: 5rpx;
+  background: #8fbadd;
+  border-radius: 999rpx;
+  transform: rotate(-8deg);
+}
+
+.formula-lines view:nth-child(2) {
+  width: 150rpx;
+}
+
+.formula-lines view:nth-child(3) {
+  width: 170rpx;
+}
+
+.formula-lines view:nth-child(4) {
+  width: 120rpx;
+}
+
+.axis {
+  position: absolute;
+  top: 94rpx;
+  right: 70rpx;
+  width: 210rpx;
+  height: 210rpx;
+}
+
+.axis-x,
+.axis-y {
+  position: absolute;
+  background: #8fbadd;
+}
+
+.axis-x {
+  top: 104rpx;
+  left: 12rpx;
+  width: 170rpx;
+  height: 4rpx;
+}
+
+.axis-y {
+  top: 28rpx;
+  left: 96rpx;
+  width: 4rpx;
+  height: 160rpx;
+}
+
+.curve {
+  position: absolute;
+  border: 4rpx solid #8fbadd;
+  border-color: #8fbadd transparent transparent #8fbadd;
+  border-radius: 50%;
+}
+
+.curve.one {
+  top: 76rpx;
+  left: 86rpx;
+  width: 68rpx;
+  height: 68rpx;
+  transform: rotate(24deg);
+}
+
+.curve.two {
+  top: 100rpx;
+  left: 112rpx;
+  width: 92rpx;
+  height: 60rpx;
+  transform: rotate(-34deg);
+}
+
+.corner {
+  position: absolute;
+  width: 44rpx;
+  height: 44rpx;
+  border-color: #007351;
+}
+
+.corner.tl {
+  top: 28rpx;
+  left: 28rpx;
+  border-top: 4rpx solid #007351;
+  border-left: 4rpx solid #007351;
+}
+
+.corner.tr {
+  top: 28rpx;
+  right: 28rpx;
+  border-top: 4rpx solid #007351;
+  border-right: 4rpx solid #007351;
+}
+
+.corner.bl {
+  bottom: 28rpx;
+  left: 28rpx;
+  border-bottom: 4rpx solid #007351;
+  border-left: 4rpx solid #007351;
+}
+
+.corner.br {
+  right: 28rpx;
+  bottom: 28rpx;
+  border-right: 4rpx solid #007351;
+  border-bottom: 4rpx solid #007351;
+}
+
+.image-actions {
+  display: flex;
   justify-content: center;
-  height: 440rpx;
-  background: #ffffff;
-  border: 2rpx dashed #cfd9d4;
-  border-radius: 18rpx;
+  gap: 48rpx;
+  padding: 28rpx 0 34rpx;
 }
 
-.shot-empty-text {
-  font-size: 26rpx;
-  color: #8a969d;
-}
-
-.shot-preview {
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 18rpx;
-}
-
-.preview-img {
+.round-action {
   display: flex;
   flex-direction: column;
-  gap: 14rpx;
   align-items: center;
-  justify-content: center;
-  height: 440rpx;
-  background: #f1f4f2;
-  border-radius: 18rpx 18rpx 0 0;
-}
-
-.preview-hint {
-  font-size: 24rpx;
-  color: #9aa5aa;
-}
-
-.preview-tools {
-  display: flex;
-  gap: 16rpx;
-  padding: 20rpx;
-}
-
-.tool-btn {
-  flex: 1;
-  margin: 0;
+  gap: 10rpx;
   font-size: 25rpx;
-  line-height: 64rpx;
-  color: #1f7159;
-  background: #eef2f0;
-  border-radius: 12rpx;
+  font-weight: 700;
+  color: #34433d;
+  background: transparent;
 }
 
-.tool-btn::after {
-  border: 0;
-}
-
-.shot-actions {
+.round-action :deep(.uni-icons),
+.crop-icon {
   display: flex;
-  gap: 16rpx;
-  margin-top: 22rpx;
-}
-
-.ghost-btn {
-  display: flex;
-  flex: 1;
-  gap: 8rpx;
   align-items: center;
   justify-content: center;
-  margin: 0;
-  font-size: 26rpx;
-  line-height: 84rpx;
-  color: #1f7159;
-  background: #e6f4ee;
-  border-radius: 14rpx;
+  width: 64rpx;
+  height: 64rpx;
+  background: #d6e5ed;
+  border-radius: 50%;
 }
 
-.ghost-btn::after {
-  border: 0;
+.crop-icon {
+  position: relative;
+}
+
+.crop-icon::before,
+.crop-icon::after {
+  position: absolute;
+  content: '';
+}
+
+.crop-icon::before {
+  width: 30rpx;
+  height: 30rpx;
+  border: 4rpx solid #34433d;
+  border-top: 0;
+  border-right: 0;
+}
+
+.crop-icon::after {
+  width: 36rpx;
+  height: 4rpx;
+  background: #34433d;
+  transform: rotate(90deg) translateX(6rpx);
 }
 
 .form-card {
-  margin-top: 22rpx;
-  padding: 0 26rpx;
+  overflow: hidden;
   background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
+  border: 2rpx solid #bec9c3;
+  border-radius: 18rpx;
+  box-shadow: 0 4rpx 12rpx rgba(15, 29, 35, 0.05);
 }
 
 .form-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 96rpx;
-  border-bottom: 1rpx solid #edf1ef;
+  min-height: 82rpx;
+  padding: 0 28rpx;
+  border-bottom: 1rpx solid #d6e5ed;
 }
 
-.form-row.no-border,
-.form-row:last-child {
-  border-bottom: 0;
+.form-left,
+.form-value,
+.source-title {
+  display: flex;
+  align-items: center;
 }
 
-.form-label {
-  font-size: 27rpx;
-  color: #4a565c;
+.form-left {
+  gap: 18rpx;
+  font-size: 29rpx;
+  color: #0f1d23;
 }
 
 .form-value {
-  display: flex;
-  gap: 6rpx;
-  align-items: center;
-  font-size: 27rpx;
-  color: #1f2d33;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: #0f1d23;
 }
 
-.form-value.ph {
-  color: #9aa5aa;
+.form-value.placeholder {
+  color: #3f4944;
+}
+
+.cap-icon {
+  width: 24rpx;
+  height: 16rpx;
+  border: 4rpx solid #34433d;
+  border-top-width: 8rpx;
+  transform: skewX(-18deg);
+}
+
+.source-icon {
+  width: 24rpx;
+  height: 18rpx;
+  border: 4rpx solid #34433d;
+  border-radius: 3rpx;
+}
+
+.source-block {
+  padding: 30rpx 28rpx 34rpx;
+}
+
+.source-title {
+  gap: 18rpx;
+  margin-bottom: 24rpx;
+  font-size: 29rpx;
+}
+
+.source-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22rpx;
+}
+
+.source-chip {
+  min-width: 106rpx;
+  height: 58rpx;
+  padding: 0 24rpx;
+  font-size: 27rpx;
+  font-weight: 700;
+  color: #34433d;
+  background: #f3faff;
+  border: 2rpx solid #bec9c3;
+  border-radius: 999rpx;
+}
+
+.source-chip.active {
+  color: #466c61;
+  background: #c2ebde;
+  border-color: #c2ebde;
 }
 
 .bottom-bar {
@@ -296,22 +542,27 @@ function startAnalyze() {
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
+  z-index: 30;
+  padding: 26rpx 24rpx calc(26rpx + env(safe-area-inset-bottom));
   background: #ffffff;
-  border-top: 1rpx solid #eef1ef;
+  border-top: 1rpx solid #bec9c3;
 }
 
-.primary-btn {
-  margin: 0;
-  font-size: 30rpx;
-  font-weight: 600;
-  line-height: 90rpx;
+.analyze-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14rpx;
+  width: 100%;
+  height: 92rpx;
+  font-size: 32rpx;
+  font-weight: 800;
   color: #ffffff;
   background: #1f7159;
-  border-radius: 16rpx;
+  border-radius: 14rpx;
 }
 
-.primary-btn::after {
-  border: 0;
+.spark {
+  font-size: 34rpx;
 }
 </style>

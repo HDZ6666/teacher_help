@@ -1,39 +1,27 @@
 <script lang="ts" setup>
-import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
-
 defineOptions({
   name: 'CheckinDone',
 })
+
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '点名完成',
   },
 })
 
-const result = ref({
-  rate: 88,
-  planned: 8,
-  present: 6,
-  late: 1,
-  excused: 0,
-  absent: 1,
-  deducted: 7,
-})
-
-const lowStudents = ref([
-  { id: 1, name: '李明轩', remaining: 1 },
-  { id: 5, name: '刘梓萱', remaining: 0 },
-])
-
-const hasNext = ref(true)
+const stats = [
+  { label: '应到人数', value: 15, icon: 'person', tone: 'normal' },
+  { label: '实到人数', value: 13, icon: 'checkmarkempty', tone: 'green' },
+  { label: '异常人数', value: 2, icon: 'info', tone: 'red' },
+]
 
 function writeComment() {
   uni.navigateTo({ url: '/pages/schedule/comment?id=1' })
 }
 
-function viewDetail() {
-  uni.navigateBack()
+function viewRecord() {
+  uni.navigateTo({ url: '/pages/schedule/course-detail?id=1' })
 }
 
 function nextCheckin() {
@@ -43,95 +31,57 @@ function nextCheckin() {
 function backToday() {
   uni.switchTab({ url: '/pages/index/index' })
 }
-
-onLoad(() => {})
 </script>
 
 <template>
   <view class="done-page">
-    <view class="success-card">
-      <view class="success-icon">
-        <uni-icons type="checkmarkempty" size="46" color="#ffffff" />
+    <view class="success-area">
+      <view class="success-circle">
+        <uni-icons type="checkmarkempty" size="66" color="#00684f" />
       </view>
       <view class="success-title">
-        点名完成
+        点名已完成
       </view>
-      <view class="success-rate">
-        出勤率 <text class="rate-num">{{ result.rate }}%</text>
-      </view>
-    </view>
-
-    <view class="stat-grid">
-      <view class="stat-item">
-        <view class="stat-num">
-          {{ result.planned }}
-        </view>
-        <view class="stat-label">
-          应到
-        </view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-num present">
-          {{ result.present }}
-        </view>
-        <view class="stat-label">
-          到课
-        </view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-num late">
-          {{ result.late }}
-        </view>
-        <view class="stat-label">
-          迟到
-        </view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-num info">
-          {{ result.excused }}
-        </view>
-        <view class="stat-label">
-          请假
-        </view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-num absent">
-          {{ result.absent }}
-        </view>
-        <view class="stat-label">
-          缺勤
-        </view>
+      <view class="success-time">
+        提交时间: 2023-10-27 14:30
       </view>
     </view>
 
-    <view class="deduct-card">
-      <uni-icons type="wallet" size="18" color="#1f7159" />
-      <text>本次共扣减 <text class="deduct-num">{{ result.deducted }}</text> 课时</text>
+    <view class="stats-card">
+      <view class="card-title">
+        本次点名统计
+      </view>
+      <view v-for="item in stats" :key="item.label" class="stat-row">
+        <view class="stat-name">
+          <uni-icons
+            :type="item.icon"
+            size="26"
+            :color="item.tone === 'red' ? '#ba1a1a' : '#00684f'"
+          />
+          <text>{{ item.label }}</text>
+        </view>
+        <text class="stat-value" :class="item.tone">
+          {{ item.value }}
+        </text>
+      </view>
     </view>
 
-    <view v-if="lowStudents.length" class="low-card">
-      <view class="low-title">
-        <uni-icons type="info" size="16" color="#c0392b" />
-        <text>课时不足学生</text>
-      </view>
-      <view v-for="s in lowStudents" :key="s.id" class="low-row">
-        <text>{{ s.name }}</text>
-        <text class="low-remain">剩余 {{ s.remaining }} 课时</text>
-      </view>
-    </view>
-
-    <view class="action-grid">
-      <button class="grid-btn primary" @click="writeComment">
-        写课后点评
+    <view class="action-stack">
+      <button class="action-btn primary" @click="writeComment">
+        <uni-icons type="compose" size="26" color="#ffffff" />
+        <text>写课后点评</text>
       </button>
-      <button class="grid-btn" @click="viewDetail">
-        查看点名详情
+      <button class="action-btn outline" @click="viewRecord">
+        <uni-icons type="loop" size="26" color="#1f7159" />
+        <text>查看上课记录</text>
       </button>
-      <button v-if="hasNext" class="grid-btn" @click="nextCheckin">
-        继续点下一节
+      <button class="action-btn soft" @click="nextCheckin">
+        <text class="play-icon">▸</text>
+        <text>继续点下一节</text>
       </button>
-      <button class="grid-btn" @click="backToday">
-        返回今日
+      <button class="back-btn" @click="backToday">
+        <uni-icons type="left" size="30" color="#34433d" />
+        <text>返回今日</text>
       </button>
     </view>
   </view>
@@ -141,165 +91,147 @@ onLoad(() => {})
 .done-page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 40rpx 28rpx 60rpx;
-  color: #1f2d33;
-  background: #f4f6f5;
+  padding: 146rpx 40rpx 56rpx;
+  color: #0f1d23;
+  background: #f3faff;
 }
 
-.success-card {
+.success-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 50rpx 30rpx;
-  color: #ffffff;
-  background: #193f36;
-  border-radius: 18rpx;
-  box-shadow: 0 18rpx 38rpx rgba(25, 63, 54, 0.16);
 }
 
-.success-icon {
+.success-circle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 120rpx;
-  height: 120rpx;
-  background: #2a9d73;
+  width: 176rpx;
+  height: 176rpx;
+  background: #e7f6fe;
   border-radius: 50%;
+  box-shadow: 0 6rpx 12rpx rgba(31, 45, 51, 0.04);
 }
 
 .success-title {
-  margin-top: 26rpx;
-  font-size: 38rpx;
+  margin-top: 64rpx;
+  font-size: 44rpx;
   font-weight: 700;
+  letter-spacing: 0;
 }
 
-.success-rate {
-  margin-top: 14rpx;
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.78);
+.success-time {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #3f4944;
 }
 
-.rate-num {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #a4f2d4;
-}
-
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10rpx;
-  margin-top: 22rpx;
-}
-
-.stat-item {
-  padding: 22rpx 4rpx;
-  text-align: center;
+.stats-card {
+  margin-top: 78rpx;
+  padding: 34rpx 32rpx;
   background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
+  border: 2rpx solid #bec9c3;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 10rpx rgba(31, 45, 51, 0.08);
 }
 
-.stat-num {
-  font-size: 34rpx;
+.card-title {
+  margin-bottom: 22rpx;
+  font-size: 33rpx;
   font-weight: 700;
-  color: #183a34;
 }
 
-.stat-num.present {
-  color: #227253;
-}
-
-.stat-num.late {
-  color: #8a671b;
-}
-
-.stat-num.info {
-  color: #335d9a;
-}
-
-.stat-num.absent {
-  color: #9a3b33;
-}
-
-.stat-label {
-  margin-top: 8rpx;
-  font-size: 21rpx;
-  color: #718088;
-}
-
-.deduct-card {
-  display: flex;
-  gap: 12rpx;
-  align-items: center;
-  margin-top: 16rpx;
-  padding: 24rpx 26rpx;
-  font-size: 27rpx;
-  color: #2d4a42;
-  background: #f3faf7;
-  border: 1rpx solid #c7e6d8;
-  border-radius: 14rpx;
-}
-
-.deduct-num {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #1f7159;
-}
-
-.low-card {
-  margin-top: 16rpx;
-  padding: 26rpx;
-  background: #fff5f4;
-  border: 1rpx solid #f6d6d2;
-  border-radius: 14rpx;
-}
-
-.low-title {
-  display: flex;
-  gap: 8rpx;
-  align-items: center;
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #9a3b33;
-}
-
-.low-row {
+.stat-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  color: #8a4a44;
+  min-height: 94rpx;
+  border-bottom: 1rpx solid #bec9c3;
 }
 
-.low-remain {
-  font-size: 24rpx;
+.stat-row:last-child {
+  border-bottom: 0;
 }
 
-.action-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12rpx;
-  margin-top: 26rpx;
+.stat-name {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  font-size: 29rpx;
+  color: #3f4944;
 }
 
-.grid-btn {
+.stat-value {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #0f1d23;
+}
+
+.stat-value.green {
+  color: #00684f;
+}
+
+.stat-value.red {
+  color: #ba1a1a;
+}
+
+.action-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-top: 312rpx;
+}
+
+.action-btn,
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18rpx;
+  padding: 0;
   margin: 0;
-  font-size: 27rpx;
-  line-height: 86rpx;
-  color: #1f7159;
-  background: #e6f4ee;
+  line-height: 1;
+}
+
+.action-btn::after,
+.back-btn::after {
+  border: 0;
+}
+
+.action-btn {
+  height: 92rpx;
+  font-size: 30rpx;
+  font-weight: 700;
   border-radius: 14rpx;
 }
 
-.grid-btn.primary {
-  font-weight: 600;
+.action-btn.primary {
   color: #ffffff;
   background: #1f7159;
 }
 
-.grid-btn::after {
-  border: 0;
+.action-btn.outline {
+  color: #1f7159;
+  background: #ffffff;
+  border: 2rpx solid #1f7159;
+}
+
+.action-btn.soft {
+  color: #34433d;
+  background: #ffffff;
+  border: 2rpx solid #bec9c3;
+}
+
+.play-icon {
+  font-size: 34rpx;
+  color: #34433d;
+}
+
+.back-btn {
+  height: 80rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #34433d;
+  background: transparent;
 }
 </style>

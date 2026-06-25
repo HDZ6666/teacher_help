@@ -1,558 +1,518 @@
 <script lang="ts" setup>
-import type { ScheduleEvent } from '@/api/teach/schedule'
-import { onPullDownRefresh, onShow } from '@dcloudio/uni-app'
-import { computed, ref } from 'vue'
-import { listScheduleEvent } from '@/api/teach/schedule'
 import { safeAreaInsets } from '@/utils/systemInfo'
 
 defineOptions({
   name: 'Home',
 })
+
 definePage({
   type: 'home',
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '老师帮',
-    enablePullDownRefresh: true,
+    enablePullDownRefresh: false,
   },
 })
 
-const loading = ref(false)
-const events = ref<ScheduleEvent[]>([])
-const currentDate = ref(new Date())
-const loadError = ref('')
+const stats = [
+  { label: '今日课程', value: '8', unit: '节', tone: 'white' },
+  { label: '待点名', value: '3', unit: '节', tone: 'error' },
+  { label: '已完成', value: '5', unit: '', tone: 'white' },
+  { label: '待处理错题', value: '12', unit: '', tone: 'mint' },
+]
 
-const todayLabel = computed(() => `${currentDate.value.getMonth() + 1}月${currentDate.value.getDate()}日`)
-const weekLabel = computed(() => ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][currentDate.value.getDay()])
-const todayIso = computed(() => formatDate(currentDate.value))
+const quickActions = [
+  { label: '快速排课', icon: 'flash-filled', url: '/pages/schedule/create' },
+  { label: '快速点名', icon: 'checkbox-filled', url: '/pages/schedule/detail' },
+  { label: '拍错题', icon: 'camera-filled', url: '/pages/wrong-question/upload' },
+  { label: '新增学员', icon: 'personadd-filled', url: '/pages/student/add' },
+]
 
-const nextEvent = computed(() => {
-  const now = Date.now()
-  const actionableEvents = events.value.filter(item => !isClosedEvent(item))
-  return actionableEvents.find(item => new Date(item.endTime).getTime() >= now)
-    || actionableEvents[actionableEvents.length - 1]
-    || events.value[0]
-})
-const heroKicker = computed(() => {
-  if (!nextEvent.value)
-    return '今日安排'
-  if (isClosedEvent(nextEvent.value))
-    return '最近课程'
-  const now = Date.now()
-  const start = new Date(nextEvent.value.startTime).getTime()
-  const end = new Date(nextEvent.value.endTime).getTime()
-  if (now >= start && now <= end)
-    return '正在上课'
-  if (now < start)
-    return '下一节课'
-  return '待收尾课程'
-})
-const heroActionText = computed(() => {
-  if (!nextEvent.value)
-    return '课表'
-  return isClosedEvent(nextEvent.value) ? '查看' : '点名'
-})
+const courses = [
+  {
+    title: '少儿数学提高班',
+    status: '待点名',
+    statusClass: 'pending',
+    time: '14:00 - 15:30',
+    room: 'A区 201教室',
+    teacher: '王老师 / 15人',
+    done: false,
+  },
+  {
+    title: '少儿英语启蒙班',
+    status: '已完成',
+    statusClass: 'done',
+    time: '09:00 - 10:30',
+    room: 'B区 105教室',
+    teacher: '李老师 / 12人',
+    done: true,
+  },
+]
 
-const totalPlanned = computed(() => events.value.reduce((sum, item) => sum + (item.cachedPlanned || 0), 0))
-const totalArrived = computed(() => events.value.reduce((sum, item) => sum + getArrivedCount(item), 0))
-const pendingCount = computed(() => events.value.reduce((sum, item) => {
-  const planned = item.cachedPlanned || 0
-  const present = item.cachedPresent || 0
-  const late = item.cachedLate || 0
-  const excused = item.cachedExcused || 0
-  const absent = item.cachedAbsent || 0
-  return sum + Math.max(planned - present - late - excused - absent, 0)
-}, 0))
+const todos = [
+  { label: '请假待确认 (2)', icon: 'calendar', tone: 'secondary' },
+  { label: '排课冲突 (1)', icon: 'info', tone: 'error' },
+]
 
-function formatDate(date: Date) {
-  const year = date.getFullYear()
-  const month = `${date.getMonth() + 1}`.padStart(2, '0')
-  const day = `${date.getDate()}`.padStart(2, '0')
-  return `${year}-${month}-${day}`
+function switchCampus() {
+  uni.showToast({ title: '切换校区', icon: 'none' })
 }
 
-function formatTime(value?: string) {
-  if (!value)
-    return '--:--'
-  const date = new Date(value)
-  return `${`${date.getHours()}`.padStart(2, '0')}:${`${date.getMinutes()}`.padStart(2, '0')}`
+function openAction(url: string) {
+  uni.navigateTo({ url })
 }
 
-function eventRange(item: ScheduleEvent) {
-  return `${formatTime(item.startTime)}-${formatTime(item.endTime)}`
+function openCheckin() {
+  uni.navigateTo({ url: '/pages/schedule/detail' })
 }
-
-function getEventState(item: ScheduleEvent) {
-  const status = String(item.status || '')
-  if (status === '2')
-    return '已完成'
-  if (status === '3')
-    return '已取消'
-  const now = Date.now()
-  const start = new Date(item.startTime).getTime()
-  const end = new Date(item.endTime).getTime()
-  if (now < start)
-    return '待上课'
-  if (now <= end)
-    return '上课中'
-  return '已结束'
-}
-
-function getEventStateClass(item: ScheduleEvent) {
-  const status = String(item.status || '')
-  if (status === '2')
-    return 'done'
-  if (status === '3')
-    return 'cancelled'
-  const now = Date.now()
-  const start = new Date(item.startTime).getTime()
-  const end = new Date(item.endTime).getTime()
-  if (now < start)
-    return 'scheduled'
-  if (now <= end)
-    return 'active'
-  return 'ended'
-}
-
-function isClosedEvent(item?: ScheduleEvent) {
-  return !!item && ['2', '3'].includes(String(item.status || ''))
-}
-
-function getEventTitle(item: ScheduleEvent) {
-  return item.courseName || item.subjectName || item.subjectCode || '未命名课程'
-}
-
-function getArrivedCount(item: ScheduleEvent) {
-  return (item.cachedPresent || 0) + (item.cachedLate || 0)
-}
-
-async function loadToday() {
-  currentDate.value = new Date()
-  loading.value = true
-  loadError.value = ''
-  try {
-    const res = await listScheduleEvent({
-      pageNum: 1,
-      pageSize: 50,
-      eventDate: todayIso.value,
-    })
-    events.value = (res.rows || []).sort((a, b) => {
-      return new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-    })
-  }
-  catch (error: any) {
-    if (!events.value.length)
-      loadError.value = error?.msg || '加载失败，请重试'
-  }
-  finally {
-    loading.value = false
-    uni.stopPullDownRefresh()
-  }
-}
-
-function openEvent(item?: ScheduleEvent) {
-  if (!item?.id) {
-    openSchedule()
-    return
-  }
-  uni.navigateTo({ url: `/pages/schedule/detail?id=${item.id}` })
-}
-
-function openSchedule() {
-  uni.switchTab({ url: '/pages/schedule/index' })
-}
-
-onShow(() => {
-  loadToday()
-})
-
-onPullDownRefresh(() => {
-  loadToday()
-})
 </script>
 
 <template>
   <view class="home-page" :style="{ paddingTop: `${safeAreaInsets?.top || 0}px` }">
     <view class="topbar">
-      <view>
-        <view class="eyebrow">
-          {{ todayLabel }} {{ weekLabel }}
-        </view>
-        <view class="title">
-          今日工作台
-        </view>
+      <view class="avatar">
+        <image src="/static/images/default-avatar.png" mode="aspectFill" />
       </view>
-      <button class="icon-btn" :disabled="loading" @click="loadToday">
-        <uni-icons type="refresh" size="18" color="#253238" />
+      <view class="brand-title">
+        老师帮
+      </view>
+      <button class="campus-btn" @click="switchCampus">
+        切换校区
       </button>
     </view>
 
-    <view class="hero-panel" @click="openEvent(nextEvent)">
-      <view class="hero-main">
-        <view class="hero-kicker">
-          {{ heroKicker }}
+    <scroll-view class="content-scroll" scroll-y>
+      <view class="page-title">
+        <view class="title-main">
+          今日
         </view>
-        <view class="hero-title">
-          {{ nextEvent ? getEventTitle(nextEvent) : '今天暂无课程' }}
-        </view>
-        <view class="hero-meta">
-          <text v-if="nextEvent">{{ eventRange(nextEvent) }}</text>
-          <text v-if="nextEvent"> · {{ nextEvent.teacherName || '未分配老师' }}</text>
-          <text v-if="!nextEvent">可以去课表查看其他日期</text>
+        <view class="date-row">
+          <uni-icons type="calendar" size="18" color="#3f4944" />
+          <text>6月23日 周二</text>
         </view>
       </view>
-      <view class="hero-action">
-        <text>{{ heroActionText }}</text>
-        <uni-icons type="right" size="16" color="#ffffff" />
-      </view>
-    </view>
 
-    <view class="metric-grid">
-      <view class="metric-item">
-        <view class="metric-value">
-          {{ events.length }}
+      <view class="hero-card">
+        <view class="hero-glow" />
+        <view class="stats-grid">
+          <view
+            v-for="item in stats"
+            :key="item.label"
+            class="stat-item"
+          >
+            <view class="stat-label">
+              {{ item.label }}
+            </view>
+            <view class="stat-value" :class="item.tone">
+              {{ item.value }}<text v-if="item.unit">{{ item.unit }}</text>
+            </view>
+          </view>
         </view>
-        <view class="metric-label">
+      </view>
+
+      <view class="quick-grid">
+        <button
+          v-for="item in quickActions"
+          :key="item.label"
+          class="quick-btn"
+          @click="openAction(item.url)"
+        >
+          <view class="quick-icon">
+            <uni-icons :type="item.icon" size="28" color="#1f7159" />
+          </view>
+          <text>{{ item.label }}</text>
+        </button>
+      </view>
+
+      <view class="section">
+        <view class="section-title">
           今日课程
         </view>
-      </view>
-      <view class="metric-item">
-        <view class="metric-value">
-          {{ totalPlanned }}
-        </view>
-        <view class="metric-label">
-          应到人次
-        </view>
-      </view>
-      <view class="metric-item">
-        <view class="metric-value">
-          {{ pendingCount }}
-        </view>
-        <view class="metric-label">
-          待处理
-        </view>
-      </view>
-      <view class="metric-item">
-        <view class="metric-value">
-          {{ totalArrived }}
-        </view>
-        <view class="metric-label">
-          已到课
-        </view>
-      </view>
-    </view>
+        <view
+          v-for="item in courses"
+          :key="item.title"
+          class="course-card"
+          :class="{ done: item.done }"
+        >
+          <view class="course-head">
+            <view class="course-title" :class="{ done: item.done }">
+              {{ item.title }}
+            </view>
+            <view class="status-pill" :class="item.statusClass">
+              <uni-icons
+                :type="item.done ? 'checkbox-filled' : 'info-filled'"
+                size="14"
+                :color="item.done ? '#3f4944' : '#93000a'"
+              />
+              <text>{{ item.status }}</text>
+            </view>
+          </view>
 
-    <view class="section-head">
-      <text>今天课程</text>
-      <button class="text-btn" @click="openSchedule">
-        全部
-      </button>
-    </view>
+          <view class="course-meta">
+            <view class="meta-item">
+              <uni-icons type="calendar" size="18" color="#3f4944" />
+              <text>{{ item.time }}</text>
+            </view>
+            <view class="meta-item">
+              <uni-icons type="location" size="18" color="#3f4944" />
+              <text>{{ item.room }}</text>
+            </view>
+            <view class="meta-item wide">
+              <uni-icons type="staff" size="18" color="#3f4944" />
+              <text>{{ item.teacher }}</text>
+            </view>
+          </view>
 
-    <view v-if="loading && !events.length" class="state-box">
-      加载中...
-    </view>
-    <view v-else-if="loadError && !events.length" class="state-box">
-      <view>{{ loadError }}</view>
-      <button class="state-action" @click="loadToday">
-        重试
-      </button>
-    </view>
-    <view v-else-if="!events.length" class="state-box">
-      今天没有排课
-    </view>
-    <view v-else class="event-list">
-      <view v-for="item in events" :key="item.id" class="event-row" @click="openEvent(item)">
-        <view class="time-col">
-          <view class="time-main">
-            {{ formatTime(item.startTime) }}
-          </view>
-          <view class="time-sub">
-            {{ formatTime(item.endTime) }}
+          <view v-if="!item.done" class="course-actions">
+            <button class="checkin-btn" @click="openCheckin">
+              去点名
+            </button>
           </view>
         </view>
-        <view class="event-info">
-          <view class="event-title-line">
-            <text class="event-title">
-              {{ getEventTitle(item) }}
-            </text>
-            <text class="event-status" :class="getEventStateClass(item)">
-              {{ getEventState(item) }}
-            </text>
-          </view>
-          <view class="event-desc">
-            {{ item.teacherName || '未分配老师' }} · {{ getArrivedCount(item) }}/{{ item.cachedPlanned || 0 }} 已到
-          </view>
-        </view>
-        <uni-icons type="right" size="16" color="#9aa3aa" />
       </view>
-    </view>
+
+      <view class="section todo-section">
+        <view class="section-title">
+          待办事项
+        </view>
+        <view
+          v-for="item in todos"
+          :key="item.label"
+          class="todo-row"
+          :class="item.tone"
+        >
+          <view class="todo-main">
+            <view class="todo-icon">
+              <uni-icons :type="item.icon" size="22" :color="item.tone === 'error' ? '#93000a' : '#466c61'" />
+            </view>
+            <text>{{ item.label }}</text>
+          </view>
+          <uni-icons type="right" size="18" color="#6f7974" />
+        </view>
+      </view>
+    </scroll-view>
   </view>
 </template>
 
 <style lang="scss" scoped>
 .home-page {
   min-height: 100vh;
-  box-sizing: border-box;
-  padding-right: 28rpx;
-  padding-bottom: 150rpx;
-  padding-left: 28rpx;
-  color: #1f2d33;
-  background: #f4f6f5;
+  color: #0f1d23;
+  background: #f3faff;
 }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28rpx 0 20rpx;
+  height: 112rpx;
+  padding: 0 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #bec9c3;
 }
 
-.eyebrow {
-  font-size: 24rpx;
-  color: #64737b;
-}
-
-.title {
-  margin-top: 6rpx;
-  font-size: 42rpx;
-  font-weight: 700;
-}
-
-.icon-btn,
-.text-btn {
-  padding: 0;
-  margin: 0;
-  line-height: 1;
-  background: transparent;
-}
-
-.icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72rpx;
-  height: 72rpx;
-  background: #ffffff;
+.avatar {
+  width: 64rpx;
+  height: 64rpx;
+  overflow: hidden;
+  background: #d6e5ed;
+  border: 1rpx solid #bec9c3;
   border-radius: 50%;
 }
 
-.icon-btn::after,
-.text-btn::after {
-  border: 0;
+.avatar image {
+  width: 100%;
+  height: 100%;
 }
 
-.hero-panel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 208rpx;
-  padding: 34rpx;
-  background: #193f36;
-  border-radius: 18rpx;
-  box-shadow: 0 18rpx 38rpx rgba(25, 63, 54, 0.16);
+.brand-title {
+  position: absolute;
+  left: 50%;
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #1f7159;
+  transform: translateX(-50%);
 }
 
-.hero-main {
-  min-width: 0;
-}
-
-.hero-kicker {
+.campus-btn {
+  padding: 10rpx 14rpx;
+  margin: 0;
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.68);
-}
-
-.hero-title {
-  max-width: 440rpx;
-  margin-top: 14rpx;
-  overflow: hidden;
-  font-size: 42rpx;
   font-weight: 700;
-  color: #ffffff;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.2;
+  color: #1f7159;
+  background: transparent;
+  border-radius: 8rpx;
 }
 
-.hero-meta {
-  margin-top: 12rpx;
-  font-size: 25rpx;
-  color: rgba(255, 255, 255, 0.76);
+.content-scroll {
+  box-sizing: border-box;
+  height: calc(100vh - 112rpx);
+  padding: 32rpx 28rpx 170rpx;
 }
 
-.hero-action {
+.page-title {
+  margin-bottom: 48rpx;
+}
+
+.title-main {
+  font-size: 48rpx;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.date-row {
   display: flex;
-  flex-shrink: 0;
+  gap: 8rpx;
   align-items: center;
-  gap: 4rpx;
-  padding: 18rpx 20rpx;
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #ffffff;
-  background: #2a9d73;
-  border-radius: 999rpx;
-}
-
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12rpx;
-  margin-top: 22rpx;
-}
-
-.metric-item {
-  padding: 22rpx 8rpx;
-  text-align: center;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
-}
-
-.metric-value {
-  font-size: 38rpx;
-  font-weight: 700;
-  color: #183a34;
-}
-
-.metric-label {
   margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #718088;
-}
-
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 34rpx;
-  margin-bottom: 16rpx;
-  font-size: 32rpx;
-  font-weight: 700;
-}
-
-.text-btn {
   font-size: 26rpx;
-  color: #1d8b69;
+  color: #3f4944;
 }
 
-.state-box {
-  padding: 70rpx 0;
-  font-size: 28rpx;
-  color: #7a858b;
-  text-align: center;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
-}
-
-.state-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 160rpx;
-  height: 64rpx;
-  padding: 0;
-  margin: 24rpx auto 0;
-  font-size: 26rpx;
-  line-height: 64rpx;
+.hero-card {
+  position: relative;
+  padding: 40rpx;
+  overflow: hidden;
   color: #ffffff;
   background: #1f7159;
-  border-radius: 12rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 6rpx 16rpx rgba(31, 113, 89, 0.12);
 }
 
-.state-action::after {
-  border: 0;
+.hero-glow {
+  position: absolute;
+  top: -80rpx;
+  right: -80rpx;
+  width: 260rpx;
+  height: 260rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
 }
 
-.event-list {
+.stats-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 48rpx;
+  column-gap: 32rpx;
+}
+
+.stat-label {
+  margin-bottom: 8rpx;
+  font-size: 22rpx;
+  color: rgba(164, 242, 212, 0.9);
+}
+
+.stat-value {
+  font-size: 48rpx;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.stat-value text {
+  margin-left: 6rpx;
+  font-size: 24rpx;
+  font-weight: 400;
+  opacity: 0.72;
+}
+
+.stat-value.error {
+  color: #ffdad6;
+}
+
+.stat-value.mint {
+  color: #c2ebde;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
+  margin-top: 40rpx;
+}
+
+.quick-btn {
   display: flex;
   flex-direction: column;
   gap: 14rpx;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #0f1d23;
+  background: transparent;
 }
 
-.event-row {
+.quick-icon {
   display: flex;
   align-items: center;
-  gap: 22rpx;
-  padding: 24rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
-}
-
-.time-col {
-  flex-shrink: 0;
+  justify-content: center;
   width: 96rpx;
-  text-align: center;
+  height: 96rpx;
+  background: #e7f6fe;
+  border-radius: 50%;
 }
 
-.time-main {
-  font-size: 30rpx;
+.section {
+  margin-top: 48rpx;
+}
+
+.section-title {
+  margin-bottom: 20rpx;
+  font-size: 34rpx;
   font-weight: 700;
-  color: #1f2d33;
 }
 
-.time-sub {
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  color: #839099;
+.course-card {
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  background: #ffffff;
+  border: 1rpx solid #bec9c3;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 10rpx rgba(15, 29, 35, 0.04);
 }
 
-.event-info {
-  flex: 1;
-  min-width: 0;
+.course-card.done {
+  opacity: 0.8;
 }
 
-.event-title-line {
+.course-head {
   display: flex;
-  align-items: center;
-  gap: 12rpx;
+  gap: 18rpx;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
-.event-title {
+.course-title {
   flex: 1;
-  overflow: hidden;
-  font-size: 31rpx;
-  font-weight: 650;
-  color: #1f2d33;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
-.event-status {
+.course-title.done {
+  color: #3f4944;
+  text-decoration: line-through;
+  text-decoration-color: #bec9c3;
+}
+
+.status-pill {
+  display: flex;
   flex-shrink: 0;
-  padding: 7rpx 14rpx;
+  gap: 6rpx;
+  align-items: center;
+  padding: 8rpx 16rpx;
   font-size: 22rpx;
-  color: #1f7159;
-  background: #e8f5ef;
+  font-weight: 600;
   border-radius: 999rpx;
 }
 
-.event-status.active {
-  color: #1f7159;
-  background: #dff4eb;
+.status-pill.pending {
+  color: #93000a;
+  background: #ffdad6;
 }
 
-.event-status.ended {
-  color: #8a671b;
-  background: #fff5d8;
+.status-pill.done {
+  color: #3f4944;
+  background: #d6e5ed;
 }
 
-.event-status.done {
-  color: #5d6a70;
-  background: #eef2f0;
+.course-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  padding-top: 24rpx;
+  margin-top: 24rpx;
+  border-top: 1rpx solid #d6e5ed;
 }
 
-.event-status.cancelled {
-  color: #9a3b33;
-  background: #ffeceb;
+.meta-item {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+  min-width: 0;
+  font-size: 26rpx;
+  color: #3f4944;
 }
 
-.event-desc {
-  margin-top: 10rpx;
+.meta-item.wide {
+  grid-column: span 2;
+}
+
+.meta-item text {
   overflow: hidden;
-  font-size: 25rpx;
-  color: #74828a;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.course-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24rpx;
+}
+
+.checkin-btn {
+  width: 176rpx;
+  height: 88rpx;
+  padding: 0;
+  margin: 0;
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 88rpx;
+  color: #ffffff;
+  background: #1f7159;
+  border-radius: 16rpx;
+}
+
+.todo-section {
+  margin-top: 40rpx;
+}
+
+.todo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  background: #e7f6fe;
+  border-left: 8rpx solid #40655b;
+  border-radius: 16rpx;
+}
+
+.todo-row.error {
+  border-left-color: #ba1a1a;
+}
+
+.todo-main {
+  display: flex;
+  gap: 18rpx;
+  align-items: center;
+  font-size: 26rpx;
+}
+
+.todo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  background: #c2ebde;
+  border-radius: 50%;
+}
+
+.todo-row.error .todo-icon {
+  background: #ffdad6;
+}
+
+.campus-btn::after,
+.quick-btn::after,
+.checkin-btn::after {
+  border: 0;
 }
 </style>

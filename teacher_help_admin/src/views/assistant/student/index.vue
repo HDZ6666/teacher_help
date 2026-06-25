@@ -17,12 +17,46 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="学员来源" prop="source">
-        <el-select v-model="queryParams.source" placeholder="请选择学员来源" clearable style="width: 200px">
-          <el-option label="线上推广" value="线上推广" />
-          <el-option label="线下推广" value="线下推广" />
-          <el-option label="老学员推荐" value="老学员推荐" />
-          <el-option label="其他" value="其他" />
+      <el-form-item label="家长姓名" prop="parentName">
+        <el-input
+          v-model="queryParams.parentName"
+          placeholder="请输入家长姓名"
+          clearable
+          style="width: 200px"
+          @keyup.enter="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="学校" prop="schoolName">
+        <el-input
+          v-model="queryParams.schoolName"
+          placeholder="请输入学校"
+          clearable
+          style="width: 200px"
+          @keyup.enter="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="年级" prop="grade">
+        <el-select v-model="queryParams.grade" placeholder="请选择年级" clearable style="width: 200px">
+          <el-option label="一年级" value="一年级" />
+          <el-option label="二年级" value="二年级" />
+          <el-option label="三年级" value="三年级" />
+          <el-option label="四年级" value="四年级" />
+          <el-option label="五年级" value="五年级" />
+          <el-option label="六年级" value="六年级" />
+          <el-option label="初一" value="初一" />
+          <el-option label="初二" value="初二" />
+          <el-option label="初三" value="初三" />
+          <el-option label="高一" value="高一" />
+          <el-option label="高二" value="高二" />
+          <el-option label="高三" value="高三" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 200px">
+          <el-option label="在读" value="1" />
+          <el-option label="休学" value="2" />
+          <el-option label="转学" value="3" />
+          <el-option label="毕业" value="4" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -53,9 +87,9 @@
       </el-form-item>
       <el-form-item label="结课状态" prop="courseStatus">
         <el-select v-model="enrollmentQueryParams.courseStatus" placeholder="请选择结课状态" clearable style="width: 200px">
-          <el-option label="在读" value="在读" />
-          <el-option label="已结课" value="已结课" />
-          <el-option label="暂停" value="暂停" />
+          <el-option label="有效" value="active" />
+          <el-option label="停课" value="stopped" />
+          <el-option label="结课" value="completed" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -178,7 +212,7 @@
           <el-link type="primary" @click="handleViewDetail(scope.row)">{{ scope.row.studentName }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column label="手机号" align="center" prop="phone" width="120" />
+      <el-table-column label="手机号" align="center" prop="parentPhone" width="120" />
       <el-table-column label="绑卡状态" align="center" prop="cardStatus" width="100">
         <template #default="scope">
           <el-tag :type="scope.row.cardStatus === 1 ? 'success' : 'info'">
@@ -193,22 +227,23 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="学员来源" align="center" prop="source" width="120" />
+      <el-table-column label="家长姓名" align="center" prop="parentName" width="120" />
       <el-table-column label="年龄" align="center" prop="age" width="80" />
       <el-table-column label="出生日期" align="center" prop="birthday" width="120" />
       <el-table-column label="所在班级" align="center" prop="className" width="120" />
       <el-table-column label="年级" align="center" prop="grade" width="100" />
-      <el-table-column label="学校" align="center" prop="school" width="150" show-overflow-tooltip />
+      <el-table-column label="学校" align="center" prop="schoolName" width="150" show-overflow-tooltip />
       <el-table-column label="标签" align="center" prop="tags" width="150">
         <template #default="scope">
           <el-tag
-            v-for="tag in scope.row.tags"
+            v-for="tag in scope.row.tags || []"
             :key="tag"
             size="small"
             style="margin-right: 5px"
           >
             {{ tag }}
           </el-tag>
+          <span v-if="!scope.row.tags || !scope.row.tags.length">-</span>
         </template>
       </el-table-column>
       <el-table-column label="国外手机号" align="center" prop="foreignPhone" width="140" />
@@ -216,7 +251,7 @@
       <el-table-column label="身份证号" align="center" prop="idCard" width="180" show-overflow-tooltip />
       <el-table-column label="跟进人" align="center" prop="follower" width="100" />
       <el-table-column label="学管师" align="center" prop="advisor" width="100" />
-      <el-table-column label="学员创建人" align="center" prop="creator" width="120" />
+      <el-table-column label="学员创建人" align="center" prop="createBy" width="120" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="160" />
       <el-table-column label="操作" align="center" width="150" fixed="right" class-name="small-padding fixed-width">
         <template #default="scope">
@@ -274,10 +309,19 @@
 
     <!-- 分页 -->
     <pagination
+      v-if="activeTab === 'active'"
       v-show="total > 0"
       :total="total"
       v-model:page="queryParams.pageNum"
       v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
+    <pagination
+      v-else
+      v-show="total > 0"
+      :total="total"
+      v-model:page="enrollmentQueryParams.pageNum"
+      v-model:limit="enrollmentQueryParams.pageSize"
       @pagination="getList"
     />
 
@@ -325,6 +369,18 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-form-item label="关联家长" prop="parentId">
+              <el-select v-model="form.parentId" placeholder="请选择家长" filterable clearable style="width: 100%">
+                <el-option
+                  v-for="parent in parentList"
+                  :key="parent.id"
+                  :label="formatParentOption(parent)"
+                  :value="parent.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="性别" prop="gender">
               <el-radio-group v-model="form.gender">
                 <el-radio label="未知">未知</el-radio>
@@ -361,8 +417,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="就读学校" prop="school">
-              <el-input v-model="form.school" placeholder="请输入就读学校" />
+            <el-form-item label="就读学校" prop="schoolName">
+              <el-input v-model="form.schoolName" placeholder="请输入就读学校" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -384,8 +440,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="学号" prop="studentNo">
-              <el-input v-model="form.studentNo" placeholder="请输入学号" />
+            <el-form-item label="学号" prop="studentIdInSchool">
+              <el-input v-model="form.studentIdInSchool" placeholder="请输入学号" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -463,32 +519,12 @@
         <el-divider content-position="left">其他信息</el-divider>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="学员来源" prop="source">
-              <el-select v-model="form.source" placeholder="请选择学员来源" style="width: 100%">
-                <el-option label="线上推广" value="线上推广" />
-                <el-option label="线下推广" value="线下推广" />
-                <el-option label="老学员推荐" value="老学员推荐" />
-                <el-option label="其他" value="其他" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
             <el-form-item label="跟进人" prop="follower">
               <el-select v-model="form.follower" placeholder="请选择跟进人" style="width: 100%">
                 <el-option label="李老师" value="李老师" />
                 <el-option label="王老师" value="王老师" />
                 <el-option label="赵老师" value="赵老师" />
                 <el-option label="孙老师" value="孙老师" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="学员创建人" prop="creator">
-              <el-select v-model="form.creator" placeholder="请选择学员创建人" style="width: 100%">
-                <el-option label="管理员" value="管理员" />
-                <el-option label="李老师" value="李老师" />
-                <el-option label="王老师" value="王老师" />
-                <el-option label="张老师" value="张老师" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -650,12 +686,14 @@
 
 <script setup name="AssistantStudent">
 import { ArrowDown, Plus, Delete } from '@element-plus/icons-vue';
+import { listStudent, getStudent, delStudent, addStudent, updateStudent, listParents, getStudentCourses } from '@/api/teach/student';
 
 const { proxy } = getCurrentInstance();
 
 const activeTab = ref('active'); // 当前激活的Tab
 const studentList = ref([]); // 在读学员列表
 const enrollmentList = ref([]); // 报读情况列表
+const parentList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -683,6 +721,8 @@ const advisorList = ref([]); // 学管师列表
 // 查询参数
 const data = reactive({
   form: {
+    id: null,
+    parentId: null,
     avatar: null,
     studentName: null,
     phone: null,
@@ -692,9 +732,9 @@ const data = reactive({
     age: null,
     ageMonth: null,
     birthday: null,
-    school: null,
+    schoolName: null,
     grade: null,
-    studentNo: null,
+    studentIdInSchool: null,
     foreignPhone: null,
     weight: null,
     idCard: null,
@@ -702,9 +742,7 @@ const data = reactive({
     mainContactPhone: null,
     backupContacts: [],
     address: null,
-    source: null,
     follower: null,
-    creator: null,
     advisor: null,
     tags: [],
     remark: null
@@ -713,7 +751,10 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     studentName: null,
-    source: null
+    parentName: null,
+    schoolName: null,
+    grade: null,
+    status: null
   },
   enrollmentQueryParams: {
     pageNum: 1,
@@ -726,8 +767,10 @@ const data = reactive({
     studentName: [
       { required: true, message: "学员姓名不能为空", trigger: "blur" }
     ],
+    parentId: [
+      { required: true, message: "请选择关联家长", trigger: "change" }
+    ],
     phone: [
-      { required: true, message: "手机号不能为空", trigger: "blur" },
       { pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur" }
     ]
   }
@@ -755,9 +798,106 @@ const filteredAdvisorList = computed(() => {
   );
 });
 
+function normalizeStudentRow(row = {}) {
+  const tags = Array.isArray(row.personalityTraits) ? row.personalityTraits : [];
+  return {
+    ...row,
+    phone: row.parentPhone || row.phone || '',
+    cardStatus: row.cardStatus ?? 0,
+    faceStatus: row.faceStatus ?? 0,
+    tags,
+    foreignPhone: row.foreignPhone || '',
+    weight: row.weight || '',
+    idCard: row.idCard || '',
+    follower: row.follower || '',
+    advisor: row.advisor || '',
+    createBy: row.createBy || ''
+  };
+}
+
+function normalizeEnrollmentRow(student, course) {
+  const purchased = Number(course.purchasedQuantity || 0);
+  const gift = Number(course.giftQuantity || 0);
+  const consumed = Number(course.consumedQuantity || 0);
+  const remaining = Number(course.remainingQuantity || 0);
+  return {
+    id: `${student.id}-${course.id}`,
+    studentId: student.id,
+    studentName: student.studentName,
+    phone: student.parentPhone || student.phone || '',
+    courseName: course.courseName || '-',
+    className: course.className || student.className || '-',
+    purchaseCount: purchased,
+    giftCount: gift,
+    consumedCount: consumed,
+    refundCount: 0,
+    remainingCount: remaining,
+    consumedAmount: 0,
+    remainingAmount: 0,
+    expireDate: course.validEndDate || '-',
+    absenceCount: 0,
+    follower: student.follower || '',
+    advisor: student.advisor || '',
+    courseStatus: course.status,
+    statusName: course.statusName || '-'
+  };
+}
+
+function buildStudentPayload() {
+  return {
+    id: form.value.id,
+    parentId: form.value.parentId,
+    studentName: form.value.studentName,
+    gender: genderToValue(form.value.gender),
+    birthday: form.value.birthday || null,
+    schoolName: form.value.schoolName || null,
+    grade: form.value.grade || null,
+    className: form.value.className || null,
+    studentIdInSchool: form.value.studentIdInSchool || null,
+    personalityTraits: form.value.tags || [],
+    emergencyContact: form.value.mainContactPhone || form.value.phone || null,
+    status: String(form.value.status || '1'),
+    remark: form.value.remark || null
+  };
+}
+
+function genderToValue(gender) {
+  if (gender === '男' || gender === 1 || gender === '1') {
+    return '1';
+  }
+  if (gender === '女' || gender === 2 || gender === '2') {
+    return '2';
+  }
+  return '0';
+}
+
+function valueToGender(gender) {
+  if (String(gender) === '1') {
+    return '男';
+  }
+  if (String(gender) === '2') {
+    return '女';
+  }
+  return '未知';
+}
+
+function formatParentOption(parent) {
+  const phone = parent.phone || parent.parentPhone || '-';
+  return `${parent.parentName || '-'}（${phone}）`;
+}
+
+function getParentList() {
+  return listParents({ pageNum: 1, pageSize: 1000 }).then(response => {
+    parentList.value = response.rows || response.data || [];
+  });
+}
+
 /** Tab切换处理 */
 function handleTabChange(tab) {
   activeTab.value = tab;
+  ids.value = [];
+  single.value = true;
+  multiple.value = true;
   getList();
 }
 
@@ -766,142 +906,49 @@ function getList() {
   loading.value = true;
 
   if (activeTab.value === 'active') {
-    // 在读学员模拟数据
-    setTimeout(() => {
-      const mockData = [
-        {
-          id: 1,
-          studentName: "张三",
-          phone: "13800138001",
-          cardStatus: 1,
-          faceStatus: 1,
-          source: "线上推广",
-          age: 12,
-          birthday: "2012-05-15",
-          className: "初一(3)班",
-          grade: "初一",
-          school: "北京市第一中学",
-          tags: ["优秀", "活跃"],
-          foreignPhone: "+1-234-567-8901",
-          weight: 45.5,
-          idCard: "110101201205150011",
-          follower: "李老师",
-          advisor: "王老师",
-          creator: "管理员",
-          createTime: "2024-01-15 10:30:00"
-        },
-        {
-          id: 2,
-          studentName: "李四",
-          phone: "13900139002",
-          cardStatus: 0,
-          faceStatus: 1,
-          source: "老学员推荐",
-          age: 13,
-          birthday: "2011-08-20",
-          className: "初二(1)班",
-          grade: "初二",
-          school: "北京市第二中学",
-          tags: ["进步"],
-          foreignPhone: "",
-          weight: 48.0,
-          idCard: "110101201108200022",
-          follower: "赵老师",
-          advisor: "王老师",
-          creator: "张老师",
-          createTime: "2024-02-10 14:20:00"
-        },
-        {
-          id: 3,
-          studentName: "王五",
-          phone: "13700137003",
-          cardStatus: 1,
-          faceStatus: 0,
-          source: "线下推广",
-          age: 11,
-          birthday: "2013-03-10",
-          className: "六年级(2)班",
-          grade: "六年级",
-          school: "北京市实验小学",
-          tags: ["需关注"],
-          foreignPhone: "",
-          weight: 42.0,
-          idCard: "110101201303100033",
-          follower: "孙老师",
-          advisor: "李老师",
-          creator: "管理员",
-          createTime: "2024-03-05 09:15:00"
-        }
-      ];
-
-      studentList.value = mockData;
-      total.value = mockData.length;
+    listStudent(queryParams.value).then(response => {
+      studentList.value = (response.rows || []).map(normalizeStudentRow);
+      total.value = response.total || 0;
+    }).finally(() => {
       loading.value = false;
-    }, 500);
+    });
   } else if (activeTab.value === 'enrollment') {
-    // 报读情况模拟数据
-    setTimeout(() => {
-      const mockEnrollmentData = [
-        {
-          id: 1,
-          studentName: "张三",
-          phone: "13800138001",
-          courseName: "数学提高班",
-          className: "初一(3)班",
-          purchaseCount: 40,
-          giftCount: 4,
-          consumedCount: 20,
-          refundCount: 0,
-          remainingCount: 24,
-          consumedAmount: 4000,
-          remainingAmount: 4800,
-          expireDate: "2025-06-30",
-          absenceCount: 2,
-          follower: "李老师",
-          advisor: "王老师"
-        },
-        {
-          id: 2,
-          studentName: "李四",
-          phone: "13900139002",
-          courseName: "英语强化班",
-          className: "初二(1)班",
-          purchaseCount: 30,
-          giftCount: 3,
-          consumedCount: 28,
-          refundCount: 0,
-          remainingCount: 5,
-          consumedAmount: 5600,
-          remainingAmount: 1000,
-          expireDate: "2025-03-15",
-          absenceCount: 1,
-          follower: "赵老师",
-          advisor: "王老师"
-        },
-        {
-          id: 3,
-          studentName: "王五",
-          phone: "13700137003",
-          courseName: "语文阅读班",
-          className: "六年级(2)班",
-          purchaseCount: 50,
-          giftCount: 5,
-          consumedCount: 15,
-          refundCount: 2,
-          remainingCount: 38,
-          consumedAmount: 3000,
-          remainingAmount: 7600,
-          expireDate: "2025-12-31",
-          absenceCount: 0,
-          follower: "孙老师",
-          advisor: "李老师"
-        }
-      ];
+    getEnrollmentList();
+  }
+}
 
-      enrollmentList.value = mockEnrollmentData;
-      total.value = mockEnrollmentData.length;
-      loading.value = false;
-    }, 500);
+/** 查询报读情况 */
+async function getEnrollmentList() {
+  try {
+    const response = await listStudent({
+      pageNum: enrollmentQueryParams.value.pageNum,
+      pageSize: enrollmentQueryParams.value.pageSize,
+      studentName: enrollmentQueryParams.value.studentName
+    });
+    const students = response.rows || [];
+    const courseResults = await Promise.all(
+      students.map(student =>
+        getStudentCourses(student.id).then(courseResponse => ({
+          student,
+          courses: courseResponse.data || []
+        })).catch(() => ({
+          student,
+          courses: []
+        }))
+      )
+    );
+    const courseNameKeyword = (enrollmentQueryParams.value.courseName || '').trim();
+    const courseStatus = enrollmentQueryParams.value.courseStatus;
+    enrollmentList.value = courseResults.flatMap(({ student, courses }) => {
+      const studentRow = normalizeStudentRow(student);
+      return courses
+        .filter(course => !courseNameKeyword || (course.courseName || '').includes(courseNameKeyword))
+        .filter(course => !courseStatus || course.status === courseStatus)
+        .map(course => normalizeEnrollmentRow(studentRow, course));
+    });
+    total.value = response.total || enrollmentList.value.length;
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -915,6 +962,7 @@ function cancel() {
 function reset() {
   form.value = {
     id: null,
+    parentId: null,
     avatar: null,
     studentName: null,
     phone: null,
@@ -924,9 +972,10 @@ function reset() {
     age: null,
     ageMonth: null,
     birthday: null,
-    school: null,
+    schoolName: null,
     grade: null,
-    studentNo: null,
+    studentIdInSchool: null,
+    className: null,
     foreignPhone: null,
     weight: null,
     idCard: null,
@@ -934,11 +983,10 @@ function reset() {
     mainContactPhone: null,
     backupContacts: [],
     address: null,
-    source: null,
     follower: null,
-    creator: null,
     advisor: null,
     tags: [],
+    status: '1',
     remark: null
   };
   proxy.resetForm("formRef");
@@ -996,6 +1044,7 @@ function removeTag(tag) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
+  getParentList();
   open.value = true;
   title.value = "添加学员";
 }
@@ -1007,7 +1056,7 @@ function handleAssignFollower() {
     return;
   }
 
-  // 初始化跟进人列表（模拟数据）
+  // 批量分配接口待补齐，当前仅提供本地候选项。
   followerList.value = [
     { id: 0, name: "待分配", phone: "-", assignedCount: 332 },
     { id: 1, name: "李老师", phone: "130****2483", assignedCount: 45 },
@@ -1035,12 +1084,8 @@ function confirmAssignFollower() {
 
   const follower = followerList.value.find(item => item.id === selectedFollowerId.value);
 
-  // 模拟分配操作
-  setTimeout(() => {
-    proxy.$modal.msgSuccess(`已成功将 ${ids.value.length} 名学员分配给 ${follower.name}`);
-    assignFollowerOpen.value = false;
-    getList();
-  }, 300);
+  proxy.$modal.msgWarning(`已选择 ${follower.name}，批量分配跟进人接口待后端补齐`);
+  assignFollowerOpen.value = false;
 }
 
 /** 分配学管师按钮操作 */
@@ -1050,7 +1095,7 @@ function handleAssignAdvisor() {
     return;
   }
 
-  // 初始化学管师列表（模拟数据）
+  // 批量分配接口待补齐，当前仅提供本地候选项。
   advisorList.value = [
     { id: 0, name: "待分配", phone: "-", assignedCount: 332 },
     { id: 1, name: "迅优文化（黄老师）", phone: "130****2483", assignedCount: 1 },
@@ -1078,17 +1123,17 @@ function confirmAssignAdvisor() {
 
   const advisor = advisorList.value.find(item => item.id === selectedAdvisorId.value);
 
-  // 模拟分配操作
-  setTimeout(() => {
-    proxy.$modal.msgSuccess(`已成功将 ${ids.value.length} 名学员分配给 ${advisor.name}`);
-    assignAdvisorOpen.value = false;
-    getList();
-  }, 300);
+  proxy.$modal.msgWarning(`已选择 ${advisor.name}，批量分配学管师接口待后端补齐`);
+  assignAdvisorOpen.value = false;
 }
 
 /** 搜索按钮操作 */
 function handleQuery() {
-  queryParams.value.pageNum = 1;
+  if (activeTab.value === 'active') {
+    queryParams.value.pageNum = 1;
+  } else {
+    enrollmentQueryParams.value.pageNum = 1;
+  }
   getList();
 }
 
@@ -1143,14 +1188,22 @@ function handleEditEnrollment(row) {
 function handleUpdate(row) {
   reset();
   const studentId = row.id || ids.value[0];
-
-  // 模拟获取详情数据
-  const student = studentList.value.find(item => item.id === studentId);
-  if (student) {
-    form.value = { ...student };
+  Promise.all([getParentList(), getStudent(studentId)]).then(([, response]) => {
+    const data = response.data || {};
+    form.value = {
+      ...form.value,
+      ...data,
+      phone: data.parentPhone || '',
+      gender: valueToGender(data.gender),
+      ageType: data.birthday ? 'birthday' : 'age',
+      tags: data.personalityTraits || [],
+      mainContactPhone: data.parentPhone || data.emergencyContact || '',
+      studentIdInSchool: data.studentIdInSchool || null,
+      status: String(data.status || '1')
+    };
     open.value = true;
     title.value = "修改学员";
-  }
+  });
 }
 
 /** 查看学员详情 */
@@ -1160,18 +1213,21 @@ function handleViewDetail(row) {
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["studentRef"].validate(valid => {
+  proxy.$refs["formRef"].validate(valid => {
     if (valid) {
+      const payload = buildStudentPayload();
       if (form.value.id != null) {
-        // 模拟修改操作
-        proxy.$modal.msgSuccess("修改成功");
-        open.value = false;
-        getList();
+        updateStudent(payload).then(() => {
+          proxy.$modal.msgSuccess("修改成功");
+          open.value = false;
+          getList();
+        });
       } else {
-        // 模拟新增操作
-        proxy.$modal.msgSuccess("新增成功");
-        open.value = false;
-        getList();
+        addStudent(payload).then(() => {
+          proxy.$modal.msgSuccess("新增成功");
+          open.value = false;
+          getList();
+        });
       }
     }
   });
@@ -1181,7 +1237,8 @@ function submitForm() {
 function handleDelete(row) {
   const studentIds = row.id || ids.value;
   proxy.$modal.confirm('是否确认删除学员编号为"' + studentIds + '"的数据项？').then(function() {
-    // 模拟删除操作
+    return delStudent(studentIds);
+  }).then(() => {
     proxy.$modal.msgSuccess("删除成功");
     getList();
   }).catch(() => {});
@@ -1189,8 +1246,8 @@ function handleDelete(row) {
 
 /** 导出按钮操作 */
 function handleExport() {
-  proxy.$modal.confirm('是否确认导出所有学员数据项？').then(function() {
-    proxy.$modal.msgSuccess("导出成功");
+  proxy.$modal.confirm('是否确认导出所有学员数据项？').then(() => {
+    proxy.download('teach/student/export', queryParams.value, `student_${new Date().getTime()}.xlsx`);
   }).catch(() => {});
 }
 
@@ -1235,5 +1292,3 @@ getList();
   border-radius: 4px;
 }
 </style>
-
-

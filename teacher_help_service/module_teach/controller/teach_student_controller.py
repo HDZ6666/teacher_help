@@ -50,7 +50,7 @@ async def get_teach_student_list(
     """
     # 获取分页数据
     student_page_query_result = await TeachStudentService.get_teach_student_list_services(
-        query_db, student_page_query, data_scope_sql
+        query_db, student_page_query, data_scope_sql, is_page=True
     )
     logger.info('获取成功')
 

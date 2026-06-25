@@ -1,419 +1,467 @@
 <script lang="ts" setup>
-import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
-
 defineOptions({
   name: 'CourseDetail',
 })
+
 definePage({
   style: {
-    navigationBarTitleText: '课次详情',
+    navigationStyle: 'custom',
+    navigationBarTitleText: '课程详情',
   },
 })
 
-const course = ref({
-  name: '数学提高A班',
-  date: '06月23日 周二',
-  time: '18:30-20:00',
-  className: '数学提高A班',
-  teacher: '王老师',
-  room: '301教室',
-  status: '待点名',
-})
+const stats = [
+  { label: '应到', value: 15, cls: 'primary' },
+  { label: '已到', value: 12, cls: 'success' },
+  { label: '请假', value: 2, cls: 'secondary' },
+  { label: '缺勤', value: 1, cls: 'error' },
+]
 
-const stats = ref({ planned: 8, present: 5, late: 1, absent: 1 })
+const students = [
+  { name: '张三', status: '已到', cls: 'present' },
+  { name: '李四', status: '已到', cls: 'present' },
+  { name: '王五', status: '请假', cls: 'leave' },
+]
 
-const students = ref([
-  { id: 1, name: '李明轩', remaining: 2, status: '到课', cls: 'present' },
-  { id: 2, name: '王诗涵', remaining: 18, status: '迟到', cls: 'late' },
-  { id: 3, name: '张子墨', remaining: 6, status: '缺勤', cls: 'absent' },
-  { id: 4, name: '陈嘉怡', remaining: 12, status: '到课', cls: 'present' },
-  { id: 5, name: '刘梓萱', remaining: 1, status: '未到', cls: 'pending' },
-])
+function goBack() {
+  uni.navigateBack()
+}
 
-const showMore = ref(false)
+function moreAction() {
+  uni.showToast({ title: '更多操作', icon: 'none' })
+}
 
 function startCheckin() {
   uni.navigateTo({ url: '/pages/schedule/detail?id=1' })
-}
-
-function editEvent() {
-  uni.showToast({ title: '编辑课次', icon: 'none' })
 }
 
 function reschedule() {
   uni.navigateTo({ url: '/pages/schedule/reschedule?id=1' })
 }
 
-function cancelEvent() {
+function cancelCourse() {
   uni.showModal({
     title: '取消课次',
-    content: '取消后本节课将不再计入考勤，关联学员课时不扣减。确认取消？',
-    confirmText: '确认取消',
-    confirmColor: '#c0392b',
-    success: (res) => {
-      if (res.confirm)
-        uni.showToast({ title: '已取消课次', icon: 'none' })
-    },
+    content: '确认取消本节课次？',
+    confirmText: '取消课次',
+    confirmColor: '#ba1a1a',
   })
 }
 
-function viewStudent(id: number) {
-  uni.navigateTo({ url: `/pages/student/detail?id=${id}` })
+function copyCourse() {
+  uni.showToast({ title: '复制排课', icon: 'none' })
 }
-
-onLoad(() => {})
 </script>
 
 <template>
-  <view class="cd-page">
-    <view class="hero-card">
-      <view class="hero-top">
-        <view class="hero-name">
-          {{ course.name }}
-        </view>
-        <text class="hero-status">
-          {{ course.status }}
-        </text>
+  <view class="course-page">
+    <view class="topbar">
+      <button class="nav-btn" @click="goBack">
+        <uni-icons type="left" size="28" color="#1f7159" />
+      </button>
+      <view class="page-title">
+        课程详情
       </view>
-      <view class="hero-meta">
-        {{ course.date }} · {{ course.time }}
-      </view>
-      <view class="hero-meta">
-        {{ course.className }} · {{ course.teacher }} · {{ course.room }}
-      </view>
-      <view class="hero-actions">
-        <button class="hero-btn primary" @click="startCheckin">
-          开始点名
-        </button>
-        <button class="hero-btn" @click="reschedule">
-          调课
-        </button>
-      </view>
-    </view>
-
-    <view class="stat-grid">
-      <view class="stat-item">
-        <view class="stat-num">
-          {{ stats.planned }}
-        </view>
-        <view class="stat-label">
-          应到
-        </view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-num present">
-          {{ stats.present }}
-        </view>
-        <view class="stat-label">
-          已到
-        </view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-num late">
-          {{ stats.late }}
-        </view>
-        <view class="stat-label">
-          迟到
-        </view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-num absent">
-          {{ stats.absent }}
-        </view>
-        <view class="stat-label">
-          缺勤
-        </view>
-      </view>
-    </view>
-
-    <view class="section-head">
-      <text>学员名单</text>
-      <text class="head-link" @click="showMore = !showMore">
-        更多操作
-      </text>
-    </view>
-
-    <view v-if="showMore" class="more-card">
-      <view class="more-row" @click="editEvent">
-        <uni-icons type="compose" size="16" color="#1f7159" /><text>编辑课次</text>
-      </view>
-      <view class="more-row" @click="cancelEvent">
-        <uni-icons type="closeempty" size="16" color="#c0392b" /><text class="danger">取消课次</text>
-      </view>
-    </view>
-
-    <view class="stu-list">
-      <view v-for="s in students" :key="s.id" class="stu-card" @click="viewStudent(s.id)">
-        <view class="stu-avatar">
-          {{ s.name.slice(0, 1) }}
-        </view>
-        <view class="stu-main">
-          <view class="stu-name">
-            {{ s.name }}
-          </view>
-          <view class="stu-sub" :class="{ low: s.remaining <= 3 }">
-            剩余 {{ s.remaining }} 课时{{ s.remaining <= 3 ? ' · 课时不足' : '' }}
-          </view>
-        </view>
-        <text class="stu-state" :class="s.cls">
-          {{ s.status }}
-        </text>
-      </view>
-    </view>
-
-    <view class="bottom-bar">
-      <button class="primary-btn" @click="startCheckin">
-        开始点名
+      <button class="nav-btn right" @click="moreAction">
+        <uni-icons type="more-filled" size="30" color="#3f4944" />
       </button>
     </view>
+
+    <scroll-view class="content-scroll" scroll-y>
+      <view class="course-hero">
+        <view class="hero-glow" />
+        <view class="hero-content">
+          <view class="hero-head">
+            <view class="course-title">
+              少儿数学提高班
+            </view>
+            <view class="status-pill">
+              进行中
+            </view>
+          </view>
+
+          <view class="meta-grid">
+            <view class="meta-item">
+              <uni-icons type="calendar" size="18" color="#ffffff" />
+              <text>6月23日 14:00-15:30</text>
+            </view>
+            <view class="meta-item">
+              <uni-icons type="staff" size="18" color="#ffffff" />
+              <text>精英A班</text>
+            </view>
+            <view class="meta-item">
+              <uni-icons type="person" size="18" color="#ffffff" />
+              <text>王老师</text>
+            </view>
+            <view class="meta-item">
+              <uni-icons type="home" size="18" color="#ffffff" />
+              <text>A区201</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="stat-grid">
+        <view
+          v-for="item in stats"
+          :key="item.label"
+          class="stat-card"
+        >
+          <view class="stat-label">
+            {{ item.label }}
+          </view>
+          <view class="stat-value" :class="item.cls">
+            {{ item.value }}
+          </view>
+        </view>
+      </view>
+
+      <view class="quick-actions">
+        <button class="checkin-btn" @click="startCheckin">
+          <uni-icons type="checkbox-filled" size="24" color="#ffffff" />
+          <text>去点名</text>
+        </button>
+        <view class="sub-actions">
+          <button class="sub-btn green" @click="reschedule">
+            <uni-icons type="loop" size="20" color="#1f7159" />
+            <text>调课</text>
+          </button>
+          <button class="sub-btn" @click="cancelCourse">
+            <uni-icons type="closeempty" size="20" color="#3f4944" />
+            <text>取消课次</text>
+          </button>
+          <button class="sub-btn" @click="copyCourse">
+            <uni-icons type="paperclip" size="20" color="#3f4944" />
+            <text>复制排课</text>
+          </button>
+        </view>
+      </view>
+
+      <view class="student-card">
+        <view class="student-head">
+          <view class="student-title">
+            学员名单
+          </view>
+          <button class="view-all">
+            查看全部
+            <uni-icons type="right" size="18" color="#1f7159" />
+          </button>
+        </view>
+        <view class="student-list">
+          <view
+            v-for="item in students"
+            :key="item.name"
+            class="student-row"
+          >
+            <view class="student-main">
+              <view class="avatar">
+                {{ item.name.slice(0, 1) }}
+              </view>
+              <text>{{ item.name }}</text>
+            </view>
+            <view class="student-status" :class="item.cls">
+              {{ item.status }}
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 </template>
 
 <style lang="scss" scoped>
-.cd-page {
+.course-page {
   min-height: 100vh;
-  box-sizing: border-box;
-  padding: 24rpx 28rpx 180rpx;
-  color: #1f2d33;
+  color: #0f1d23;
   background: #f4f6f5;
 }
 
-.hero-card {
-  padding: 30rpx;
-  color: #ffffff;
-  background: #193f36;
-  border-radius: 18rpx;
-  box-shadow: 0 18rpx 38rpx rgba(25, 63, 54, 0.16);
-}
-
-.hero-top {
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 112rpx;
+  padding: 0 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #bec9c3;
 }
 
-.hero-name {
-  font-size: 38rpx;
-  font-weight: 700;
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 80rpx;
+  height: 80rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
 }
 
-.hero-status {
-  padding: 6rpx 18rpx;
+.nav-btn.right {
+  justify-content: flex-end;
+}
+
+.page-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #1f7159;
+}
+
+.content-scroll {
+  box-sizing: border-box;
+  height: calc(100vh - 112rpx);
+  padding: 28rpx 28rpx 170rpx;
+}
+
+.course-hero {
+  position: relative;
+  padding: 32rpx;
+  overflow: hidden;
+  color: #ffffff;
+  background: #1f7159;
+  border-radius: 24rpx;
+  box-shadow: 0 6rpx 16rpx rgba(31, 113, 89, 0.12);
+}
+
+.hero-glow {
+  position: absolute;
+  top: -80rpx;
+  right: -80rpx;
+  width: 260rpx;
+  height: 260rpx;
+  background: rgba(0, 88, 66, 0.5);
+  border-radius: 50%;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-head {
+  display: flex;
+  gap: 18rpx;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.course-title {
+  flex: 1;
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 1.32;
+}
+
+.status-pill {
+  flex-shrink: 0;
+  padding: 8rpx 18rpx;
   font-size: 22rpx;
-  color: #a4f2d4;
-  background: rgba(42, 157, 115, 0.3);
+  font-weight: 700;
+  color: #1f7159;
+  background: #ffffff;
   border-radius: 999rpx;
 }
 
-.hero-meta {
-  margin-top: 12rpx;
-  font-size: 25rpx;
-  color: rgba(255, 255, 255, 0.78);
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx 24rpx;
+  margin-top: 28rpx;
 }
 
-.hero-actions {
+.meta-item {
   display: flex;
-  gap: 16rpx;
-  margin-top: 26rpx;
+  gap: 8rpx;
+  align-items: center;
+  min-width: 0;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.hero-btn {
-  flex: 1;
-  margin: 0;
-  font-size: 27rpx;
-  line-height: 78rpx;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 14rpx;
-}
-
-.hero-btn.primary {
-  color: #ffffff;
-  background: #2a9d73;
-}
-
-.hero-btn::after {
-  border: 0;
+.meta-item text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12rpx;
-  margin-top: 22rpx;
+  gap: 24rpx;
+  margin-top: 28rpx;
 }
 
-.stat-item {
-  padding: 22rpx 8rpx;
+.stat-card {
+  padding: 24rpx 8rpx;
   text-align: center;
   background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 14rpx;
-}
-
-.stat-num {
-  font-size: 38rpx;
-  font-weight: 700;
-  color: #183a34;
-}
-
-.stat-num.present {
-  color: #227253;
-}
-
-.stat-num.late {
-  color: #8a671b;
-}
-
-.stat-num.absent {
-  color: #9a3b33;
+  border: 1rpx solid #bec9c3;
+  border-radius: 16rpx;
 }
 
 .stat-label {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #718088;
+  margin-bottom: 8rpx;
+  font-size: 24rpx;
+  color: #3f4944;
 }
 
-.section-head {
+.stat-value {
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.stat-value.primary {
+  color: #1f7159;
+}
+
+.stat-value.success {
+  color: #007351;
+}
+
+.stat-value.secondary {
+  color: #40655b;
+}
+
+.stat-value.error {
+  color: #ba1a1a;
+}
+
+.quick-actions {
+  margin-top: 28rpx;
+}
+
+.checkin-btn {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 30rpx 0 16rpx;
-  font-size: 30rpx;
-  font-weight: 700;
-}
-
-.head-link {
-  font-size: 25rpx;
-  font-weight: 400;
-  color: #1d8b69;
-}
-
-.more-card {
-  margin-bottom: 16rpx;
-  padding: 8rpx 26rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
-}
-
-.more-row {
-  display: flex;
-  gap: 12rpx;
-  align-items: center;
-  height: 88rpx;
-  font-size: 27rpx;
-  border-bottom: 1rpx solid #edf1ef;
-}
-
-.more-row:last-child {
-  border-bottom: 0;
-}
-
-.more-row .danger {
-  color: #c0392b;
-}
-
-.stu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14rpx;
-}
-
-.stu-card {
-  display: flex;
-  gap: 20rpx;
-  align-items: center;
-  padding: 22rpx 24rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
-}
-
-.stu-avatar {
-  display: flex;
-  flex-shrink: 0;
+  gap: 10rpx;
   align-items: center;
   justify-content: center;
-  width: 72rpx;
-  height: 72rpx;
+  width: 100%;
+  height: 88rpx;
+  padding: 0;
+  margin: 0;
   font-size: 28rpx;
   font-weight: 700;
-  color: #1f7159;
-  background: #e6f4ee;
-  border-radius: 18rpx;
-}
-
-.stu-main {
-  flex: 1;
-  min-width: 0;
-}
-
-.stu-name {
-  font-size: 29rpx;
-  font-weight: 600;
-}
-
-.stu-sub {
-  margin-top: 8rpx;
-  font-size: 23rpx;
-  color: #839099;
-}
-
-.stu-sub.low {
-  color: #c0392b;
-}
-
-.stu-state {
-  flex-shrink: 0;
-  padding: 7rpx 16rpx;
-  font-size: 22rpx;
-  border-radius: 999rpx;
-}
-
-.stu-state.present {
-  color: #227253;
-  background: #e9f6ef;
-}
-
-.stu-state.late {
-  color: #8a671b;
-  background: #fff5d8;
-}
-
-.stu-state.absent {
-  color: #9a3b33;
-  background: #ffeceb;
-}
-
-.stu-state.pending {
-  color: #5d6a70;
-  background: #eef2f0;
-}
-
-.bottom-bar {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
-  border-top: 1rpx solid #eef1ef;
-}
-
-.primary-btn {
-  margin: 0;
-  font-size: 30rpx;
-  font-weight: 600;
-  line-height: 90rpx;
   color: #ffffff;
   background: #1f7159;
   border-radius: 16rpx;
 }
 
-.primary-btn::after {
+.sub-actions {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 18rpx;
+}
+
+.sub-btn {
+  display: flex;
+  flex: 1;
+  gap: 6rpx;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0;
+  margin: 0;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #3f4944;
+  background: #ffffff;
+  border: 1rpx solid #bec9c3;
+  border-radius: 16rpx;
+}
+
+.sub-btn.green {
+  color: #1f7159;
+  border-color: #1f7159;
+}
+
+.student-card {
+  margin-top: 28rpx;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1rpx solid #bec9c3;
+  border-radius: 16rpx;
+}
+
+.student-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #bec9c3;
+}
+
+.student-title {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.view-all {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  font-size: 24rpx;
+  color: #1f7159;
+  background: transparent;
+}
+
+.student-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 28rpx;
+  border-bottom: 1rpx solid #bec9c3;
+}
+
+.student-row:last-child {
+  border-bottom: 0;
+}
+
+.student-main {
+  display: flex;
+  gap: 18rpx;
+  align-items: center;
+  font-size: 28rpx;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #00201a;
+  background: #c2ebde;
+  border-radius: 50%;
+}
+
+.student-status {
+  padding: 6rpx 14rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  border-radius: 999rpx;
+}
+
+.student-status.present {
+  color: #007351;
+  background: rgba(0, 115, 81, 0.08);
+}
+
+.student-status.leave {
+  color: #40655b;
+  background: rgba(194, 235, 222, 0.35);
+}
+
+.nav-btn::after,
+.checkin-btn::after,
+.sub-btn::after,
+.view-all::after {
   border: 0;
 }
 </style>

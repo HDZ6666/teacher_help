@@ -1,0 +1,434 @@
+[
+  {
+    "route": "pages/index/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__index__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "老师帮 切换校区 今日 6月23日 周二 今日课程 8节 待点名 3节 已完成 5 待处理错题 12 快速排课 快速点名 拍错题 新增学员 今日课程 少儿数学提高班 待点名 14:00 - 15:30 A区 201教室 王老师 / 15人 ",
+    "error": ""
+  },
+  {
+    "route": "pages/class/create",
+    "file": "tmp\\uniapp-screens\\all\\pages__class__create.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "创建班级 班级名称 * 班级类型 班课 一对一 关联课程 请选择课程体系 容纳人数 - 15 + 允许超额 授课教师 选择主讲教师 默认教室 选择上课地点 开课日期 备注信息 添加其他说明事项... 保存 保存并排课",
+    "error": ""
+  },
+  {
+    "route": "pages/class/detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__class__detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "班级详情 初二英语培优班(秋季) 常规班 进行中 课程 初中英语强化课程 人数/容量 24 / 30 主教 李晓晴 教室 302 阶梯教室 添加学员 新增排课 去点名 班级请假 升班结业 学员 课表 点名 请假 设置 共 24 名学员 筛选",
+    "error": ""
+  },
+  {
+    "route": "pages/class/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__class__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "班级 搜索班级/课程/老师 全部 班课 一对一 今日有课 待排课 已结业 春季初二数学强化班 开班中 初中数学 班课 张老师 教室 A102 12/15 人 每周 2 节课，已上 10/20 学员 排课 点名 详情 高中英语VIP(李华) ",
+    "error": ""
+  },
+  {
+    "route": "pages/class/upgrade",
+    "file": "tmp\\uniapp-screens\\all\\pages__class__upgrade.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "学员结课与升班 1 选择学员 2 操作设置 选择学员 已选 3 人 全选 张 张子涵 剩余课时：2 李 李语桐 剩余课时：0 王 王浩宇 剩余课时：1 展开更多 学员升班 学员结业 目标班级 * 请选择升入的班级 课时结转方式 按比例折算 ",
+    "error": ""
+  },
+  {
+    "route": "pages/course/create",
+    "file": "tmp\\uniapp-screens\\all\\pages__course__create.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "新增/编辑课程 基本信息 课程名称 * 请输入课程名称 课程类型 * 一对多 一对一 展示颜色 收费标准 + 添加标准 收费方式 按课时 按月 按次 价格名称 如：春季常规班 包含课时 0 单价 0.00 总价 0.00 设置与备注 是否启",
+    "error": ""
+  },
+  {
+    "route": "pages/course/detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__course__detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "课程详情 一对多 少儿英语进阶 启用中 可售 价格 班级 套餐 规则 标准收费 总价 ￥2400 单价 ￥200 数量 12 节 规则详情 请假扣课 提前2小时可退 课时消耗 每节课消耗1课时 有效期 自报读起1年有效 编辑课程",
+    "error": ""
+  },
+  {
+    "route": "pages/course/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__course__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "课程 搜索课程名称 全部 一对多 一对一 启用 停用 可售卖 少儿英语进阶 启用 线上售卖 类型: 一对多 收费: 按课时 ￥2400 / 12节 关联班级: 3个 查看 编辑 排课 钢琴一对一VIP 启用 类型: 一对一 收费: 按期 ￥",
+    "error": ""
+  },
+  {
+    "route": "pages/course/package",
+    "file": "tmp\\uniapp-screens\\all\\pages__course__package.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "套餐 特惠套餐 思维+编程启蒙包 已售罄 ￥3200 课程 2 门 物品 0 个 英语+美术暑期联报包 可售 ￥4800 包含课程 (2) 少儿英语 创意美术 物品及费用 (2) 教材包 建档费 原价合计 ￥5600 套餐优惠 - ￥800",
+    "error": ""
+  },
+  {
+    "route": "pages/item/edit",
+    "file": "tmp\\uniapp-screens\\all\\pages__item__edit.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "新增物品 物品名称 * 请输入物品名称 物品图片 点击上传图片 规格 如：500ml、10个/盒 销售价格 ¥ 0.00 库存预警值 预警阈值数量 关联课程 添加课程 基础数学 启用状态 线上售卖 保存 保存并入库",
+    "error": ""
+  },
+  {
+    "route": "pages/item/fee",
+    "file": "tmp\\uniapp-screens\\all\\pages__item__fee.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "费用项目 建档费 ¥200.00 已启用 线上售卖 适用课程: 所有课程 编辑 停用 详情 保险费 ¥150.00 已启用 适用课程: 游泳初级班, 游泳进阶班 编辑 停用 详情 新增费用项目",
+    "error": ""
+  },
+  {
+    "route": "pages/item/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__item__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "物品费用 搜索物品或费用名称 物品 费用 库存流水 物品总数 128 库存预警 5 今日入库 45 今日出库 12 采购入库 库存流水",
+    "error": ""
+  },
+  {
+    "route": "pages/item/list",
+    "file": "tmp\\uniapp-screens\\all\\pages__item__list.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "物品列表 全部 教材 文具 设备 少儿英语教材 (Level 1) 规格: A4全彩精装 ¥85.00 库存: 45件 库存充足 线上售卖 详情 领用 入库 学生随堂测验纸 规格: B5单色 100张/包 ¥15.00 库存: 3包 库存预",
+    "error": ""
+  },
+  {
+    "route": "pages/item/purchase",
+    "file": "tmp\\uniapp-screens\\all\\pages__item__purchase.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "采购入库 物品信息 选择物品 * 搜索物品名称、编码或SKU... 规格 选择物品后显示规格 采购数据 采购日期 * 请选择日期 单价 * ¥ 0.00 数量 * 0 总金额 ¥0.00 支付方式 请选择支付方式 管理信息 经办人 经办人姓",
+    "error": ""
+  },
+  {
+    "route": "pages/item/stock-log",
+    "file": "tmp\\uniapp-screens\\all\\pages__item__stock-log.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "库存流水 近7天 全部经办人 全部 采购入库 销售出库 领用 退货 盘点调整 采购入库 少儿英语教材 (Level 1) 规格: A4全彩精装 +50 2026-06-24 14:00 张老师 PO-202606-042 销售出库 学生随堂",
+    "error": ""
+  },
+  {
+    "route": "pages/login/login",
+    "file": "tmp\\uniapp-screens\\all\\pages__login__login.png",
+    "loginLike": true,
+    "blankLike": false,
+    "sample": "老师帮 让上课、点名、排课更快一点 选择校区 杭州总校区 请输入手机号 请输入密码 记住登录 忘记密码? 登录 验证码登录 登录即代表同意 《用户服务协议》 和 《隐私政策》 v1.2.0",
+    "error": ""
+  },
+  {
+    "route": "pages/me/business",
+    "file": "tmp\\uniapp-screens\\all\\pages__me__business.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "经营管理概览 物品费用 新增 在售商品 124 今日收费 ¥2.4k 会员卡概况 总活跃会员 1,842 次卡 856 月卡/季卡 420 年卡 566 场地管理 (今日) 占用率 68% A区101 舞蹈室 容量: 20人 使用中 当前:",
+    "error": ""
+  },
+  {
+    "route": "pages/me/me",
+    "file": "tmp\\uniapp-screens\\all\\pages__me__me.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "林老师 138****6699 高级老师 杭州总校区 本月课时 86节 综合评级 S+ 12 课程 8 班级 86 课时 3 消息 更多工具 切换校区 杭州总校区 账号安全 通知设置 数据同步 刚刚 帮助与反馈 关于老师帮 退出登录 今日 ",
+    "error": ""
+  },
+  {
+    "route": "pages/me/settings",
+    "file": "tmp\\uniapp-screens\\all\\pages__me__settings.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "设置 个人资料 修改密码 手机号绑定 138****5678 消息通知 隐私与权限 清理缓存 128 MB 关于版本 v2.4.1 退出登录",
+    "error": ""
+  },
+  {
+    "route": "pages/me/tools",
+    "file": "tmp\\uniapp-screens\\all\\pages__me__tools.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "更多工具 高频工具 排课管理 智能编排课程计划 点名记录 课堂考勤快速登记 学员请假 请假审批与补课 错题分析记录 学情诊断与提分 教务管理 课程管理 课程体系与大纲 班级管理 班级编排与升班 老师管理 教师档案与排期 教室/场地 场地资源",
+    "error": ""
+  },
+  {
+    "route": "pages/member-card/detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__member-card__detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "会员卡详情 VIP 数学强化卡 初中数学专用 已启用 ¥1,200 ¥1,500 权益信息 适用课程 初中数学 可使用次数 10次 有效天数 180天 生效方式 即时生效 购买限制 不限 使用说明 仅限本人使用。不可转让，不可与其他优惠叠加",
+    "error": ""
+  },
+  {
+    "route": "pages/member-card/grant-record",
+    "file": "tmp\\uniapp-screens\\all\\pages__member-card__grant-record.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "发放记录 搜索学员姓名/卡号 全部时间 全部状态 张 张三 正常 MC882039 ¥1,200 卡片名称 10次数学精品课卡 剩余权益 8次 有效期至 2024-12-31 来源 后台发放 查看 续费 停用 李 李四 已停用 MC8820",
+    "error": ""
+  },
+  {
+    "route": "pages/member-card/grant",
+    "file": "tmp\\uniapp-screens\\all\\pages__member-card__grant.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "发放会员卡 选择学员 请选择学员 选择会员卡 请选择会员卡类型 实收金额 ¥ 0.00 支付方式 微信 支付宝 现金 余额 生效日期 请选择日期 备注 添加备注信息... 确认发放",
+    "error": ""
+  },
+  {
+    "route": "pages/member-card/hold-detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__member-card__hold-detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "持卡详情 有效 张三 10次数学精品课卡 剩余 8 次 有效期至 2024-12-31 操作记录 2023-10-24 14:30 -1次 消耗 1 次 课程: 初中数学强化 2023-10-15 16:00 -1次 消耗 1 次 课程: ",
+    "error": ""
+  },
+  {
+    "route": "pages/member-card/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__member-card__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "会员卡 搜索卡名称 全部 课程卡 场地折扣卡 启用 停用 线上售卖 10次数学精品课卡 已启用 课程卡 • 权益: 10次 ¥1,200 有效期 180天 已发卡 24张 分享 详情 发放 暑期钢琴启蒙月卡 已启用 课程卡 • 权益: 无限",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/checkin-done",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__checkin-done.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "点名已完成 提交时间: 2023-10-27 14:30 本次点名统计 应到人数 15 实到人数 13 异常人数 2 写课后点评 查看上课记录 ▸ 继续点下一节 返回今日",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/comment",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__comment.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "课后点评 李 李明轩 钢琴中级班 - 第12节 课堂表现总结 请描述学生本节课的学习状态、掌握情况... 表现积极 需加强练习 作业已布置 专注度高 作业说明 填写课后需要完成的练习或作业内容... 课堂照片 (最多9张) 上传 给家长的备",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/conflict",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__conflict.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "排课冲突 发现 2 个排课冲突 请处理以下冲突以完成排课。您也可以选择跳过这些有冲突的课次。 老师冲突 第 3 节课次 王老师在 14:00 已有课程 原计划：2023-10-25 14:00 - 15:30 · 高一数学强化班 更换老师 ",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/course-detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__course-detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "课程详情 少儿数学提高班 进行中 6月23日 14:00-15:30 精英A班 王老师 A区201 应到 15 已到 12 请假 2 缺勤 1 去点名 调课 取消课次 复制排课 学员名单 查看全部 张 张三 已到 李 李四 已到 王 王五 ",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/create",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__create.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "新增排课 排课模式 单次排课 安排单节课程 规则排课 按周期批量生成 日历排课 手动多选日期 基本信息 课程选择 请选择 班级/学员 请选择 授课老师 请选择 教室 请选择 (选填) 时间安排 上课日期 今天 10月24日 上课时间 09:",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "老师帮 切换校区 少儿数学提高班 精英A班 14:00 - 15:30 王老师 A区201 应到 15 已到 12 迟到 1 请假 1 缺勤 1 一键全到 未到设缺勤 请假导入 重置 已到 img 张子涵 剩余课时: 24 到 迟 假 缺 ",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/exception-confirm",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__exception-confirm.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "数学集训营 - 秋季班 进行中 迟到 请假 缺勤 点名异常确认 以下学员存在考勤异常： 张三 迟到 李四 请假 王五 缺勤 当前存在 3 名异常学员，是否确认提交？ 返回修改 确认提交",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "我的课表 一 22 二 23 三 24 四 25 五 26 六 27 日 28 日程 周 月 列表 14:00 - 15:30 待点名 少儿数学提高班 王老师 A区201 详情 调课 去点名 09:00 - 10:30 已完成 少儿英语启蒙",
+    "error": ""
+  },
+  {
+    "route": "pages/schedule/reschedule",
+    "file": "tmp\\uniapp-screens\\all\\pages__schedule__reschedule.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "调课申请 当前课次 数学提高A班 06月23日 周二 · 18:30-20:00 王老师 · 301教室 新日期 请选择新日期 新时间 选择常用时间段 08:00-09:00 10:00-11:30 14:00-15:30 18:30-20",
+    "error": ""
+  },
+  {
+    "route": "pages/student/add",
+    "file": "tmp\\uniapp-screens\\all\\pages__student__add.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "添加学生 搜索姓名或手机号 张伟 138 0000 0001 王芳 139 1234 5678 李 李娜 137 9876 5432 赵 赵强 136 1111 2222 陈明 135 5555 6666 已选 3 人 新增学员并加入 确认",
+    "error": ""
+  },
+  {
+    "route": "pages/student/detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__student__detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "学员详情 张子涵 在读学员 138****8888（张爸爸） 剩余课时 24 节 可用积分 1,250 分 联系家长 学员请假 报名/续费 添加跟进 课程 上课记录 请假 错题 跟进 小学六年级奥数秋季冲刺班 正价课 秋季周末A班（周六 0",
+    "error": ""
+  },
+  {
+    "route": "pages/student/enroll",
+    "file": "tmp\\uniapp-screens\\all\\pages__student__enroll.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "报名续费 李 李明轩 ID: 20230891 在读 选择课程 请点击选择课程 选择班级 请先选择课程 课时数量 10 费用金额 (¥) 请输入金额 优惠减免 (¥) 实收金额 ¥ 0.00 支付方式 微信 支付宝 现金 转账 备注信息 请",
+    "error": ""
+  },
+  {
+    "route": "pages/student/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__student__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "老师帮 切换校区 学员 搜索姓名、手机号、班级 全部 在读 待续费 已停课 今日有课 请假中 张 张小明 ♂ 12岁 · 初一 · 英语进阶班 在读 剩余课时 24 节 最近上课 2023-10-27 联系 请假 详情 李思思 ♀ 10岁 ",
+    "error": ""
+  },
+  {
+    "route": "pages/student/leave",
+    "file": "tmp\\uniapp-screens\\all\\pages__student__leave.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "学员请假 学员姓名 林小明 请假课程 少儿钢琴进阶班（周三 16:00） 请假日期 2023-11-15 请假原因 病假 是否补课 申请后需教务安排 备注说明 请输入详细的请假原因或其他需要老师注意的事项... 审批流转 发起申请 待提交 ",
+    "error": ""
+  },
+  {
+    "route": "pages/teacher/create",
+    "file": "tmp\\uniapp-screens\\all\\pages__teacher__create.png",
+    "loginLike": true,
+    "blankLike": false,
+    "sample": "新增老师 姓名 * 请输入姓名 联系电话 请输入手机号码 性别 男 女 擅长科目 数学 添加科目... 角色 选择角色 考勤组 选择考勤组 允许登录 开启后该老师可登录系统 备注 请输入备注信息... 权限配置请到 PC 后台完成 取消 保",
+    "error": ""
+  },
+  {
+    "route": "pages/teacher/detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__teacher__detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "老师详情 李 李明 启用 初中数学 · 高级老师 联系方式 138 0013 8000 本月课时 48 课时 查看课表 联系老师 新增排课 编辑资料 课表 班级 记录 资料 近期课程 全部 今天 10月24日 初三数学冲刺班 (A班) 未开",
+    "error": ""
+  },
+  {
+    "route": "pages/teacher/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__teacher__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "老师 搜索姓名/手机号/学科 全部 今日有课 本周有课 启用 停用 李 李明 初中数学 138 0000 0001 启用 今日课程 2 节 本周课时 12 时 课表 联系 详情 张 张芳 高中英语 139 1234 5678 启用 今日课程",
+    "error": ""
+  },
+  {
+    "route": "pages/teacher/schedule",
+    "file": "tmp\\uniapp-screens\\all\\pages__teacher__schedule.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "李老师的课表 2023年 10月 日历 一 16 二 17 三 18 四 19 五 20 六 21 日 22 09:00 - 10:30 待点名 初中数学强化 秋季A班 (30人) A102 教室 调课 详情 点名 14:00 - 15:3",
+    "error": ""
+  },
+  {
+    "route": "pages/venue/booking-detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__venue__booking-detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "预约详情 已预约 张 张三 138 0013 8000 场地 A101 教室 - 北校区 日期时间 2026年06月25日 14:00 - 15:30 支付金额 ¥ 150.00 预约来源 App 订单编号 ORD202606250018 ",
+    "error": ""
+  },
+  {
+    "route": "pages/venue/cancel",
+    "file": "tmp\\uniapp-screens\\all\\pages__venue__cancel.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "取消预约 取消规则 临近开始时间的预约取消可能产生费用，请核对退款金额并记录原因。 目标预约 A101 教室预约 今天 14:00 - 15:30 · A101 教室 - 北校区 预约人：张三 · BK202606250014 退款金额（¥",
+    "error": ""
+  },
+  {
+    "route": "pages/venue/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__venue__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "场地管理 周一 12 周二 13 周三 14 周四 15 周五 16 周六 17 周日 18 +2 12 今日预约 24 可订时段 5 待核销 2 已锁场地 场地 A101 教室 北校区 空闲 容量 40 人 今日占用 25% 预约 锁场 ",
+    "error": ""
+  },
+  {
+    "route": "pages/venue/lock",
+    "file": "tmp\\uniapp-screens\\all\\pages__venue__lock.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "锁场 临时关闭场地的可预约状态，用于场地维护或私人活动。 目标场地 请选择场地... 日期范围 开始 — 结束 时间段 08:00 — 17:00 重复方式 不重复 每天 每周 锁场原因 维护 / 维修 补充说明 填写必要的说明（如：维修内",
+    "error": ""
+  },
+  {
+    "route": "pages/venue/proxy-booking",
+    "file": "tmp\\uniapp-screens\\all\\pages__venue__proxy-booking.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "代预约 预约信息 场地 A工作室 - 市中心校区 日期 2023年10月24日 时段 14:00 - 15:30 用户信息 学员 访客 姓名 请输入用户姓名 手机号 请输入手机号 支付信息 折扣 (%) 0 减免 (￥) 0.00 实付金额",
+    "error": ""
+  },
+  {
+    "route": "pages/venue/schedule",
+    "file": "tmp\\uniapp-screens\\all\\pages__venue__schedule.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "订场时间表 日期 2023年10月24日 校区 总校区 A101 A102 B205 C310 实验室1 08:00 09:00 空闲 点击代预约 09:00 10:00 已预约 王老师 · 生物入门 10:00 11:00 已锁定 设备维",
+    "error": ""
+  },
+  {
+    "route": "pages/wrong-question/analyzing",
+    "file": "tmp\\uniapp-screens\\all\\pages__wrong-question__analyzing.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "Σ 正在识别题目 正在分析解法 正在生成讲解 正在为您生成深度解析，您可以先处理其他事务，完成后将收到提醒。 后台处理 取消分析",
+    "error": ""
+  },
+  {
+    "route": "pages/wrong-question/detail",
+    "file": "tmp\\uniapp-screens\\all\\pages__wrong-question__detail.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "错题详情 y = ax² + bx + c 题目文本 已知在平面直角坐标系中，抛物线 y = ax² + bx + c 与 x 轴交于 A(-1, 0) 和 B(3, 0) 两点，且过点 C(0, -3)。求该抛物线的解析式并确定其顶点坐标",
+    "error": ""
+  },
+  {
+    "route": "pages/wrong-question/edit",
+    "file": "tmp\\uniapp-screens\\all\\pages__wrong-question__edit.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "错题本 编辑 AI 解析内容 您可以修改以下由系统自动提取和生成的解析内容，以确保其准确无误。 题目文本 答案 解题步骤 ✦ AI 润色 错因分析 考察知识点 二次函数图像 待定系数法 三元一次方程组 添加新知识点... 放弃修改 保存修改",
+    "error": ""
+  },
+  {
+    "route": "pages/wrong-question/index",
+    "file": "tmp\\uniapp-screens\\all\\pages__wrong-question__index.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "错题本 搜索题目、知识点、学员... 今日新增 24 待分析 8 已解析 156 已掌握 89% 拍照上传 相册选择 最近错题 张子涵 数学 一元二次方程根的判别式 已解析 未掌握 李心怡 物理 牛顿第二定律综合应用 分析中 部分掌握 王宇",
+    "error": ""
+  },
+  {
+    "route": "pages/wrong-question/upload",
+    "file": "tmp\\uniapp-screens\\all\\pages__wrong-question__upload.png",
+    "loginLike": false,
+    "blankLike": false,
+    "sample": "拍照上传 裁剪 重新拍照 关联学员 请选择 科目 数学 年级 八年级 来源 作业 课堂 考试 其他 ✦ 开始 AI 分析",
+    "error": ""
+  }
+]

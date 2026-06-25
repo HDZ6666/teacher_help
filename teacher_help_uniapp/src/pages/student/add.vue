@@ -1,235 +1,104 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 defineOptions({
   name: 'StudentAdd',
 })
 definePage({
   style: {
-    navigationBarTitleText: '添加学员',
+    navigationStyle: 'custom',
+    navigationBarTitleText: '添加学生',
   },
 })
 
-const genderOptions = ['男', '女']
-const genderIndex = ref(0)
-const gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '初一', '初二', '初三', '高一', '高二', '高三']
-const gradeIndex = ref(2)
-const relationOptions = ['母亲', '父亲', '爷爷', '奶奶', '本人', '其他']
-const relationIndex = ref(0)
-const sourceOptions = ['到店咨询', '老学员转介绍', '线上推广', '地推活动', '电话邀约', '其他']
-const sourceIndex = ref(0)
+interface Candidate {
+  id: number
+  name: string
+  phone: string
+  checked: boolean
+  avatar?: string
+}
 
-const form = ref({
-  name: '',
-  school: '',
-  birthday: '',
-  phone: '',
-  wechat: '',
-  intentCourse: '',
-  follower: '',
-  manager: '',
-  remark: '',
+const keyword = ref('')
+const candidates = ref<Candidate[]>([
+  { id: 1, name: '张伟', phone: '138 0000 0001', checked: true, avatar: '/static/images/avatar.jpg' },
+  { id: 2, name: '王芳', phone: '139 1234 5678', checked: false, avatar: '/static/images/default-avatar.png' },
+  { id: 3, name: '李娜', phone: '137 9876 5432', checked: true },
+  { id: 4, name: '赵强', phone: '136 1111 2222', checked: false },
+  { id: 5, name: '陈明', phone: '135 5555 6666', checked: true, avatar: '/static/images/avatar.jpg' },
+])
+
+const filteredCandidates = computed(() => {
+  return candidates.value.filter(item => !keyword.value || item.name.includes(keyword.value) || item.phone.includes(keyword.value))
 })
 
-const tags = ['潜在客户', '已试听', '课时不足', '待跟进', '重点维护']
-const selectedTags = ref<string[]>([])
+const selectedCount = computed(() => candidates.value.filter(item => item.checked).length)
 
-function toggleTag(t: string) {
-  const i = selectedTags.value.indexOf(t)
-  if (i >= 0)
-    selectedTags.value.splice(i, 1)
-  else
-    selectedTags.value.push(t)
+function toggle(item: Candidate) {
+  item.checked = !item.checked
 }
 
-function onGenderChange(e: any) {
-  genderIndex.value = e.detail.value
-}
-function onGradeChange(e: any) {
-  gradeIndex.value = e.detail.value
-}
-function onRelationChange(e: any) {
-  relationIndex.value = e.detail.value
-}
-function onSourceChange(e: any) {
-  sourceIndex.value = e.detail.value
-}
-function onBirthdayChange(e: any) {
-  form.value.birthday = e.detail.value
+function goBack() {
+  uni.navigateBack()
 }
 
-function save() {
-  if (!form.value.name) {
-    uni.showToast({ title: '请填写学员姓名', icon: 'none' })
-    return
-  }
-  if (!form.value.phone) {
-    uni.showToast({ title: '请填写联系电话', icon: 'none' })
-    return
-  }
-  uni.showToast({ title: '已保存', icon: 'success' })
+function createAndJoin() {
+  uni.showToast({ title: '打开新增学员表单', icon: 'none' })
+}
+
+function confirmAdd() {
+  uni.showToast({ title: `已添加 ${selectedCount.value} 人`, icon: 'success' })
   setTimeout(() => uni.navigateBack(), 700)
 }
 </script>
 
 <template>
   <view class="add-page">
-    <!-- 基础信息 -->
-    <view class="group-title">
-      基础信息
-    </view>
-    <view class="form-card">
-      <view class="row">
-        <text class="row-label req">
-          姓名
-        </text>
-        <input v-model="form.name" class="row-input" placeholder="请输入学员姓名">
-      </view>
-      <picker :value="genderIndex" :range="genderOptions" @change="onGenderChange">
-        <view class="row">
-          <text class="row-label">
-            性别
-          </text>
-          <view class="row-value">
-            {{ genderOptions[genderIndex] }}
-            <uni-icons type="right" size="15" color="#9aa5aa" />
-          </view>
-        </view>
-      </picker>
-      <picker :value="gradeIndex" :range="gradeOptions" @change="onGradeChange">
-        <view class="row">
-          <text class="row-label">
-            年级
-          </text>
-          <view class="row-value">
-            {{ gradeOptions[gradeIndex] }}
-            <uni-icons type="right" size="15" color="#9aa5aa" />
-          </view>
-        </view>
-      </picker>
-      <view class="row">
-        <text class="row-label">
-          学校
-        </text>
-        <input v-model="form.school" class="row-input" placeholder="选填">
-      </view>
-      <picker mode="date" :value="form.birthday" @change="onBirthdayChange">
-        <view class="row no-border">
-          <text class="row-label">
-            生日
-          </text>
-          <view class="row-value" :class="{ ph: !form.birthday }">
-            {{ form.birthday || '选填' }}
-            <uni-icons type="right" size="15" color="#9aa5aa" />
-          </view>
-        </view>
-      </picker>
-    </view>
-
-    <!-- 联系人 -->
-    <view class="group-title">
-      联系人
-    </view>
-    <view class="form-card">
-      <picker :value="relationIndex" :range="relationOptions" @change="onRelationChange">
-        <view class="row">
-          <text class="row-label">
-            与学员关系
-          </text>
-          <view class="row-value">
-            {{ relationOptions[relationIndex] }}
-            <uni-icons type="right" size="15" color="#9aa5aa" />
-          </view>
-        </view>
-      </picker>
-      <view class="row">
-        <text class="row-label req">
-          联系电话
-        </text>
-        <input v-model="form.phone" type="number" class="row-input" placeholder="请输入手机号">
-      </view>
-      <view class="row no-border">
-        <text class="row-label">
-          微信
-        </text>
-        <input v-model="form.wechat" class="row-input" placeholder="选填">
-      </view>
-    </view>
-
-    <!-- 报读意向 -->
-    <view class="group-title">
-      报读意向
-    </view>
-    <view class="form-card">
-      <view class="row" @click="form.intentCourse = '数学提高班'">
-        <text class="row-label">
-          意向课程
-        </text>
-        <view class="row-value" :class="{ ph: !form.intentCourse }">
-          {{ form.intentCourse || '请选择' }}
-          <uni-icons type="right" size="15" color="#9aa5aa" />
-        </view>
-      </view>
-      <picker :value="sourceIndex" :range="sourceOptions" @change="onSourceChange">
-        <view class="row">
-          <text class="row-label">
-            来源渠道
-          </text>
-          <view class="row-value">
-            {{ sourceOptions[sourceIndex] }}
-            <uni-icons type="right" size="15" color="#9aa5aa" />
-          </view>
-        </view>
-      </picker>
-      <view class="row" @click="form.follower = '王老师'">
-        <text class="row-label">
-          跟进人
-        </text>
-        <view class="row-value" :class="{ ph: !form.follower }">
-          {{ form.follower || '请选择' }}
-          <uni-icons type="right" size="15" color="#9aa5aa" />
-        </view>
-      </view>
-      <view class="row no-border" @click="form.manager = '张学管'">
-        <text class="row-label">
-          学管师
-        </text>
-        <view class="row-value" :class="{ ph: !form.manager }">
-          {{ form.manager || '请选择' }}
-          <uni-icons type="right" size="15" color="#9aa5aa" />
-        </view>
-      </view>
-    </view>
-
-    <!-- 标签 -->
-    <view class="group-title">
-      标签
-    </view>
-    <view class="form-card pad">
-      <view class="tag-wrap">
-        <view
-          v-for="t in tags"
-          :key="t"
-          class="tag-chip"
-          :class="{ on: selectedTags.includes(t) }"
-          @click="toggleTag(t)"
-        >
-          {{ t }}
-        </view>
-      </view>
-    </view>
-
-    <!-- 备注 -->
-    <view class="form-card pad">
-      <text class="row-label">
-        备注
+    <view class="top-bar">
+      <button class="back-btn" @click="goBack">
+        <uni-icons type="left" size="26" color="#34433d" />
+      </button>
+      <text class="nav-title">
+        添加学生
       </text>
-      <textarea v-model="form.remark" class="remark-area" placeholder="补充说明（选填）" />
+      <view class="nav-space" />
+    </view>
+
+    <view class="search-box">
+      <uni-icons type="search" size="26" color="#6f7974" />
+      <input v-model="keyword" class="search-input" placeholder="搜索姓名或手机号" placeholder-class="placeholder">
+    </view>
+
+    <view class="candidate-list">
+      <view v-for="item in filteredCandidates" :key="item.id" class="candidate-card" @click="toggle(item)">
+        <image v-if="item.avatar" :src="item.avatar" mode="aspectFill" class="candidate-avatar" />
+        <view v-else class="candidate-letter">
+          {{ item.name.slice(0, 1) }}
+        </view>
+        <view class="candidate-main">
+          <view class="candidate-name">
+            {{ item.name }}
+          </view>
+          <view class="candidate-phone">
+            {{ item.phone }}
+          </view>
+        </view>
+        <view class="check-box" :class="{ checked: item.checked }">
+          <uni-icons v-if="item.checked" type="checkmarkempty" size="18" color="#ffffff" />
+        </view>
+      </view>
     </view>
 
     <view class="bottom-bar">
-      <button class="primary-btn" @click="save">
-        保存
+      <view class="selected">
+        <uni-icons type="checkbox-filled" size="20" color="#00684f" />
+        <text>已选 {{ selectedCount }} 人</text>
+      </view>
+      <button class="outline-btn" @click="createAndJoin">
+        新增学员并加入
+      </button>
+      <button class="primary-btn" @click="confirmAdd">
+        确认添加
       </button>
     </view>
   </view>
@@ -239,101 +108,128 @@ function save() {
 .add-page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 8rpx 28rpx 180rpx;
-  color: #1f2d33;
+  padding: 0 28rpx 150rpx;
+  color: #101f26;
   background: #f4f6f5;
 }
 
-.group-title {
-  margin: 24rpx 4rpx 14rpx;
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #4a565c;
+button::after {
+  border: 0;
 }
 
-.form-card {
-  margin-bottom: 4rpx;
-  padding: 0 26rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
-}
-
-.form-card.pad {
-  padding: 24rpx 26rpx;
-}
-
-.row {
+.top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 96rpx;
-  border-bottom: 1rpx solid #edf1ef;
+  height: 102rpx;
+  margin: 0 -28rpx;
+  padding: 0 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #b8c6c0;
 }
 
-.row.no-border {
-  border-bottom: 0;
+.back-btn,
+.nav-space {
+  width: 64rpx;
+  height: 64rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
 }
 
-.row-label {
-  flex-shrink: 0;
-  font-size: 27rpx;
-  color: #4a565c;
+.nav-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #00684f;
 }
 
-.row-label.req::before {
-  margin-right: 6rpx;
-  color: #c0392b;
-  content: '*';
-}
-
-.row-value {
+.search-box {
   display: flex;
-  gap: 6rpx;
   align-items: center;
-  font-size: 27rpx;
+  gap: 22rpx;
+  height: 78rpx;
+  margin-top: 30rpx;
+  padding: 0 28rpx;
+  background: #ffffff;
+  border: 1rpx solid #b8c6c0;
+  border-radius: 14rpx;
 }
 
-.row-value.ph {
+.search-input {
+  flex: 1;
+  font-size: 30rpx;
+}
+
+.placeholder {
   color: #9aa5aa;
 }
 
-.row-input {
-  flex: 1;
-  margin-left: 24rpx;
-  font-size: 27rpx;
-  text-align: right;
-}
-
-.tag-wrap {
+.candidate-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 14rpx;
+  flex-direction: column;
+  gap: 22rpx;
+  margin-top: 28rpx;
 }
 
-.tag-chip {
-  padding: 12rpx 24rpx;
-  font-size: 24rpx;
-  color: #67757c;
-  background: #f1f4f2;
-  border: 1rpx solid transparent;
-  border-radius: 999rpx;
+.candidate-card {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  min-height: 118rpx;
+  padding: 18rpx 24rpx;
+  background: #ffffff;
+  border: 1rpx solid #b8c6c0;
+  border-radius: 14rpx;
 }
 
-.tag-chip.on {
-  color: #1e7259;
-  background: #e6f4ee;
-  border-color: #b8dccc;
+.candidate-avatar,
+.candidate-letter {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 50%;
 }
 
-.remark-area {
-  width: 100%;
-  height: 140rpx;
-  margin-top: 16rpx;
-  padding: 18rpx 20rpx;
-  font-size: 27rpx;
-  background: #f6f8f7;
-  border-radius: 12rpx;
+.candidate-avatar {
+  border: 1rpx solid #c9d5d0;
+}
+
+.candidate-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #1f7159;
+  background: #c2ebde;
+}
+
+.candidate-main {
+  flex: 1;
+}
+
+.candidate-name {
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.candidate-phone {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  color: #34433d;
+}
+
+.check-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid #5d6a70;
+  border-radius: 2rpx;
+}
+
+.check-box.checked {
+  background: #2e67d8;
+  border-color: #2e67d8;
 }
 
 .bottom-bar {
@@ -341,24 +237,44 @@ function save() {
   right: 0;
   bottom: 0;
   left: 0;
-  display: flex;
-  padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: auto 1.2fr 1fr;
+  gap: 14rpx;
+  align-items: center;
+  padding: 24rpx 28rpx calc(24rpx + env(safe-area-inset-bottom));
   background: #ffffff;
-  border-top: 1rpx solid #eef1ef;
+  border-top: 1rpx solid #b8c6c0;
+}
+
+.selected {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #00684f;
+  white-space: nowrap;
+}
+
+.outline-btn,
+.primary-btn {
+  height: 76rpx;
+  padding: 0;
+  margin: 0;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 76rpx;
+  border-radius: 12rpx;
+}
+
+.outline-btn {
+  color: #00684f;
+  background: #ffffff;
+  border: 2rpx solid #00684f;
 }
 
 .primary-btn {
-  flex: 1;
-  margin: 0;
-  font-size: 30rpx;
-  font-weight: 600;
-  line-height: 90rpx;
   color: #ffffff;
   background: #1f7159;
-  border-radius: 16rpx;
-}
-
-.primary-btn::after {
-  border: 0;
 }
 </style>

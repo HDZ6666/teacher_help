@@ -494,7 +494,7 @@ function handleExport() {
 /** 获取家长列表 */
 function getParentList() {
   listParents().then(response => {
-    parentList.value = response.data;
+    parentList.value = response.rows || response.data || [];
   });
 }
 

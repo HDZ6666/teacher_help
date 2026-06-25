@@ -25,6 +25,11 @@ class ClassRecordAttendanceQueryModel(ClassRecordQueryBaseModel):
 
 
 @as_query
+class ClassRecordStudentAttendanceQueryModel(ClassRecordQueryBaseModel):
+    status: Optional[int] = Field(default=None, description='student attendance status')
+
+
+@as_query
 class ClassRecordOvertimeQueryModel(ClassRecordQueryBaseModel):
     pass
 

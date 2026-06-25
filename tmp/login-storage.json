@@ -1,0 +1,14 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://127.0.0.1:9000",
+      "localStorage": [
+        {
+          "name": "app-tabbar-index",
+          "value": "{\"type\":\"number\",\"data\":0}"
+        }
+      ]
+    }
+  ]
+}

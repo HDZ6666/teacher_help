@@ -7,222 +7,139 @@ defineOptions({
 })
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '学员请假',
   },
 })
 
-const form = ref({
-  student: '',
-  course: '',
-  reason: '',
-  startDate: '',
-  endDate: '',
-})
+const studentName = ref('林小明')
+const makeup = ref(true)
+const remark = ref('')
 
-const leaveTypes = ['事假', '病假', '其他']
-const leaveType = ref('事假')
-
-type Mode = 'lesson' | 'range'
-const mode = ref<Mode>('lesson')
-
-// 按课次：可选课次
-const lessons = ref([
-  { id: 1, title: '数学提高A班', time: '06-25 18:30-20:00', checked: true },
-  { id: 2, title: '数学提高A班', time: '06-27 18:30-20:00', checked: false },
-  { id: 3, title: '数学提高A班', time: '06-30 18:30-20:00', checked: false },
-])
-
-const deduct = ref(false)
-const images = ref<string[]>([])
-
-function toggleLesson(id: number) {
-  const l = lessons.value.find(i => i.id === id)
-  if (l)
-    l.checked = !l.checked
-}
-
-function onStartChange(e: any) {
-  form.value.startDate = e.detail.value
-}
-function onEndChange(e: any) {
-  form.value.endDate = e.detail.value
-}
-
-function chooseImage() {
-  uni.chooseImage({
-    count: 3,
-    success: (res: any) => {
-      images.value = images.value.concat(res.tempFilePaths).slice(0, 3)
-    },
-  })
-}
-function removeImage(idx: number) {
-  images.value.splice(idx, 1)
+function goBack() {
+  uni.navigateBack()
 }
 
 function submit() {
-  if (!form.value.student) {
-    uni.showToast({ title: '请选择学员', icon: 'none' })
-    return
-  }
   uni.showToast({ title: '请假已提交', icon: 'success' })
   setTimeout(() => uni.navigateBack(), 700)
 }
 
 onLoad((query) => {
   if (query?.name)
-    form.value.student = decodeURIComponent(query.name)
+    studentName.value = decodeURIComponent(query.name)
 })
 </script>
 
 <template>
   <view class="leave-page">
+    <view class="top-bar">
+      <button class="back-btn" @click="goBack">
+        <uni-icons type="left" size="26" color="#101f26" />
+      </button>
+      <text class="nav-title">
+        学员请假
+      </text>
+      <view class="nav-space" />
+    </view>
+
     <view class="form-card">
-      <view class="row" @click="form.student = form.student || '李明轩'">
-        <text class="row-label req">
-          请假学员
-        </text>
-        <view class="row-value" :class="{ ph: !form.student }">
-          {{ form.student || '请选择学员' }}
-          <uni-icons type="right" size="15" color="#9aa5aa" />
-        </view>
-      </view>
-      <view class="row no-border" @click="form.course = '数学提高A班'">
+      <view class="form-row">
         <text class="row-label">
-          关联课程
+          学员姓名
         </text>
-        <view class="row-value" :class="{ ph: !form.course }">
-          {{ form.course || '请选择课程' }}
-          <uni-icons type="right" size="15" color="#9aa5aa" />
+        <view class="row-value">
+          <image src="/static/images/avatar.jpg" mode="aspectFill" class="mini-avatar" />
+          <text>{{ studentName }}</text>
         </view>
       </view>
-    </view>
-
-    <!-- 请假类型 -->
-    <view class="form-card pad">
-      <text class="row-label">
-        请假类型
-      </text>
-      <view class="seg-wrap">
-        <view
-          v-for="t in leaveTypes"
-          :key="t"
-          class="seg-item"
-          :class="{ on: leaveType === t }"
-          @click="leaveType = t"
-        >
-          {{ t }}
-        </view>
-      </view>
-    </view>
-
-    <!-- 请假方式 -->
-    <view class="form-card pad">
-      <text class="row-label">
-        请假方式
-      </text>
-      <view class="seg-wrap">
-        <view class="seg-item" :class="{ on: mode === 'lesson' }" @click="mode = 'lesson'">
-          按课次
-        </view>
-        <view class="seg-item" :class="{ on: mode === 'range' }" @click="mode = 'range'">
-          按时间段
-        </view>
-      </view>
-    </view>
-
-    <!-- 按课次 -->
-    <template v-if="mode === 'lesson'">
-      <view class="form-card pad">
+      <view class="form-row">
         <text class="row-label">
-          选择课次
+          请假课程
         </text>
-        <view
-          v-for="l in lessons"
-          :key="l.id"
-          class="lesson-row"
-          @click="toggleLesson(l.id)"
-        >
-          <view class="lesson-main">
-            <view class="lesson-title">
-              {{ l.title }}
-            </view>
-            <view class="lesson-time">
-              {{ l.time }}
-            </view>
-          </view>
-          <view class="checkbox" :class="{ on: l.checked }">
-            <uni-icons v-if="l.checked" type="checkmarkempty" size="15" color="#ffffff" />
-          </view>
+        <view class="row-value">
+          <text>少儿钢琴进阶班（周三 16:00）</text>
+          <uni-icons type="right" size="17" color="#6f7974" />
         </view>
       </view>
-    </template>
-
-    <!-- 按时间段 -->
-    <template v-else>
-      <view class="form-card">
-        <picker mode="date" :value="form.startDate" @change="onStartChange">
-          <view class="row">
-            <text class="row-label">
-              开始日期
-            </text>
-            <view class="row-value" :class="{ ph: !form.startDate }">
-              {{ form.startDate || '请选择' }}
-              <uni-icons type="right" size="15" color="#9aa5aa" />
-            </view>
-          </view>
-        </picker>
-        <picker mode="date" :value="form.endDate" @change="onEndChange">
-          <view class="row no-border">
-            <text class="row-label">
-              结束日期
-            </text>
-            <view class="row-value" :class="{ ph: !form.endDate }">
-              {{ form.endDate || '请选择' }}
-              <uni-icons type="right" size="15" color="#9aa5aa" />
-            </view>
-          </view>
-        </picker>
-      </view>
-    </template>
-
-    <!-- 原因 + 图片 -->
-    <view class="form-card pad">
-      <text class="row-label">
-        请假原因
-      </text>
-      <textarea v-model="form.reason" class="remark-area" placeholder="请填写请假原因" />
-      <view class="img-row">
-        <view v-for="(img, idx) in images" :key="idx" class="img-item">
-          <image :src="img" mode="aspectFill" class="img-thumb" />
-          <view class="img-del" @click="removeImage(idx)">
-            <uni-icons type="clear" size="18" color="#ffffff" />
-          </view>
-        </view>
-        <view v-if="images.length < 3" class="img-add" @click="chooseImage">
-          <uni-icons type="camera" size="26" color="#9aa5aa" />
+      <view class="form-row">
+        <text class="row-label">
+          请假日期
+        </text>
+        <view class="row-value">
+          <uni-icons type="calendar" size="18" color="#6f7974" />
+          <text>2023-11-15</text>
+          <uni-icons type="right" size="17" color="#6f7974" />
         </view>
       </view>
-    </view>
-
-    <!-- 是否扣课 -->
-    <view class="form-card">
-      <view class="row no-border">
+      <view class="form-row">
+        <text class="row-label">
+          请假原因
+        </text>
+        <view class="row-value">
+          <text>病假</text>
+          <uni-icons type="right" size="17" color="#6f7974" />
+        </view>
+      </view>
+      <view class="switch-row">
         <view>
-          <text class="row-label">
-            本次请假扣课时
-          </text>
-          <view class="row-sub">
-            关闭则不扣减剩余课时
+          <view class="row-label">
+            是否补课
+          </view>
+          <view class="row-desc">
+            申请后需教务安排
           </view>
         </view>
-        <switch :checked="deduct" color="#1f7159" @change="deduct = $event.detail.value" />
+        <switch :checked="makeup" color="#00684f" @change="makeup = $event.detail.value" />
+      </view>
+      <view class="remark-block">
+        <text class="row-label">
+          备注说明
+        </text>
+        <textarea v-model="remark" class="remark-area" placeholder="请输入详细的请假原因或其他需要老师注意的事项..." />
+      </view>
+    </view>
+
+    <view class="flow-card">
+      <view class="flow-title">
+        审批流转
+      </view>
+      <view class="flow-row">
+        <view class="flow-dot muted">
+          <view class="inner" />
+        </view>
+        <view>
+          <view class="flow-main">
+            发起申请
+          </view>
+          <view class="flow-sub">
+            待提交
+          </view>
+        </view>
+      </view>
+      <view class="flow-line" />
+      <view class="flow-row">
+        <view class="flow-dot active">
+          <view class="inner" />
+        </view>
+        <view>
+          <view class="flow-main active-text">
+            待确认
+          </view>
+          <view class="flow-sub">
+            需班主任/教务审核通过
+          </view>
+        </view>
       </view>
     </view>
 
     <view class="bottom-bar">
       <button class="primary-btn" @click="submit">
-        提交请假
+        <uni-icons type="paperplane" size="20" color="#d9fff0" />
+        <text>提交请假</text>
+      </button>
+      <button class="text-btn" @click="goBack">
+        取消请假
       </button>
     </view>
   </view>
@@ -232,177 +149,165 @@ onLoad((query) => {
 .leave-page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 24rpx 28rpx 180rpx;
-  color: #1f2d33;
+  padding: 0 28rpx 190rpx;
+  color: #101f26;
   background: #f4f6f5;
 }
 
-.form-card {
-  margin-bottom: 16rpx;
-  padding: 0 26rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
+button::after {
+  border: 0;
 }
 
-.form-card.pad {
-  padding: 24rpx 26rpx;
-}
-
-.row {
+.top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 96rpx;
-  border-bottom: 1rpx solid #edf1ef;
+  height: 102rpx;
+  margin: 0 -28rpx;
+  padding: 0 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #b8c6c0;
 }
 
-.row.no-border {
-  border-bottom: 0;
+.back-btn,
+.nav-space {
+  width: 64rpx;
+  height: 64rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.form-card,
+.flow-card {
+  margin-top: 28rpx;
+  padding: 28rpx;
+  background: #ffffff;
+  border: 1rpx solid #b8c6c0;
+  border-radius: 14rpx;
+}
+
+.form-row,
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 92rpx;
+  border-bottom: 1rpx solid #d6e5ed;
 }
 
 .row-label {
-  font-size: 27rpx;
-  color: #4a565c;
-}
-
-.row-label.req::before {
-  margin-right: 6rpx;
-  color: #c0392b;
-  content: '*';
-}
-
-.row-sub {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #9aa5aa;
+  font-size: 30rpx;
+  color: #101f26;
 }
 
 .row-value {
   display: flex;
-  gap: 6rpx;
-  align-items: center;
-  font-size: 27rpx;
-}
-
-.row-value.ph {
-  color: #9aa5aa;
-}
-
-.seg-wrap {
-  display: flex;
-  gap: 12rpx;
-  margin-top: 18rpx;
-}
-
-.seg-item {
   flex: 1;
+  gap: 10rpx;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  font-size: 30rpx;
+  color: #34433d;
+  text-align: right;
+}
+
+.mini-avatar {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+}
+
+.row-desc {
+  margin-top: 12rpx;
   font-size: 26rpx;
-  line-height: 72rpx;
-  color: #67757c;
-  text-align: center;
-  background: #f1f4f2;
-  border: 1rpx solid transparent;
-  border-radius: 12rpx;
+  color: #6f7974;
 }
 
-.seg-item.on {
-  font-weight: 600;
-  color: #1e7259;
-  background: #e6f4ee;
-  border-color: #b8dccc;
-}
-
-.lesson-row {
-  display: flex;
+.switch-row {
   align-items: center;
-  justify-content: space-between;
-  padding: 22rpx 0;
-  border-bottom: 1rpx solid #edf1ef;
+  padding: 24rpx 0;
 }
 
-.lesson-row:last-child {
-  border-bottom: 0;
-}
-
-.lesson-title {
-  font-size: 27rpx;
-  font-weight: 600;
-}
-
-.lesson-time {
-  margin-top: 8rpx;
-  font-size: 23rpx;
-  color: #839099;
-}
-
-.checkbox {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 40rpx;
-  height: 40rpx;
-  border: 2rpx solid #cfd9d4;
-  border-radius: 8rpx;
-}
-
-.checkbox.on {
-  background: #1f7159;
-  border-color: #1f7159;
+.remark-block {
+  padding-top: 30rpx;
 }
 
 .remark-area {
   width: 100%;
-  height: 130rpx;
-  margin-top: 16rpx;
-  padding: 18rpx 20rpx;
-  font-size: 27rpx;
-  background: #f6f8f7;
-  border-radius: 12rpx;
+  height: 176rpx;
+  box-sizing: border-box;
+  margin-top: 24rpx;
+  padding: 22rpx;
+  font-size: 28rpx;
+  line-height: 42rpx;
+  background: #f3faff;
+  border: 1rpx solid #b8c6c0;
+  border-radius: 14rpx;
 }
 
-.img-row {
+.flow-title {
+  margin-bottom: 28rpx;
+  font-size: 30rpx;
+}
+
+.flow-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  margin-top: 20rpx;
+  gap: 28rpx;
+  align-items: center;
+  padding-left: 20rpx;
 }
 
-.img-item {
-  position: relative;
-  width: 130rpx;
-  height: 130rpx;
-}
-
-.img-thumb {
-  width: 130rpx;
-  height: 130rpx;
-  border-radius: 12rpx;
-}
-
-.img-del {
-  position: absolute;
-  top: -10rpx;
-  right: -10rpx;
+.flow-dot {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36rpx;
-  height: 36rpx;
-  background: rgba(0, 0, 0, 0.5);
+  width: 42rpx;
+  height: 42rpx;
+  border: 4rpx solid #b8c6c0;
   border-radius: 50%;
 }
 
-.img-add {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 130rpx;
-  height: 130rpx;
-  background: #f6f8f7;
-  border: 1rpx dashed #cfd9d4;
-  border-radius: 12rpx;
+.flow-dot.active {
+  border-color: #00684f;
+}
+
+.flow-dot .inner {
+  width: 18rpx;
+  height: 18rpx;
+  background: #6f7974;
+  border-radius: 50%;
+}
+
+.flow-dot.active .inner {
+  background: #00684f;
+}
+
+.flow-line {
+  width: 4rpx;
+  height: 62rpx;
+  margin-left: 40rpx;
+  background: #d6e5ed;
+}
+
+.flow-main {
+  font-size: 30rpx;
+}
+
+.flow-main.active-text {
+  color: #00684f;
+}
+
+.flow-sub {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #6f7974;
 }
 
 .bottom-bar {
@@ -410,24 +315,35 @@ onLoad((query) => {
   right: 0;
   bottom: 0;
   left: 0;
-  display: flex;
-  padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
+  padding: 22rpx 28rpx calc(20rpx + env(safe-area-inset-bottom));
   background: #ffffff;
-  border-top: 1rpx solid #eef1ef;
+  border-top: 1rpx solid #b8c6c0;
 }
 
 .primary-btn {
-  flex: 1;
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 82rpx;
+  padding: 0;
   margin: 0;
   font-size: 30rpx;
-  font-weight: 600;
-  line-height: 90rpx;
-  color: #ffffff;
+  font-weight: 700;
+  line-height: 82rpx;
+  color: #d9fff0;
   background: #1f7159;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
 }
 
-.primary-btn::after {
-  border: 0;
+.text-btn {
+  width: 100%;
+  padding: 0;
+  margin: 24rpx 0 0;
+  font-size: 28rpx;
+  line-height: 58rpx;
+  color: #6f7974;
+  background: transparent;
 }
 </style>

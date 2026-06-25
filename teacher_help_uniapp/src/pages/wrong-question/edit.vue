@@ -4,262 +4,414 @@ import { ref } from 'vue'
 defineOptions({
   name: 'WrongEdit',
 })
+
 definePage({
   style: {
+    navigationStyle: 'custom',
     navigationBarTitleText: '编辑解析',
   },
 })
 
 const form = ref({
-  question: '一根绳子长 12 米，第一次用去全长的 1/3，第二次用去剩下的 1/2，还剩多少米？',
-  subject: '数学',
-  point: '分数应用题',
-  answer: '4 米',
-  steps: '1. 12 × 1/3 = 4，剩 8\n2. 8 × 1/2 = 4\n3. 8 - 4 = 4',
-  mistakes: '易把"剩下的 1/2"误算成"全长的 1/2"。',
-  remark: '',
+  question: '已知函数 f(x) = ax² + bx + c 经过点 (1, 2) 和 (-1, 0)，且对称轴为 x = 1/2。求函数的解析式。',
+  answer: 'f(x) = -2x² + 2x + 2',
+  steps:
+    '1. 由对称轴 x = -b/(2a) = 1/2，得 b = -a。\n2. 将点 (1, 2) 代入得：a + b + c = 2。\n3. 将点 (-1, 0) 代入得：a - b + c = 0。\n4. 联立上述方程组解得：a = -2，b = 2，c = 2。\n5. 故函数解析式为 f(x) = -2x² + 2x + 2。',
+  mistake: '学生在代入对称轴公式时符号混淆，导致 b 的值计算错误，进而影响后续方程组的求解。',
 })
 
-const subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物']
-const subjectIndex = ref(1)
+const knowledgePoints = ref(['二次函数图像', '待定系数法', '三元一次方程组'])
+const newPoint = ref('')
 
-const masteryOptions = ['未掌握', '已了解', '已掌握']
-const mastery = ref('未掌握')
-
-function onSubjectChange(e: any) {
-  subjectIndex.value = e.detail.value
-  form.value.subject = subjectOptions[e.detail.value]
+function openMenu() {
+  uni.navigateBack()
 }
 
-function save() {
-  uni.showToast({ title: '已保存解析', icon: 'success' })
-  setTimeout(() => uni.navigateBack(), 600)
+function openSearch() {
+  uni.showToast({ title: '搜索错题', icon: 'none' })
+}
+
+function polishSteps() {
+  uni.showToast({ title: 'AI 已润色步骤', icon: 'success' })
+}
+
+function removePoint(index: number) {
+  knowledgePoints.value.splice(index, 1)
+}
+
+function addPoint() {
+  const value = newPoint.value.trim()
+  if (!value)
+    return
+  if (!knowledgePoints.value.includes(value))
+    knowledgePoints.value.push(value)
+  newPoint.value = ''
 }
 
 function discard() {
   uni.navigateBack()
 }
 
-function remove() {
-  uni.showModal({
-    title: '删除错题',
-    content: '删除后无法恢复，确认删除这道错题？',
-    confirmText: '删除',
-    confirmColor: '#c0392b',
-    success: (res) => {
-      if (res.confirm) {
-        uni.showToast({ title: '已删除', icon: 'none' })
-        setTimeout(() => uni.navigateBack({ delta: 2 }), 500)
-      }
-    },
-  })
+function save() {
+  uni.showToast({ title: '已保存修改', icon: 'success' })
+  setTimeout(() => uni.navigateBack(), 600)
 }
 </script>
 
 <template>
-  <view class="we-page">
-    <view class="form-card">
-      <view class="field">
-        <text class="field-label">
-          题干
-        </text>
-        <textarea v-model="form.question" class="field-textarea" placeholder="题目内容" />
+  <view class="edit-page">
+    <view class="top-bar">
+      <button class="icon-btn" @click="openMenu">
+        <uni-icons type="bars" size="30" color="#005842" />
+      </button>
+      <view class="page-title">
+        错题本
       </view>
+      <button class="icon-btn right" @click="openSearch">
+        <uni-icons type="search" size="34" color="#005842" />
+      </button>
     </view>
 
-    <view class="form-card">
-      <picker :value="subjectIndex" :range="subjectOptions" @change="onSubjectChange">
-        <view class="row">
-          <text class="row-label">
-            学科
-          </text>
-          <view class="row-value">
-            {{ form.subject }}
-            <uni-icons type="right" size="15" color="#9aa5aa" />
+    <scroll-view class="content-scroll" scroll-y>
+      <view class="intro-block">
+        <view class="intro-title">
+          编辑 AI 解析内容
+        </view>
+        <view class="intro-desc">
+          您可以修改以下由系统自动提取和生成的解析内容，以确保其准确无误。
+        </view>
+      </view>
+
+      <view class="form-card">
+        <view class="field-title">
+          <uni-icons type="compose" size="22" color="#1f7159" />
+          <text>题目文本</text>
+        </view>
+        <textarea
+          v-model="form.question"
+          class="field-textarea question"
+          maxlength="-1"
+          placeholder="输入题目内容..."
+          placeholder-class="placeholder"
+        />
+      </view>
+
+      <view class="form-card">
+        <view class="field-title">
+          <uni-icons type="checkbox" size="22" color="#1f7159" />
+          <text>答案</text>
+        </view>
+        <textarea
+          v-model="form.answer"
+          class="field-textarea answer"
+          maxlength="-1"
+          placeholder="输入最终答案..."
+          placeholder-class="placeholder"
+        />
+      </view>
+
+      <view class="form-card">
+        <view class="field-head">
+          <view class="field-title no-margin">
+            <uni-icons type="list" size="22" color="#1f7159" />
+            <text>解题步骤</text>
+          </view>
+          <button class="ai-btn" @click="polishSteps">
+            <text class="spark">✦</text>
+            <text>AI 润色</text>
+          </button>
+        </view>
+        <textarea
+          v-model="form.steps"
+          class="field-textarea steps"
+          maxlength="-1"
+          placeholder="详细输入解题步骤..."
+          placeholder-class="placeholder"
+        />
+      </view>
+
+      <view class="form-card">
+        <view class="field-title error">
+          <uni-icons type="info" size="22" color="#ba1a1a" />
+          <text>错因分析</text>
+        </view>
+        <textarea
+          v-model="form.mistake"
+          class="field-textarea mistake"
+          maxlength="-1"
+          placeholder="记录学生的常见错误原因..."
+          placeholder-class="placeholder"
+        />
+      </view>
+
+      <view class="form-card point-card">
+        <view class="field-title">
+          <uni-icons type="tag" size="22" color="#1f7159" />
+          <text>考察知识点</text>
+        </view>
+        <view class="point-list">
+          <view
+            v-for="(point, index) in knowledgePoints"
+            :key="point"
+            class="point-chip"
+          >
+            <text>{{ point }}</text>
+            <button class="remove-point" @click="removePoint(index)">
+              <uni-icons type="closeempty" size="18" color="#6f7974" />
+            </button>
           </view>
         </view>
-      </picker>
-      <view class="row no-border">
-        <text class="row-label">
-          知识点
-        </text>
-        <input v-model="form.point" class="row-input" placeholder="如：分数应用题">
-      </view>
-    </view>
-
-    <view class="form-card">
-      <view class="field">
-        <text class="field-label">
-          答案
-        </text>
-        <input v-model="form.answer" class="field-input" placeholder="正确答案">
-      </view>
-      <view class="field">
-        <text class="field-label">
-          解题步骤
-        </text>
-        <textarea v-model="form.steps" class="field-textarea" placeholder="每行一个步骤" />
-      </view>
-      <view class="field no-mb">
-        <text class="field-label">
-          易错点
-        </text>
-        <textarea v-model="form.mistakes" class="field-textarea sm" placeholder="易错原因" />
-      </view>
-    </view>
-
-    <view class="form-card">
-      <text class="field-label">
-        掌握状态
-      </text>
-      <view class="mastery-row">
-        <view
-          v-for="m in masteryOptions"
-          :key="m"
-          class="mastery-chip"
-          :class="{ active: mastery === m }"
-          @click="mastery = m"
-        >
-          {{ m }}
+        <view class="add-point">
+          <input
+            v-model="newPoint"
+            class="point-input"
+            placeholder="添加新知识点..."
+            placeholder-class="placeholder"
+            @confirm="addPoint"
+          >
+          <button class="add-btn" @click="addPoint">
+            <uni-icons type="plus-filled" size="26" color="#1f7159" />
+          </button>
         </view>
       </view>
-    </view>
-
-    <view class="form-card">
-      <view class="field no-mb">
-        <text class="field-label">
-          老师补充说明
-        </text>
-        <textarea v-model="form.remark" class="field-textarea sm" placeholder="补充说明（可选）" />
-      </view>
-    </view>
-
-    <button class="del-btn" @click="remove">
-      删除错题
-    </button>
+    </scroll-view>
 
     <view class="bottom-bar">
-      <button class="ghost-btn" @click="discard">
+      <button class="discard-btn" @click="discard">
         放弃修改
       </button>
-      <button class="primary-btn" @click="save">
-        保存
+      <button class="save-btn" @click="save">
+        保存修改
       </button>
     </view>
   </view>
 </template>
 
 <style lang="scss" scoped>
-.we-page {
+.edit-page {
   min-height: 100vh;
-  box-sizing: border-box;
-  padding: 24rpx 28rpx 180rpx;
-  color: #1f2d33;
-  background: #f4f6f5;
+  color: #0f1d23;
+  background: #f3faff;
 }
 
-.form-card {
-  margin-bottom: 16rpx;
-  padding: 26rpx;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
-}
-
-.field {
-  margin-bottom: 24rpx;
-}
-
-.field.no-mb {
-  margin-bottom: 0;
-}
-
-.field-label,
-.row-label {
-  font-size: 26rpx;
-  color: #4a565c;
-}
-
-.field-input,
-.field-textarea {
-  width: 100%;
-  margin-top: 14rpx;
-  padding: 18rpx 20rpx;
-  font-size: 27rpx;
-  background: #f6f8f7;
-  border-radius: 12rpx;
-}
-
-.field-input {
-  box-sizing: border-box;
-  height: 80rpx;
-}
-
-.field-textarea {
-  box-sizing: border-box;
-  height: 160rpx;
-}
-
-.field-textarea.sm {
-  height: 120rpx;
-}
-
-.row {
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 92rpx;
-  border-bottom: 1rpx solid #edf1ef;
+  height: 112rpx;
+  padding: 0 28rpx;
+  background: #f3faff;
+  border-bottom: 1rpx solid #bec9c3;
 }
 
-.row.no-border {
-  border-bottom: 0;
+.page-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #1f7159;
 }
 
-.row-value {
+.icon-btn {
   display: flex;
-  gap: 6rpx;
   align-items: center;
-  font-size: 27rpx;
+  justify-content: flex-start;
+  width: 80rpx;
+  height: 80rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: 50%;
 }
 
-.row-input {
-  font-size: 27rpx;
-  text-align: right;
+.icon-btn.right {
+  justify-content: flex-end;
 }
 
-.mastery-row {
-  display: flex;
-  gap: 14rpx;
-  margin-top: 18rpx;
+.icon-btn::after,
+.ai-btn::after,
+.remove-point::after,
+.add-btn::after,
+.discard-btn::after,
+.save-btn::after {
+  border: 0;
 }
 
-.mastery-chip {
-  flex: 1;
+.content-scroll {
+  box-sizing: border-box;
+  height: calc(100vh - 112rpx);
+  padding: 32rpx 28rpx 140rpx;
+}
+
+.intro-block {
+  margin-bottom: 48rpx;
+}
+
+.intro-title {
+  margin-bottom: 8rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #0f1d23;
+}
+
+.intro-desc {
   font-size: 26rpx;
-  line-height: 72rpx;
-  text-align: center;
-  color: #67757c;
-  background: #f1f4f2;
-  border-radius: 12rpx;
+  line-height: 1.45;
+  color: #3f4944;
 }
 
-.mastery-chip.active {
-  color: #ffffff;
-  background: #1f7159;
-}
-
-.del-btn {
-  margin: 8rpx 0 0;
-  font-size: 27rpx;
-  line-height: 88rpx;
-  color: #a4423a;
-  background: #ffeceb;
+.form-card {
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  background: #ffffff;
+  border: 2rpx solid #bec9c3;
   border-radius: 16rpx;
 }
 
-.del-btn::after {
-  border: 0;
+.field-title,
+.field-head {
+  display: flex;
+  align-items: center;
+}
+
+.field-title {
+  gap: 10rpx;
+  margin-bottom: 16rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #3f4944;
+}
+
+.field-title.no-margin {
+  margin-bottom: 0;
+}
+
+.field-title.error {
+  color: #3f4944;
+}
+
+.field-head {
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.ai-btn {
+  display: flex;
+  gap: 6rpx;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 36rpx;
+  color: #1f7159;
+  background: transparent;
+}
+
+.spark {
+  font-size: 24rpx;
+}
+
+.field-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 22rpx;
+  font-size: 28rpx;
+  line-height: 1.55;
+  color: #0f1d23;
+  background: #ffffff;
+  border: 2rpx solid #bec9c3;
+  border-radius: 12rpx;
+}
+
+.field-textarea.question {
+  height: 180rpx;
+}
+
+.field-textarea.answer {
+  height: 136rpx;
+}
+
+.field-textarea.steps {
+  height: 330rpx;
+}
+
+.field-textarea.mistake {
+  height: 150rpx;
+}
+
+.placeholder {
+  color: #6f7974;
+}
+
+.point-card {
+  margin-bottom: 24rpx;
+}
+
+.point-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+  margin-bottom: 20rpx;
+}
+
+.point-chip {
+  display: inline-flex;
+  gap: 8rpx;
+  align-items: center;
+  padding: 10rpx 14rpx 10rpx 18rpx;
+  color: #1f7159;
+  background: #e7f6fe;
+  border: 2rpx solid #d6e5ed;
+  border-radius: 999rpx;
+}
+
+.point-chip text {
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.remove-point {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28rpx;
+  height: 28rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.add-point {
+  position: relative;
+}
+
+.point-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 84rpx;
+  padding: 0 78rpx 0 22rpx;
+  font-size: 28rpx;
+  color: #0f1d23;
+  background: #f3faff;
+  border: 2rpx solid #bec9c3;
+  border-radius: 12rpx;
+}
+
+.add-btn {
+  position: absolute;
+  top: 0;
+  right: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 84rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
 }
 
 .bottom-bar {
@@ -267,35 +419,34 @@ function remove() {
   right: 0;
   bottom: 0;
   left: 0;
+  z-index: 30;
   display: flex;
-  gap: 16rpx;
-  padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom));
+  gap: 24rpx;
+  padding: 28rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
   background: #ffffff;
-  border-top: 1rpx solid #eef1ef;
+  border-top: 1rpx solid #bec9c3;
+  box-shadow: 0 -8rpx 32rpx rgba(15, 29, 35, 0.04);
 }
 
-.ghost-btn,
-.primary-btn {
+.discard-btn,
+.save-btn {
   flex: 1;
+  height: 92rpx;
+  padding: 0;
   margin: 0;
-  font-size: 30rpx;
-  line-height: 90rpx;
+  font-size: 26rpx;
+  font-weight: 700;
   border-radius: 16rpx;
 }
 
-.ghost-btn {
+.discard-btn {
   color: #1f7159;
-  background: #e6f4ee;
+  background: transparent;
+  border: 2rpx solid #1f7159;
 }
 
-.primary-btn {
-  font-weight: 600;
+.save-btn {
   color: #ffffff;
   background: #1f7159;
-}
-
-.ghost-btn::after,
-.primary-btn::after {
-  border: 0;
 }
 </style>

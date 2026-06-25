@@ -54,122 +54,400 @@
       "style": {
         "navigationStyle": "custom",
         "navigationBarTitleText": "老师帮",
-        "enablePullDownRefresh": true
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/class/create",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "创建班级"
+      }
+    },
+    {
+      "path": "pages/class/detail",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "班级详情"
+      }
+    },
+    {
+      "path": "pages/class/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "班级"
+      }
+    },
+    {
+      "path": "pages/class/upgrade",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "升班/结业"
+      }
+    },
+    {
+      "path": "pages/course/create",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "新增/编辑课程"
+      }
+    },
+    {
+      "path": "pages/course/detail",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "课程详情"
+      }
+    },
+    {
+      "path": "pages/course/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "课程"
+      }
+    },
+    {
+      "path": "pages/course/package",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "套餐"
+      }
+    },
+    {
+      "path": "pages/item/edit",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "新增/编辑物品"
+      }
+    },
+    {
+      "path": "pages/item/fee",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "费用项目"
+      }
+    },
+    {
+      "path": "pages/item/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "物品费用"
+      }
+    },
+    {
+      "path": "pages/item/list",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "物品列表"
+      }
+    },
+    {
+      "path": "pages/item/purchase",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "采购入库"
+      }
+    },
+    {
+      "path": "pages/item/stock-log",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "库存流水"
       }
     },
     {
       "path": "pages/login/login",
       "type": "page",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/me/business",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "经营管理概览"
       }
     },
     {
       "path": "pages/me/me",
       "type": "page",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "我的"
       }
     },
     {
-      "path": "pages/schedule/detail",
+      "path": "pages/me/settings",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "点名",
-        "enablePullDownRefresh": true
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "设置"
       }
     },
     {
-      "path": "pages/schedule/index",
+      "path": "pages/me/tools",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "课表",
-        "enablePullDownRefresh": true
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "更多工具"
       }
     },
     {
-      "path": "pages/schedule/create",
+      "path": "pages/member-card/detail",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "新增排课"
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "会员卡详情"
       }
     },
     {
-      "path": "pages/schedule/conflict",
+      "path": "pages/member-card/grant-record",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "排课冲突"
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "发放记录"
       }
     },
     {
-      "path": "pages/schedule/reschedule",
+      "path": "pages/member-card/grant",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "调课"
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "发放会员卡"
       }
     },
     {
-      "path": "pages/schedule/course-detail",
+      "path": "pages/member-card/hold-detail",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "课次详情"
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "持卡详情"
+      }
+    },
+    {
+      "path": "pages/member-card/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "会员卡"
       }
     },
     {
       "path": "pages/schedule/checkin-done",
       "type": "page",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "点名完成"
       }
     },
     {
-      "path": "pages/student/index",
+      "path": "pages/schedule/comment",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "学员",
-        "enablePullDownRefresh": true
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "课后点评"
       }
     },
     {
-      "path": "pages/student/detail",
+      "path": "pages/schedule/conflict",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "学员详情"
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "排课冲突"
+      }
+    },
+    {
+      "path": "pages/schedule/course-detail",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "课程详情"
+      }
+    },
+    {
+      "path": "pages/schedule/create",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "新增排课"
+      }
+    },
+    {
+      "path": "pages/schedule/detail",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "点名"
+      }
+    },
+    {
+      "path": "pages/schedule/exception-confirm",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "点名异常确认"
+      }
+    },
+    {
+      "path": "pages/schedule/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "课表",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/schedule/reschedule",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "调课申请"
       }
     },
     {
       "path": "pages/student/add",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "添加学员"
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "添加学生"
+      }
+    },
+    {
+      "path": "pages/student/detail",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "学员详情"
+      }
+    },
+    {
+      "path": "pages/student/enroll",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "报名续费"
+      }
+    },
+    {
+      "path": "pages/student/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "学员",
+        "enablePullDownRefresh": true
       }
     },
     {
       "path": "pages/student/leave",
       "type": "page",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "学员请假"
       }
     },
     {
-      "path": "pages/wrong-question/index",
+      "path": "pages/teacher/create",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "错题本",
-        "enablePullDownRefresh": true
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "新增/编辑老师"
       }
     },
     {
-      "path": "pages/wrong-question/upload",
+      "path": "pages/teacher/detail",
       "type": "page",
       "style": {
-        "navigationBarTitleText": "拍照上传"
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "老师详情"
+      }
+    },
+    {
+      "path": "pages/teacher/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "老师"
+      }
+    },
+    {
+      "path": "pages/teacher/schedule",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "老师课表"
+      }
+    },
+    {
+      "path": "pages/venue/booking-detail",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "预约详情"
+      }
+    },
+    {
+      "path": "pages/venue/cancel",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "取消预约"
+      }
+    },
+    {
+      "path": "pages/venue/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "场地管理"
+      }
+    },
+    {
+      "path": "pages/venue/lock",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "锁场"
+      }
+    },
+    {
+      "path": "pages/venue/proxy-booking",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "代预约"
+      }
+    },
+    {
+      "path": "pages/venue/schedule",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "订场时间表"
       }
     },
     {
       "path": "pages/wrong-question/analyzing",
       "type": "page",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "AI 分析中"
       }
     },
@@ -177,6 +455,7 @@
       "path": "pages/wrong-question/detail",
       "type": "page",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "错题详情"
       }
     },
@@ -184,7 +463,24 @@
       "path": "pages/wrong-question/edit",
       "type": "page",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "编辑解析"
+      }
+    },
+    {
+      "path": "pages/wrong-question/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "错题本"
+      }
+    },
+    {
+      "path": "pages/wrong-question/upload",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "拍照上传"
       }
     }
   ],

@@ -34,7 +34,7 @@ async def get_teach_parent_list(
     data_scope_sql: str = Depends(GetDataScope('TeachParent'))
 ):
     parent_page_query_result = await TeachParentService.get_teach_parent_list_services(
-        query_db, parent_page_query, data_scope_sql
+        query_db, parent_page_query, data_scope_sql, is_page=True
     )
     logger.info('获取成功')
 
