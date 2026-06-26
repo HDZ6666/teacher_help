@@ -1,7 +1,7 @@
 # PC 端前端进度
 
 > 适用范围：仅统计 PC 管理端 `teacher_help_admin`。移动端进度不在本文范围内。
-> 依据：`doc/产品图片` 9 个 PC 原型目录、`doc/01-09_*模块总结报告.md`、`teacher_help_admin/src/router/index.js`、`teacher_help_admin/src/views/assistant`、`teacher_help_admin/src/api`。
+> 依据：`doc/产品图片` 9 个 PC 原型目录及各模块目录内的 `*_模块总结报告.md`、`teacher_help_admin/src/router/index.js`、`teacher_help_admin/src/views/assistant`、`teacher_help_admin/src/api`。
 > 更新日期：2026-06-25
 
 ## 1. 总结
@@ -290,4 +290,3 @@ PC 原型实际有 9 个业务模块，仍缺 3 个完整模块入口：
 5. 补课表详情内联点名、调课、临时学员、导出。
 6. 补老师管理 assistant 入口。
 7. 最后再开会员卡和场地。
-
