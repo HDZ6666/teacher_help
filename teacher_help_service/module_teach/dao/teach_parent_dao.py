@@ -31,8 +31,8 @@ class TeachParentDao:
             TeachParent.user_id == TeachBaseUser.id
         ).where(
             and_(
-                TeachParent.del_flag == 0,
-                TeachBaseUser.del_flag == 0
+                TeachParent.del_flag == '0',
+                TeachBaseUser.del_flag == '0'
             )
         )
         if query_object.parent_name:
@@ -67,8 +67,8 @@ class TeachParentDao:
         ).where(
             and_(
                 TeachParent.id == parent_id,
-                TeachParent.del_flag == 0,
-                TeachBaseUser.del_flag == 0
+                TeachParent.del_flag == '0',
+                TeachBaseUser.del_flag == '0'
             )
         )
         result = await db.execute(query)
@@ -86,7 +86,7 @@ class TeachParentDao:
         query = select(TeachParent).where(
             and_(
                 TeachParent.user_id == user_id,
-                TeachParent.del_flag == 0
+                TeachParent.del_flag == '0'
             )
         )
         result = await db.execute(query)
@@ -131,14 +131,14 @@ class TeachParentDao:
         query = select(TeachParent).where(
             and_(
                 TeachParent.id.in_(parent_ids),
-                TeachParent.del_flag == 0
+                TeachParent.del_flag == '0'
             )
         )
         result = await db.execute(query)
         parents = result.scalars().all()
         count = 0
         for parent in parents:
-            parent.del_flag = 1
+            parent.del_flag = '2'
             parent.update_time = datetime.now()
             count += 1
         await db.flush()
@@ -153,7 +153,7 @@ class TeachParentDao:
         :return: 家长总数
         """
         query = select(func.count(TeachParent.id)).where(
-            TeachParent.del_flag == 0
+            TeachParent.del_flag == '0'
         )
         result = await db.execute(query)
         return result.scalar()

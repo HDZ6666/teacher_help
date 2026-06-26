@@ -58,10 +58,6 @@ function checkin() {
 function leave() {
   uni.navigateTo({ url: '/pages/student/leave' })
 }
-
-function upgrade() {
-  uni.navigateTo({ url: '/pages/class/upgrade' })
-}
 </script>
 
 <template>
@@ -104,7 +100,7 @@ function upgrade() {
         </view>
         <view class="info-block">
           <text class="label">主教</text>
-          <text class="value">李晓晴</text>
+          <text class="value">李晓明</text>
         </view>
         <view class="info-block">
           <text class="label">教室</text>
@@ -137,12 +133,6 @@ function upgrade() {
           <uni-icons type="calendar" size="22" color="#1f7159" />
         </view>
         <text>班级请假</text>
-      </button>
-      <button class="quick-item" @click="upgrade">
-        <view class="quick-icon">
-          <uni-icons type="redo" size="22" color="#1f7159" />
-        </view>
-        <text>升班结业</text>
       </button>
     </view>
 
@@ -336,7 +326,7 @@ button::after {
 
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14rpx;
   margin-top: 22rpx;
 }

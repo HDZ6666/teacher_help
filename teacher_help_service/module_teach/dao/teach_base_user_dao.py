@@ -26,7 +26,7 @@ class TeachBaseUserDao:
         query = select(TeachBaseUser).where(
             and_(
                 TeachBaseUser.id == user_id,
-                TeachBaseUser.del_flag == 0
+                TeachBaseUser.del_flag == '0'
             )
         )
         result = await db.execute(query)
@@ -44,7 +44,7 @@ class TeachBaseUserDao:
         query = select(TeachBaseUser).where(
             and_(
                 TeachBaseUser.phone == phone,
-                TeachBaseUser.del_flag == 0
+                TeachBaseUser.del_flag == '0'
             )
         )
         result = await db.execute(query)
@@ -89,14 +89,14 @@ class TeachBaseUserDao:
         query = select(TeachBaseUser).where(
             and_(
                 TeachBaseUser.id.in_(user_ids),
-                TeachBaseUser.del_flag == 0
+                TeachBaseUser.del_flag == '0'
             )
         )
         result = await db.execute(query)
         users = result.scalars().all()
         count = 0
         for user in users:
-            user.del_flag = 1
+            user.del_flag = '2'
             user.update_time = datetime.now()
             count += 1
         await db.flush()
@@ -112,7 +112,7 @@ class TeachBaseUserDao:
         :return: 用户总数
         """
         query = select(func.count(TeachBaseUser.id)).where(
-            TeachBaseUser.del_flag == 0
+            TeachBaseUser.del_flag == '0'
         )
         if user_type:
             query = query.where(TeachBaseUser.user_type == user_type)
@@ -132,7 +132,7 @@ class TeachBaseUserDao:
         query = select(TeachBaseUser).where(
             and_(
                 TeachBaseUser.phone == phone,
-                TeachBaseUser.del_flag == 0
+                TeachBaseUser.del_flag == '0'
             )
         )
         if user_id:
@@ -153,7 +153,7 @@ class TeachBaseUserDao:
         query = select(TeachBaseUser).where(
             and_(
                 TeachBaseUser.id == user_id,
-                TeachBaseUser.del_flag == 0
+                TeachBaseUser.del_flag == '0'
             )
         )
         result = await db.execute(query)

@@ -228,8 +228,8 @@ button::after {
 }
 
 .check-box.checked {
-  background: #2e67d8;
-  border-color: #2e67d8;
+  background: #005842;
+  border-color: #005842;
 }
 
 .bottom-bar {

@@ -34,8 +34,8 @@ class TeachTeacherDao:
             TeachTeacher.user_id == TeachBaseUser.id
         ).where(
             and_(
-                TeachTeacher.del_flag == 0,
-                TeachBaseUser.del_flag == 0
+                TeachTeacher.del_flag == '0',
+                TeachBaseUser.del_flag == '0'
             )
         )
         if query_object.teacher_name:
@@ -70,8 +70,8 @@ class TeachTeacherDao:
         ).where(
             and_(
                 TeachTeacher.id == teacher_id,
-                TeachTeacher.del_flag == 0,
-                TeachBaseUser.del_flag == 0
+                TeachTeacher.del_flag == '0',
+                TeachBaseUser.del_flag == '0'
             )
         )
         result = await db.execute(query)
@@ -89,7 +89,7 @@ class TeachTeacherDao:
         query = select(TeachTeacher).where(
             and_(
                 TeachTeacher.user_id == user_id,
-                TeachTeacher.del_flag == 0
+                TeachTeacher.del_flag == '0'
             )
         )
         result = await db.execute(query)
@@ -134,14 +134,14 @@ class TeachTeacherDao:
         query = select(TeachTeacher).where(
             and_(
                 TeachTeacher.id.in_(teacher_ids),
-                TeachTeacher.del_flag == 0
+                TeachTeacher.del_flag == '0'
             )
         )
         result = await db.execute(query)
         teachers = result.scalars().all()
         count = 0
         for teacher in teachers:
-            teacher.del_flag = 1
+            teacher.del_flag = '2'
             teacher.update_time = datetime.now()
             count += 1
         await db.flush()
@@ -156,7 +156,7 @@ class TeachTeacherDao:
         :return: 教师总数
         """
         query = select(func.count(TeachTeacher.id)).where(
-            TeachTeacher.del_flag == 0
+            TeachTeacher.del_flag == '0'
         )
         result = await db.execute(query)
         return result.scalar()

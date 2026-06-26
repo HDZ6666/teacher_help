@@ -29,19 +29,29 @@ interface Item {
 const filters = ['全部', '教材', '文具', '设备']
 const activeFilter = ref('全部')
 
+const searchVisible = ref(false)
+const keyword = ref('')
+
 const items = ref<Item[]>([
   { id: 1, name: '少儿英语教材 (Level 1)', spec: '规格: A4全彩精装', price: '¥85.00', stock: '45件', stockState: 'ok', tag: '线上售卖', icon: 'paperplane', secondaryAction: '领用', primaryAction: '入库' },
   { id: 2, name: '学生随堂测验纸', spec: '规格: B5单色 100张/包', price: '¥15.00', stock: '3包', stockState: 'warn', tag: '内部领用', icon: 'list', secondaryAction: '领用', secondaryDisabled: true, primaryAction: '紧急采购', primaryDanger: true },
   { id: 3, name: '教学平板电脑 (备用)', spec: '规格: 10.5英寸 64G', price: '--', stock: '12台', stockState: 'ok', tag: '固定资产', icon: 'gear', secondaryAction: '借用', primaryAction: '归还登记' },
 ])
 
-const filteredItems = computed(() => items.value)
+const filteredItems = computed(() => {
+  const kw = keyword.value.trim()
+  if (!kw)
+    return items.value
+  return items.value.filter(it => it.name.includes(kw) || it.spec.includes(kw))
+})
 
 function goBack() {
   uni.navigateBack()
 }
-function onDetail() {
-  uni.showToast({ title: '查看详情', icon: 'none' })
+function toggleSearch() {
+  searchVisible.value = !searchVisible.value
+  if (!searchVisible.value)
+    keyword.value = ''
 }
 function onEdit() {
   uni.navigateTo({ url: '/pages/item/edit?id=1' })
@@ -70,9 +80,14 @@ function onSecondary(it: Item) {
       <text class="nav-title">
         物品列表
       </text>
-      <button class="icon-btn" @click="onEdit">
+      <button class="icon-btn" @click="toggleSearch">
         <uni-icons type="search" size="24" color="#3f4944" />
       </button>
+    </view>
+
+    <view v-if="searchVisible" class="search-box">
+      <uni-icons type="search" size="22" color="#6f7974" />
+      <input v-model="keyword" class="search-input" focus placeholder="搜索物品名称或规格" placeholder-class="placeholder">
     </view>
 
     <view class="filter-bar">
@@ -126,7 +141,7 @@ function onSecondary(it: Item) {
           </view>
         </view>
         <view class="card-actions">
-          <button class="act-btn ghost" @click="onDetail">
+          <button class="act-btn ghost" @click="onEdit">
             详情
           </button>
           <button class="act-btn ghost" :class="{ disabled: it.secondaryDisabled }" @click="onSecondary(it)">
@@ -177,6 +192,27 @@ button::after {
   font-size: 36rpx;
   font-weight: 700;
   color: #005842;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  height: 76rpx;
+  margin-top: 24rpx;
+  padding: 0 26rpx;
+  background: #ffffff;
+  border: 1rpx solid #bec9c3;
+  border-radius: 14rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.placeholder {
+  color: #9aa5aa;
 }
 
 .filter-bar {

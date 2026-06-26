@@ -35,9 +35,9 @@ class TeachStudentDao:
             TeachParent.user_id == TeachBaseUser.id
         ).where(
             and_(
-                TeachStudent.del_flag == 0,
-                TeachParent.del_flag == 0,
-                TeachBaseUser.del_flag == 0
+                TeachStudent.del_flag == '0',
+                TeachParent.del_flag == '0',
+                TeachBaseUser.del_flag == '0'
             )
         )
         if query_object.student_name:
@@ -79,9 +79,9 @@ class TeachStudentDao:
         ).where(
             and_(
                 TeachStudent.id == student_id,
-                TeachStudent.del_flag == 0,
-                TeachParent.del_flag == 0,
-                TeachBaseUser.del_flag == 0
+                TeachStudent.del_flag == '0',
+                TeachParent.del_flag == '0',
+                TeachBaseUser.del_flag == '0'
             )
         )
         result = await db.execute(query)
@@ -99,7 +99,7 @@ class TeachStudentDao:
         query = select(TeachStudent).where(
             and_(
                 TeachStudent.parent_id == parent_id,
-                TeachStudent.del_flag == 0
+                TeachStudent.del_flag == '0'
             )
         ).order_by(TeachStudent.create_time)
         result = await db.execute(query)
@@ -144,14 +144,14 @@ class TeachStudentDao:
         query = select(TeachStudent).where(
             and_(
                 TeachStudent.id.in_(student_ids),
-                TeachStudent.del_flag == 0
+                TeachStudent.del_flag == '0'
             )
         )
         result = await db.execute(query)
         students = result.scalars().all()
         count = 0
         for student in students:
-            student.del_flag = 1
+            student.del_flag = '2'
             student.update_time = datetime.now()
             count += 1
         await db.flush()
@@ -166,7 +166,7 @@ class TeachStudentDao:
         :return: 学生总数
         """
         query = select(func.count(TeachStudent.id)).where(
-            TeachStudent.del_flag == 0
+            TeachStudent.del_flag == '0'
         )
         result = await db.execute(query)
         return result.scalar()
@@ -185,7 +185,7 @@ class TeachStudentDao:
         query = select(TeachStudent.id).where(
             TeachStudent.student_name == student_name,
             TeachStudent.parent_id == parent_id,
-            TeachStudent.del_flag == 0
+            TeachStudent.del_flag == '0'
         )
 
         # 编辑时排除自己

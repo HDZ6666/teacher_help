@@ -23,7 +23,7 @@ class TeachStudentPageQueryModel(BaseModel):
     school_name: Optional[str] = Field(default=None, description='就读学校')
     grade: Optional[str] = Field(default=None, description='年级')
     gender: Optional[Literal['0', '1', '2']] = Field(default=None, description='性别')
-    status: Optional[Literal['1', '2', '3', '4']] = Field(default=None, description='状态')
+    status: Optional[Literal['0', '1', '2', '3']] = Field(default=None, description='状态: 0-在读, 1-休学, 2-转学, 3-毕业')
     begin_time: Optional[str] = Field(default=None, description='开始时间')
     end_time: Optional[str] = Field(default=None, description='结束时间')
 
@@ -49,7 +49,7 @@ class AddTeachStudentModel(BaseModel):
     interests_hobbies: Optional[List[str]] = Field(default=None, description='兴趣爱好')
     medical_notes: Optional[str] = Field(default=None, description='医疗备注(过敏史等)')
     emergency_contact: Optional[str] = Field(default=None, description='紧急联系人电话', max_length=20)
-    status: Optional[Literal['1', '2', '3', '4']] = Field(default='1', description='状态: 1-在读, 2-休学, 3-转学, 4-毕业')
+    status: Optional[Literal['0', '1', '2', '3']] = Field(default='0', description='状态: 0-在读, 1-休学, 2-转学, 3-毕业')
     remark: Optional[str] = Field(default=None, description='备注', max_length=500)
 
     @NotBlank(field_name='student_name', message='学生姓名不能为空')
@@ -88,7 +88,7 @@ class EditTeachStudentModel(BaseModel):
     interests_hobbies: Optional[List[str]] = Field(default=None, description='兴趣爱好')
     medical_notes: Optional[str] = Field(default=None, description='医疗备注(过敏史等)')
     emergency_contact: Optional[str] = Field(default=None, description='紧急联系人电话', max_length=20)
-    status: Optional[Literal['1', '2', '3', '4']] = Field(default=None, description='状态: 1-在读, 2-休学, 3-转学, 4-毕业')
+    status: Optional[Literal['0', '1', '2', '3']] = Field(default=None, description='状态: 0-在读, 1-休学, 2-转学, 3-毕业')
     remark: Optional[str] = Field(default=None, description='备注', max_length=500)
 
     @NotBlank(field_name='student_name', message='学生姓名不能为空')

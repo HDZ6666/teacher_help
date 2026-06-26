@@ -63,6 +63,37 @@ class TeachClassService:
         3: '请假',
         4: '未到',
     }
+    # 班级点名表(teach_class_attendance_detail) status -> 课表考勤表(teach_schedule_attendances) status 映射
+    # 新表: 1到课 2迟到 3请假 4未到
+    # 旧表: 0未到 1出勤 2迟到 3请假 4缺勤
+    # 说明: 新表的"4未到"在写入旧表时统一落到"4缺勤"。
+    #       班级点名属于"应到名单内未到课"的场景, 语义上等价于旧表的"缺勤(应到未到)",
+    #       而非旧表的"0未到"(多用于尚未考勤/无名单的初始态), 故选 4 而不是 0。
+    CLASS_TO_SCHEDULE_STATUS_MAP = {
+        1: 1,  # 到课 -> 出勤
+        2: 2,  # 迟到 -> 迟到
+        3: 3,  # 请假 -> 请假
+        4: 4,  # 未到 -> 缺勤
+    }
+    # 旧表 status -> 新表 status 反向映射(读取旧表数据回填新表表单时用)
+    # 旧表 0未到 没有"无名单初始态"的新表对应值, 统一回退到新表"4未到"。
+    SCHEDULE_TO_CLASS_STATUS_MAP = {
+        0: 4,  # 未到 -> 未到
+        1: 1,  # 出勤 -> 到课
+        2: 2,  # 迟到 -> 迟到
+        3: 3,  # 请假 -> 请假
+        4: 4,  # 缺勤 -> 未到
+    }
+
+    @classmethod
+    def map_class_status_to_schedule(cls, class_status):
+        """班级点名 status 映射为课表考勤 status, 无法识别时按"缺勤"处理。"""
+        return cls.CLASS_TO_SCHEDULE_STATUS_MAP.get(class_status, 4)
+
+    @classmethod
+    def map_schedule_status_to_class(cls, schedule_status):
+        """课表考勤 status 映射为班级点名 status, 无法识别时按"未到"处理。"""
+        return cls.SCHEDULE_TO_CLASS_STATUS_MAP.get(schedule_status, 4)
 
     @classmethod
     def make_class_no(cls):
@@ -543,7 +574,14 @@ class TeachClassService:
             schedule_attendance = schedule_attendance_map.get(student.get('studentId'))
             if event_id and not schedule_attendance:
                 continue
-            attendance_status = schedule_attendance.status if schedule_attendance and schedule_attendance.status else 1
+            # schedule_attendance.status 来自旧表(0未到 1出勤 2迟到 3请假 4缺勤),
+            # 需先反向映射成新表枚举, 否则旧表的 0未到 会被新表标签字典显示成"到课"。
+            raw_schedule_status = schedule_attendance.status if schedule_attendance else None
+            attendance_status = (
+                cls.map_schedule_status_to_class(raw_schedule_status)
+                if raw_schedule_status is not None
+                else 1
+            )
             prepared_students.append(
                 {
                     **student,
@@ -737,7 +775,8 @@ class TeachClassService:
                 )
                 if page_object.event_id:
                     schedule_attendance = schedule_attendance_map[item.student_id]
-                    schedule_attendance.status = item.status
+                    # 新表枚举与旧表枚举不同, 必须显式映射后再反写, 避免跨表串味
+                    schedule_attendance.status = cls.map_class_status_to_schedule(item.status)
                     schedule_attendance.check_in_time = datetime.now()
                     schedule_attendance.check_in_method = 'M'
                     schedule_attendance.notes = item.remark

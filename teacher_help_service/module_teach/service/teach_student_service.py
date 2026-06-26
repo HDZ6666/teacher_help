@@ -366,15 +366,15 @@ class TeachStudentService:
             else:
                 gender_name = '未知'
 
-            # 状态名称映射
+            # 状态名称映射（0在读 1休学 2转学 3毕业，与库/DO编码对齐）
             status_value = str(student.get('status', ''))
-            if status_value == '1':
+            if status_value == '0':
                 status_name = '在读'
-            elif status_value == '2':
+            elif status_value == '1':
                 status_name = '休学'
-            elif status_value == '3':
+            elif status_value == '2':
                 status_name = '转学'
-            elif status_value == '4':
+            elif status_value == '3':
                 status_name = '毕业'
             else:
                 status_name = '未知'

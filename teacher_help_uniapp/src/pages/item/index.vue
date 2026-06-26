@@ -92,17 +92,6 @@ function goPurchase() {
         </text>
       </view>
     </view>
-
-    <view class="quick-grid">
-      <view class="quick-btn" @click="goPurchase">
-        <uni-icons type="paperplane" size="22" color="#1f7159" />
-        <text>采购入库</text>
-      </view>
-      <view class="quick-btn" @click="uni.navigateTo({ url: '/pages/item/stock-log' })">
-        <uni-icons type="loop" size="22" color="#1f7159" />
-        <text>库存流水</text>
-      </view>
-    </view>
   </view>
 </template>
 
@@ -231,26 +220,5 @@ button::after {
 
 .stat-value.danger {
   color: #ba1a1a;
-}
-
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 22rpx;
-  margin-top: 24rpx;
-}
-
-.quick-btn {
-  display: flex;
-  gap: 12rpx;
-  align-items: center;
-  justify-content: center;
-  height: 96rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #1f7159;
-  background: #ffffff;
-  border: 1rpx solid #e7ece9;
-  border-radius: 16rpx;
 }
 </style>
