@@ -71,12 +71,14 @@ ACTION_LABELS = {
     'upload': '上传',
     'download': '下载',
     'consume': '核销',
+    'revoke': '撤销点名',
 }
 
 # P0 之后新增的权限使用固定菜单ID（5900 起），避免插入到顺序编号中间导致已有按钮ID整体后移、
 # 已分配给角色的 sys_role_menu 关系错位。新增权限请在这里追加，ID 只增不改。
 PINNED_BUTTON_IDS = {
     'teach:card:consume': 5900,
+    'teach:classRecord:revoke': 5901,
 }
 
 

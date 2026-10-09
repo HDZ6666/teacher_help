@@ -869,3 +869,95 @@ class TeachClassService:
         except Exception as e:
             await query_db.rollback()
             raise e
+
+    @classmethod
+    async def revoke_class_attendance_services(
+        cls, query_db: AsyncSession, attendance_id: int, reason: str | None, current_user_name: str
+    ):
+        """
+        撤销点名（整次点名记录）：
+        1. 已有课后点评的点名不能撤销（需先撤销点评），避免点评挂在已撤销的记录上；
+        2. 按明细逐条退回扣除的课时（课程账户加锁）；
+        3. 点名记录与明细软删除，并释放课次唯一约束（event_id 置空，原课次写入备注），课次可重新点名；
+        4. 班级已上课次/已结课时回退；课次状态回到“已安排”，课表考勤恢复为“未到”，已通过请假的学员恢复为“请假”。
+        课程卡核销与点名相互独立，不涉及会员卡次数。
+        """
+        attendance = await TeachClassDao.get_class_attendance_by_id(query_db, attendance_id)
+        if not attendance:
+            raise ServiceException(message='点名记录不存在或已撤销')
+        try:
+            # 与点名提交相同的加锁顺序：先班级行，再点名记录
+            class_obj = await TeachClassDao.get_teach_class_by_id(query_db, attendance.class_id, for_update=True)
+            attendance = await TeachClassDao.get_class_attendance_by_id(query_db, attendance_id, for_update=True)
+            if not attendance:
+                raise ServiceException(message='点名记录不存在或已撤销')
+            if await TeachClassDao.count_attendance_comments(query_db, attendance.id):
+                raise ServiceException(message='该次点名已有课后点评，请先撤销点评后再撤销点名')
+            now = datetime.now()
+            refunded = 0
+            details = await TeachClassDao.get_attendance_details_for_update(query_db, attendance.id)
+            for detail in details:
+                deduct = detail.deduct_quantity or 0
+                if deduct > 0:
+                    if not detail.course_account_id:
+                        raise ServiceException(message=f'{detail.student_name}的扣课记录缺少课程账户，无法退回课时')
+                    account = await TeachClassDao.get_course_account_by_id(
+                        query_db, detail.course_account_id, for_update=True
+                    )
+                    if not account:
+                        raise ServiceException(message=f'{detail.student_name}的课程账户不存在，无法退回课时')
+                    account.remaining_quantity = (account.remaining_quantity or 0) + deduct
+                    account.consumed_quantity = max((account.consumed_quantity or 0) - deduct, 0)
+                    account.update_by = current_user_name
+                    account.update_time = now
+                    refunded += deduct
+                detail.del_flag = 1
+                detail.update_by = current_user_name
+                detail.update_time = now
+            event_id = attendance.event_id
+            note = f'撤销点名{f"(原课次ID {event_id})" if event_id else ""}：{reason or "无"}'
+            attendance.remark = f'{attendance.remark}；{note}' if attendance.remark else note
+            attendance.event_id = None
+            attendance.del_flag = 1
+            attendance.update_by = current_user_name
+            attendance.update_time = now
+            if class_obj:
+                class_obj.completed_lessons = max((class_obj.completed_lessons or 0) - 1, 0)
+                class_obj.completed_hours = max(
+                    cls.to_decimal(class_obj.completed_hours, 0) - cls.to_decimal(attendance.lesson_hours, 1),
+                    Decimal('0'),
+                )
+                class_obj.update_by = current_user_name
+                class_obj.update_time = now
+            if event_id:
+                event = await TeachScheduleEventDao.get_raw_schedule_event_by_id(query_db, event_id)
+                if event:
+                    event.status = '0'
+                    event.cached_present = 0
+                    event.cached_late = 0
+                    event.cached_excused = 0
+                    event.cached_absent = 0
+                    event.cached_rate = 0
+                    event.update_by = current_user_name
+                    event.update_time = now
+                schedule_rows = await TeachScheduleAttendanceDao.get_attendances_by_event(query_db, event_id)
+                leave_map = await cls.get_approved_leave_map(
+                    query_db, attendance.class_id, [row.student_id for row in schedule_rows], event_id,
+                    attendance.class_date,
+                )
+                for row in schedule_rows:
+                    leave = leave_map.get(row.student_id)
+                    row.status = 3 if leave else 0
+                    row.notes = f'请假：{leave.leave_no}' if leave else None
+                    row.check_in_time = None
+                    row.check_in_method = None
+                    row.update_by = current_user_name
+                    row.update_time = now
+            await query_db.flush()
+            await query_db.commit()
+            return CrudResponseModel(
+                is_success=True, message=f'撤销成功，已退回课时 {refunded}', result={'refundedQuantity': refunded}
+            )
+        except Exception as e:
+            await query_db.rollback()
+            raise e

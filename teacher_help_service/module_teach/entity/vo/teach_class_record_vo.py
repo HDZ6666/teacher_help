@@ -49,3 +49,14 @@ class ClassRecordAbsenceQueryModel(BaseModel):
     class_id: Optional[int] = Field(default=None, description='class id')
     min_absences: Optional[int] = Field(default=None, description='minimum missed count')
     max_absences: Optional[int] = Field(default=None, description='maximum missed count')
+
+
+class RevokeClassAttendanceModel(BaseModel):
+    """
+    撤销点名模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True, populate_by_name=True)
+
+    id: int = Field(description='点名记录ID')
+    reason: Optional[str] = Field(default=None, description='撤销原因', max_length=200)

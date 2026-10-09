@@ -308,6 +308,45 @@ class TeachClassDao:
         return attendance
 
     @classmethod
+    async def get_class_attendance_by_id(cls, db: AsyncSession, attendance_id: int, for_update: bool = False):
+        query = select(TeachClassAttendance).where(
+            TeachClassAttendance.id == attendance_id,
+            TeachClassAttendance.del_flag == 0,
+        )
+        if for_update:
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
+        return result.scalars().first()
+
+    @classmethod
+    async def get_attendance_details_for_update(cls, db: AsyncSession, attendance_id: int):
+        await db.flush()
+        result = await db.execute(
+            select(TeachClassAttendanceDetail)
+            .where(
+                TeachClassAttendanceDetail.attendance_id == attendance_id,
+                TeachClassAttendanceDetail.del_flag == 0,
+            )
+            .order_by(TeachClassAttendanceDetail.id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+        return result.scalars().all()
+
+    @classmethod
+    async def count_attendance_comments(cls, db: AsyncSession, attendance_id: int):
+        from module_teach.entity.do.teach_comment_do import TeachStudentComment
+
+        result = await db.execute(
+            select(func.count(TeachStudentComment.id)).where(
+                TeachStudentComment.attendance_id == attendance_id,
+                TeachStudentComment.del_flag == 0,
+            )
+        )
+        return result.scalar() or 0
+
+    @classmethod
     async def get_class_attendance_by_event_id(cls, db: AsyncSession, event_id: int, for_update: bool = False):
         query = select(TeachClassAttendance).where(
             TeachClassAttendance.event_id == event_id,

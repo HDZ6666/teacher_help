@@ -72,7 +72,7 @@
             <template #default="{ row }">
               <el-button type="primary" link @click="handleDetail(row)">详情</el-button>
               <el-button type="warning" link @click="handleComment(row)">课后点评</el-button>
-              <el-button type="danger" link @click="handleDelete(row)">撤销</el-button>
+              <el-button type="danger" link @click="handleDelete(row)" v-hasPermi="['teach:classRecord:revoke']">撤销</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -346,7 +346,8 @@ import {
   listAbsenceReminder,
   listAttendanceRecord,
   listMakeupRecord,
-  listOvertimeRecord
+  listOvertimeRecord,
+  revokeAttendanceRecord
 } from '@/api/assistant/classRecord'
 
 const { proxy } = getCurrentInstance()
@@ -485,8 +486,18 @@ function handleComment(row) {
   })
 }
 
-function handleDelete() {
-  proxy.$modal.msgInfo('撤销点名记录后续接入')
+function handleDelete(row) {
+  proxy.$modal
+    .prompt(
+      `确认撤销 ${row.className || ''} ${row.classDate || ''} 的点名吗？已扣课时将退回，课次可重新点名；已有课后点评的需先撤销点评。请输入撤销原因`,
+      '撤销点名'
+    )
+    .then(async ({ value }) => {
+      const res = await revokeAttendanceRecord({ id: row.id, reason: value })
+      proxy.$modal.msgSuccess(res.msg || '撤销成功')
+      getList()
+    })
+    .catch(() => {})
 }
 
 async function initSelectOptions() {
