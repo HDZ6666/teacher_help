@@ -1,9 +1,11 @@
 from datetime import datetime
 
-from sqlalchemy import desc, func, or_, select, update
+from sqlalchemy import and_, desc, false, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from module_teach.entity.do.teach_class_do import TeachClassAttendanceDetail
 from module_teach.entity.do.teach_leave_do import TeachLeaveApplication
+from module_teach.entity.do.teach_schedule_event_do import TeachScheduleEvent
 from module_teach.entity.vo.teach_leave_vo import TeachLeavePageQueryModel
 
 
@@ -47,12 +49,85 @@ class TeachLeaveDao:
         return await cls.paginate(db, query, query_object.page_num, query_object.page_size)
 
     @classmethod
-    async def get_leave_by_id(cls, db: AsyncSession, leave_id: int):
+    async def get_leave_by_id(cls, db: AsyncSession, leave_id: int, for_update: bool = False):
+        query = select(TeachLeaveApplication).where(
+            TeachLeaveApplication.id == leave_id,
+            TeachLeaveApplication.del_flag == 0,
+        )
+        if for_update:
+            # 审批前加锁，防止并发重复审批
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
+        return result.scalars().first()
+
+    @classmethod
+    async def get_leaves_by_ids(cls, db: AsyncSession, leave_ids: list[int]):
+        if not leave_ids:
+            return []
         result = await db.execute(
             select(TeachLeaveApplication).where(
-                TeachLeaveApplication.id == leave_id,
+                TeachLeaveApplication.id.in_(leave_ids),
                 TeachLeaveApplication.del_flag == 0,
             )
+        )
+        return result.scalars().all()
+
+    @classmethod
+    async def get_approved_leaves_for_roll_call(
+        cls, db: AsyncSession, class_id: int, student_ids: list[int], event_id: int | None, class_date
+    ):
+        """
+        查询点名时生效的“已通过”请假：
+        1. 按课次请假：leave.event_id == 本次课次
+        2. 按日期请假：leave.event_id 为空、leave_date == 上课日期，且未指定班级或班级一致
+        """
+        if not student_ids:
+            return []
+        by_event = TeachLeaveApplication.event_id == event_id if event_id else false()
+        by_date = and_(
+            TeachLeaveApplication.event_id.is_(None),
+            TeachLeaveApplication.leave_date == class_date,
+            or_(TeachLeaveApplication.class_id.is_(None), TeachLeaveApplication.class_id == class_id),
+        )
+        result = await db.execute(
+            select(TeachLeaveApplication)
+            .where(
+                TeachLeaveApplication.del_flag == 0,
+                TeachLeaveApplication.leave_status == 2,
+                TeachLeaveApplication.student_id.in_(student_ids),
+                or_(by_event, by_date),
+            )
+            .order_by(TeachLeaveApplication.id)
+        )
+        return result.scalars().all()
+
+    @classmethod
+    async def get_class_events_by_date(cls, db: AsyncSession, class_id: int, event_date):
+        """获取班级某日未取消的排课课次"""
+        result = await db.execute(
+            select(TeachScheduleEvent).where(
+                TeachScheduleEvent.class_id == class_id,
+                TeachScheduleEvent.event_date == event_date,
+                TeachScheduleEvent.del_flag == '0',
+                TeachScheduleEvent.status != '3',
+            )
+        )
+        return result.scalars().all()
+
+    @classmethod
+    async def get_attendance_detail_for_update(cls, db: AsyncSession, attendance_id: int, student_id: int):
+        """加锁读取某次点名中某个学员的明细"""
+        await db.flush()
+        result = await db.execute(
+            select(TeachClassAttendanceDetail)
+            .where(
+                TeachClassAttendanceDetail.attendance_id == attendance_id,
+                TeachClassAttendanceDetail.student_id == student_id,
+                TeachClassAttendanceDetail.del_flag == 0,
+            )
+            .with_for_update()
+            .execution_options(populate_existing=True)
         )
         return result.scalars().first()
 

@@ -89,7 +89,12 @@
         <el-table-column label="姓名" min-width="150">
           <template #default="{ row }">
             <div class="student-cell">
-              <span>{{ row.studentName }}</span>
+              <span>
+                {{ row.studentName }}
+                <el-tag v-if="row.leaveId" size="small" type="warning">
+                  已请假{{ row.leaveIsDeduct === 1 ? '(扣课时)' : '' }}
+                </el-tag>
+              </span>
               <span class="muted">{{ row.phone || '-' }}</span>
             </div>
           </template>
@@ -119,7 +124,7 @@
               v-model="row.deductQuantity"
               :min="0"
               :max="row.remainingQuantity ?? 999"
-              :disabled="row.attendanceStatus === 3 || row.attendanceStatus === 4 || !row.courseAccountId"
+              :disabled="!canDeduct(row)"
               size="small"
               controls-position="right"
             />
@@ -218,8 +223,15 @@ async function loadData() {
   }
 }
 
+// 到课/迟到扣课；请假仅在已通过且标记“扣课时”的请假单下扣课（与后端规则一致）
+function canDeduct(row) {
+  if (!row.courseAccountId) return false;
+  if (row.attendanceStatus === 1 || row.attendanceStatus === 2) return true;
+  return row.attendanceStatus === 3 && row.leaveIsDeduct === 1;
+}
+
 function handleStatusChange(row) {
-  if (row.attendanceStatus === 1 || row.attendanceStatus === 2) {
+  if (canDeduct(row)) {
     row.deductQuantity = row.courseAccountId && Number(row.remainingQuantity || 0) > 0 ? (row.deductQuantity || 1) : 0;
     if (row.remainingQuantity !== null && row.remainingQuantity !== undefined && row.deductQuantity > row.remainingQuantity) {
       row.deductQuantity = row.remainingQuantity;
