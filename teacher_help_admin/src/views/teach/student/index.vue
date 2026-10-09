@@ -121,10 +121,10 @@
       <el-table-column label="家长手机号" align="center" prop="parentPhone" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 1" type="success">在读</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" type="warning">休学</el-tag>
-          <el-tag v-else-if="scope.row.status === 3" type="info">转学</el-tag>
-          <el-tag v-else-if="scope.row.status === 4" type="primary">毕业</el-tag>
+          <el-tag v-if="String(scope.row.status) === '0'" type="success">在读</el-tag>
+          <el-tag v-else-if="String(scope.row.status) === '1'" type="warning">休学</el-tag>
+          <el-tag v-else-if="String(scope.row.status) === '2'" type="info">转学</el-tag>
+          <el-tag v-else-if="String(scope.row.status) === '3'" type="primary">毕业</el-tag>
           <el-tag v-else type="default">未知</el-tag>
         </template>
       </el-table-column>
@@ -398,7 +398,7 @@ function reset() {
     personalityTraits: [],
     learningGoals: null,
     weakSubjects: [],
-    status: 1,
+    status: '0',
     remark: null
   };
   proxy.resetForm("studentRef");

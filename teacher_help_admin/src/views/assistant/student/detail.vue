@@ -365,10 +365,9 @@ const orderItemList = computed(() => {
 function getStudentStatusName(status) {
   const statusMap = {
     0: '在读学员',
-    1: '在读学员',
-    2: '休学',
-    3: '转学',
-    4: '毕业'
+    1: '休学',
+    2: '转学',
+    3: '毕业'
   };
   return statusMap[status] || '在读学员';
 }

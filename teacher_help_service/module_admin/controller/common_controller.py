@@ -1,4 +1,5 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Query, Request, UploadFile
+from module_admin.aspect.interface_auth import CheckUserInterfaceAuth
 from module_admin.service.common_service import CommonService
 from module_admin.service.login_service import LoginService
 from utils.log_util import logger
@@ -7,7 +8,7 @@ from utils.response_util import ResponseUtil
 commonController = APIRouter(prefix='/common', dependencies=[Depends(LoginService.get_current_user)])
 
 
-@commonController.post('/upload')
+@commonController.post('/upload', dependencies=[Depends(CheckUserInterfaceAuth('common:file:upload'))])
 async def common_upload(request: Request, file: UploadFile = File(...)):
     upload_result = await CommonService.upload_service(request, file)
     logger.info('上传成功')
@@ -15,7 +16,7 @@ async def common_upload(request: Request, file: UploadFile = File(...)):
     return ResponseUtil.success(model_content=upload_result.result)
 
 
-@commonController.get('/download')
+@commonController.get('/download', dependencies=[Depends(CheckUserInterfaceAuth('common:file:download'))])
 async def common_download(
     request: Request,
     background_tasks: BackgroundTasks,
@@ -28,7 +29,7 @@ async def common_download(
     return ResponseUtil.streaming(data=download_result.result)
 
 
-@commonController.get('/download/resource')
+@commonController.get('/download/resource', dependencies=[Depends(CheckUserInterfaceAuth('common:file:download'))])
 async def common_download_resource(request: Request, resource: str = Query()):
     download_resource_result = await CommonService.download_resource_services(resource)
     logger.info(download_resource_result.message)

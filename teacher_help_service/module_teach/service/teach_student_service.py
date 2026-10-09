@@ -149,8 +149,8 @@ class TeachStudentService:
                 'id': 0,
                 'parent_id': 0,
                 'student_name': '',
-                'gender': 0,
-                'status': 0,
+                'gender': '0',
+                'status': '0',
                 'create_time': datetime.now(),
                 'update_time': datetime.now()
             }

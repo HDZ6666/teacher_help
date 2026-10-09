@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
 from pydantic_validation_decorator import FieldValidationError
+from config.env import AppConfig
 from exceptions.exception import (
     AuthException,
     LoginException,
@@ -68,4 +69,7 @@ def handle_exception(app: FastAPI):
     @app.exception_handler(Exception)
     async def exception_handler(request: Request, exc: Exception):
         logger.exception(exc)
+        # 生产环境不向客户端回显异常详情，避免泄露SQL、路径等内部信息
+        if AppConfig.app_env == 'prod':
+            return ResponseUtil.error(msg='系统内部错误，请联系管理员')
         return ResponseUtil.error(msg=str(exc))

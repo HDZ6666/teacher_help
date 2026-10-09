@@ -12,6 +12,9 @@ Desktop.ini
 .env
 .env.local
 .env.*.local
+/teacher_help_service/.env.*
+!/teacher_help_service/.env.example
+/teacher_help_service/1.json
 
 # Project local backup and AI completion logs
 /back/*

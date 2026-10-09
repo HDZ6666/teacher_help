@@ -673,10 +673,9 @@ function toNumber(value, defaultValue = 0) {
 function getStudentStatusName(status) {
   const statusMap = {
     0: '在读',
-    1: '在读',
-    2: '休学',
-    3: '转学',
-    4: '毕业'
+    1: '休学',
+    2: '转学',
+    3: '毕业'
   };
   return statusMap[status] || '在读';
 }

@@ -21,7 +21,7 @@ class TeachScheduleAttendance(Base):
     notes = Column(String(255), nullable=True, comment='备注')
     del_flag = Column(String(1), nullable=False, default='0', comment='删除标志（0存在 2删除）')
     create_by = Column(String(64), nullable=True, default='', comment='创建者')
-    create_time = Column(DateTime, nullable=False, default=datetime.now(), comment='创建时间')
+    create_time = Column(DateTime, nullable=False, default=datetime.now, comment='创建时间')
     update_by = Column(String(64), nullable=True, default='', comment='更新者')
-    update_time = Column(DateTime, nullable=False, default=datetime.now(), onupdate=datetime.now(), comment='更新时间')
+    update_time = Column(DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 

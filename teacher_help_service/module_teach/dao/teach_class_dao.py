@@ -71,8 +71,13 @@ class TeachClassDao:
         return await PageUtil.paginate(db, query, query_object.page_num, query_object.page_size, is_page)
 
     @classmethod
-    async def get_teach_class_by_id(cls, db: AsyncSession, class_id: int):
-        result = await db.execute(select(TeachClass).where(TeachClass.id == class_id, TeachClass.del_flag == 0))
+    async def get_teach_class_by_id(cls, db: AsyncSession, class_id: int, for_update: bool = False):
+        query = select(TeachClass).where(TeachClass.id == class_id, TeachClass.del_flag == 0)
+        if for_update:
+            # 会话 autoflush=False，先 flush 未提交的修改，避免 populate_existing 覆盖内存中的变更
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
         return result.scalars().first()
 
     @classmethod
@@ -283,13 +288,16 @@ class TeachClassDao:
         return result.scalars().first()
 
     @classmethod
-    async def get_course_account_by_id(cls, db: AsyncSession, account_id: int):
-        result = await db.execute(
-            select(TeachStudentCourseAccount).where(
-                TeachStudentCourseAccount.id == account_id,
-                TeachStudentCourseAccount.del_flag == 0,
-            )
+    async def get_course_account_by_id(cls, db: AsyncSession, account_id: int, for_update: bool = False):
+        query = select(TeachStudentCourseAccount).where(
+            TeachStudentCourseAccount.id == account_id,
+            TeachStudentCourseAccount.del_flag == 0,
         )
+        if for_update:
+            # 会话 autoflush=False，先 flush 未提交的修改，避免 populate_existing 覆盖内存中的变更
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
         return result.scalars().first()
 
     @classmethod
@@ -300,13 +308,15 @@ class TeachClassDao:
         return attendance
 
     @classmethod
-    async def get_class_attendance_by_event_id(cls, db: AsyncSession, event_id: int):
-        result = await db.execute(
-            select(TeachClassAttendance).where(
-                TeachClassAttendance.event_id == event_id,
-                TeachClassAttendance.del_flag == 0,
-            )
+    async def get_class_attendance_by_event_id(cls, db: AsyncSession, event_id: int, for_update: bool = False):
+        query = select(TeachClassAttendance).where(
+            TeachClassAttendance.event_id == event_id,
+            TeachClassAttendance.del_flag == 0,
         )
+        if for_update:
+            # 加锁读取最新已提交数据，避免可重复读快照导致重复点名判断失效
+            query = query.with_for_update()
+        result = await db.execute(query)
         return result.scalars().first()
 
     @classmethod

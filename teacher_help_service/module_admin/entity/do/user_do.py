@@ -25,9 +25,9 @@ class SysUser(Base):
     login_ip = Column(String(128), default='', comment='最后登录IP')
     login_date = Column(DateTime, comment='最后登录时间')
     create_by = Column(String(64), default='', comment='创建者')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now)
     update_by = Column(String(64), default='', comment='更新者')
-    update_time = Column(DateTime, comment='更新时间', default=datetime.now())
+    update_time = Column(DateTime, comment='更新时间', default=datetime.now)
     remark = Column(String(500), default=None, comment='备注')
 
 

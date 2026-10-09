@@ -4,8 +4,10 @@
     <div class="page-header">
       <el-button type="text" icon="ArrowLeft" @click="goBack">评价学员</el-button>
       <div class="header-actions">
-        <el-button>保存草稿</el-button>
-        <el-button type="warning" @click="handleSubmit">发送</el-button>
+        <el-tooltip content="草稿功能暂未接入后端" placement="bottom">
+          <span><el-button disabled>保存草稿</el-button></span>
+        </el-tooltip>
+        <el-button type="warning" :loading="submitting" :disabled="!studentList.length" @click="handleSubmit">发送</el-button>
       </div>
     </div>
 
@@ -14,21 +16,29 @@
       <h3>课次信息</h3>
       <el-row :gutter="20">
         <el-col :span="12">
-          <div class="info-item">托展训练周六9:00——10:00</div>
-          <div class="info-item">上课时间：{{ classInfo.classTime }}</div>
-          <div class="info-item">上课老师：{{ classInfo.teacher }}</div>
-          <div class="info-item">上课内容：</div>
+          <div class="info-item">{{ classInfo.courseName || '-' }}</div>
+          <div class="info-item">上课时间：{{ classInfo.classTime || '-' }}</div>
+          <div class="info-item">上课老师：{{ classInfo.teacherName || '-' }}</div>
+          <div class="info-item">上课内容：{{ classInfo.content || '-' }}</div>
         </el-col>
         <el-col :span="12">
           <div class="info-item">所属班级：{{ classInfo.className }}</div>
-          <div class="info-item">点名时间：{{ classInfo.attendanceTime }}</div>
-          <div class="info-item">点名老师：{{ classInfo.attendanceTeacher }}</div>
+          <div class="info-item">点名时间：{{ classInfo.attendanceTime || '-' }}</div>
+          <div class="info-item">点名老师：{{ classInfo.createBy || '-' }}</div>
         </el-col>
       </el-row>
     </el-card>
 
     <!-- 写评价 -->
-    <el-card class="evaluate-card">
+    <el-card v-loading="loading" class="evaluate-card">
+      <el-alert
+        class="mb20"
+        type="info"
+        :closable="false"
+        show-icon
+        title="当前保存“课堂表现”“跟课巩固（作业）”两项评分和评价内容；学习态度、动作技巧评分、评价模板、录音/图片/视频附件暂未接入后端，不会保存。"
+      />
+      <el-empty v-if="!loading && !studentList.length" description="该课次没有待点评的学员" />
       <h3>写评价 <span class="student-count">(给{{ studentList.length }}个学员)</span></h3>
 
       <!-- Tab切换 -->
@@ -40,12 +50,12 @@
       <!-- 评价模板选择 -->
       <div class="template-selector">
         <span>评价模板：</span>
-        <el-select v-model="selectedTemplate" placeholder="舞蹈" style="width: 200px">
+        <el-select v-model="selectedTemplate" placeholder="舞蹈" style="width: 200px" disabled>
           <el-option label="舞蹈" value="dance" />
           <el-option label="体育" value="sports" />
           <el-option label="美术" value="art" />
         </el-select>
-        <el-button type="text" class="template-link">设置评价模板</el-button>
+        <el-button type="text" class="template-link" disabled>设置评价模板（未接入）</el-button>
       </div>
 
       <!-- 统一评价模式 -->
@@ -64,17 +74,17 @@
               <el-rate v-model="unifiedRating.classPerformance" />
             </div>
             <div class="rating-item">
-              <span class="rating-label">学习态度：</span>
-              <el-rate v-model="unifiedRating.learningAttitude" />
+              <span class="rating-label">学习态度（未接入）：</span>
+              <el-rate v-model="unifiedRating.learningAttitude" disabled />
             </div>
           </div>
           <div class="rating-row">
             <div class="rating-item">
-              <span class="rating-label">动作技巧：</span>
-              <el-rate v-model="unifiedRating.skillLevel" />
+              <span class="rating-label">动作技巧（未接入）：</span>
+              <el-rate v-model="unifiedRating.skillLevel" disabled />
             </div>
             <div class="rating-item">
-              <span class="rating-label">跟课巩固：</span>
+              <span class="rating-label">跟课巩固（作业）：</span>
               <el-rate v-model="unifiedRating.consolidation" />
             </div>
           </div>
@@ -134,14 +144,14 @@
         <div v-for="(student, index) in studentList" :key="student.id" class="student-evaluate-item">
           <div class="student-header">
             <div class="student-info">
-              <el-avatar :size="40" :src="student.avatar">{{ student.studentName.charAt(0) }}</el-avatar>
+              <el-avatar :size="40" :src="student.avatar">{{ (student.studentName || '').charAt(0) }}</el-avatar>
               <div class="student-detail">
                 <div class="student-name">{{ student.studentName }}</div>
                 <el-tag v-if="student.tag" size="small">{{ student.tag }}</el-tag>
                 <div class="student-meta">{{ student.meta }}</div>
               </div>
             </div>
-            <el-button type="text" class="skip-btn">暂不评价ta</el-button>
+            <el-button type="text" class="skip-btn" @click="handleSkipStudent(index)">暂不评价ta</el-button>
           </div>
 
           <!-- 评分区域 -->
@@ -152,17 +162,17 @@
                 <el-rate v-model="student.classPerformance" />
               </div>
               <div class="rating-item">
-                <span class="rating-label">学习态度：</span>
-                <el-rate v-model="student.learningAttitude" />
+                <span class="rating-label">学习态度（未接入）：</span>
+                <el-rate v-model="student.learningAttitude" disabled />
               </div>
             </div>
             <div class="rating-row">
               <div class="rating-item">
-                <span class="rating-label">动作技巧：</span>
-                <el-rate v-model="student.skillLevel" />
+                <span class="rating-label">动作技巧（未接入）：</span>
+                <el-rate v-model="student.skillLevel" disabled />
               </div>
               <div class="rating-item">
-                <span class="rating-label">跟课巩固：</span>
+                <span class="rating-label">跟课巩固（作业）：</span>
                 <el-rate v-model="student.consolidation" />
               </div>
             </div>
@@ -225,54 +235,26 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { getAttendanceRecord } from '@/api/assistant/classRecord'
+import { addComment, batchComment, listPendingCommentStudents } from '@/api/teach/comment'
 
 const route = useRoute()
 const router = useRouter()
 
+const loading = ref(false)
+const submitting = ref(false)
+
 // 评价模式
 const evaluateMode = ref('unified')
 
-// 选中的模板
+// 选中的模板（评价模板暂未接入后端）
 const selectedTemplate = ref('dance')
 
-// 课次信息
-const classInfo = ref({
-  classTime: '2025-11-03 10:00 - 11:30',
-  teacher: '叶老师',
-  className: '拓展训练班',
-  attendanceTime: '2025-11-05 14:53',
-  attendanceTeacher: '黄老师'
-})
+// 课次信息（来自 /teach/class-record/attendance/{id}）
+const classInfo = ref({})
 
-// 学员列表
-const studentList = ref([
-  {
-    id: 1,
-    studentName: '宁宁',
-    avatar: '',
-    tag: '刷新',
-    meta: '',
-    classPerformance: 0,
-    learningAttitude: 0,
-    skillLevel: 0,
-    consolidation: 0,
-    contentTab: 'ai',
-    aiComment: ''
-  },
-  {
-    id: 2,
-    studentName: '西西',
-    avatar: '',
-    tag: '刷新',
-    meta: '未到2次后，无法发送到家长端',
-    classPerformance: 0,
-    learningAttitude: 0,
-    skillLevel: 0,
-    consolidation: 0,
-    contentTab: 'ai',
-    aiComment: ''
-  }
-])
+// 待点评学员列表（来自 /teach/comment/pending）
+const studentList = ref([])
 
 // 统一评价 - 评分
 const unifiedRating = ref({
@@ -321,50 +303,127 @@ function addUnifiedComment(comment) {
   }
 }
 
+// 暂不评价某个学员
+function handleSkipStudent(index) {
+  studentList.value.splice(index, 1)
+}
+
 // 返回上一页
 function goBack() {
   router.back()
 }
 
-// 提交评价
+/** 加载课次信息和待点评学员 */
+function loadData() {
+  const attendanceId = route.params.id
+  if (!attendanceId) {
+    return
+  }
+  const selectedIds = String(route.query.studentIds || '')
+    .split(',')
+    .filter(Boolean)
+  loading.value = true
+  Promise.all([getAttendanceRecord(attendanceId), listPendingCommentStudents(attendanceId)])
+    .then(([recordRes, pendingRes]) => {
+      classInfo.value = recordRes.data || {}
+      const pending = pendingRes.data || []
+      const matched = pending.filter(item => selectedIds.includes(String(item.studentId)))
+      // 传入的学员ID与待点评名单匹配不上时，展示该课次全部待点评学员
+      const source = matched.length ? matched : pending
+      studentList.value = source.map(item => ({
+        ...item,
+        id: item.studentId,
+        avatar: '',
+        tag: item.attendanceStatusName,
+        meta: '',
+        classPerformance: 0,
+        learningAttitude: 0,
+        skillLevel: 0,
+        consolidation: 0,
+        contentTab: 'ai',
+        aiComment: ''
+      }))
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+// 提交评价：统一评价调用 /teach/comment/batch，分开评价逐个调用 /teach/comment
 function handleSubmit() {
+  if (!studentList.value.length) {
+    ElMessage.warning('没有可点评的学员')
+    return
+  }
+  const attendanceId = Number(route.params.id)
   if (evaluateMode.value === 'unified') {
-    // 统一评价模式验证
-    if (!unifiedRating.value.classPerformance || !unifiedRating.value.learningAttitude ||
-        !unifiedRating.value.skillLevel || !unifiedRating.value.consolidation) {
-      ElMessage.warning('请完成所有评分项')
+    if (!unifiedRating.value.classPerformance || !unifiedRating.value.consolidation) {
+      ElMessage.warning('请完成课堂表现和跟课巩固评分')
       return
     }
     if (!unifiedComment.value) {
       ElMessage.warning('请输入评价内容')
       return
     }
-  } else {
-    // 分开评价模式验证
-    const unrated = studentList.value.filter(s =>
-      !s.classPerformance || !s.learningAttitude || !s.skillLevel || !s.consolidation || !s.aiComment
-    )
-
-    if (unrated.length > 0) {
-      ElMessage.warning('请完成所有学员的评价')
-      return
-    }
+    submitting.value = true
+    batchComment({
+      attendanceId,
+      classId: classInfo.value.classId,
+      studentIds: studentList.value.map(s => s.studentId),
+      performanceScore: unifiedRating.value.classPerformance,
+      homeworkScore: unifiedRating.value.consolidation,
+      commentContent: unifiedComment.value,
+      commentType: 'unified'
+    })
+      .then(res => {
+        ElMessage.success(res.msg || '点评发布成功')
+        router.back()
+      })
+      .finally(() => {
+        submitting.value = false
+      })
+    return
   }
 
-  ElMessage.success('评价提交成功')
-  // TODO: 调用API提交评价
-  setTimeout(() => {
-    router.back()
-  }, 1000)
+  const unrated = studentList.value.filter(s => !s.classPerformance || !s.consolidation || !s.aiComment)
+  if (unrated.length > 0) {
+    ElMessage.warning('请完成所有学员的评分和评价内容')
+    return
+  }
+  submitting.value = true
+  const tasks = studentList.value.map(student =>
+    addComment({
+      attendanceId,
+      attendanceDetailId: student.attendanceDetailId,
+      classId: student.classId,
+      studentId: student.studentId,
+      studentName: student.studentName,
+      performanceScore: student.classPerformance,
+      homeworkScore: student.consolidation,
+      commentContent: student.aiComment,
+      commentType: 'single'
+    })
+      .then(() => ({ ok: true }))
+      .catch(() => ({ ok: false, name: student.studentName }))
+  )
+  Promise.all(tasks)
+    .then(results => {
+      const failed = results.filter(item => !item.ok)
+      if (failed.length) {
+        ElMessage.error(`以下学员点评发布失败：${failed.map(item => item.name).join('、')}`)
+        loadData()
+        return
+      }
+      ElMessage.success('点评发布成功')
+      router.back()
+    })
+    .finally(() => {
+      submitting.value = false
+    })
 }
 
-// 组件挂载时获取数据
 onMounted(() => {
-  const recordId = route.params.id
-  const studentIds = route.query.studentIds
-  console.log('课程ID:', recordId)
-  console.log('学员IDs:', studentIds)
-  // TODO: 根据ID获取课程和学员数据
+  loadData()
 })
 </script>
 

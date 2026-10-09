@@ -39,10 +39,44 @@ class UploadUtil:
         :param file: 文件对象
         :return: 校验结果
         """
-        file_extension = file.filename.rsplit('.', 1)[-1]
+        if not file.filename or '.' not in file.filename:
+            return False
+        file_extension = cls.get_file_extension(file.filename)
         if file_extension in UploadConfig.DEFAULT_ALLOWED_EXTENSION:
             return True
         return False
+
+    @classmethod
+    def get_file_extension(cls, filename: str):
+        """
+        获取文件后缀（小写）
+
+        :param filename: 文件名称
+        :return: 文件后缀
+        """
+        return os.path.basename(filename or '').rsplit('.', 1)[-1].lower()
+
+    @classmethod
+    def resolve_safe_path(cls, base_dir: str, file_name: str):
+        """
+        将相对文件名解析为基础目录下的真实路径，拒绝绝对路径和越出基础目录的路径
+
+        :param base_dir: 基础目录
+        :param file_name: 相对文件名
+        :return: 合法时返回真实路径，否则返回None
+        """
+        if not file_name or '\x00' in file_name:
+            return None
+        if os.path.isabs(file_name) or file_name.startswith(('/', '\\')) or os.path.splitdrive(file_name)[0]:
+            return None
+        base_real_path = os.path.realpath(base_dir)
+        target_real_path = os.path.realpath(os.path.join(base_real_path, file_name))
+        if (
+            os.path.commonpath([base_real_path, target_real_path]) != base_real_path
+            or target_real_path == base_real_path
+        ):
+            return None
+        return target_real_path
 
     @classmethod
     def check_file_timestamp(cls, filename: str):

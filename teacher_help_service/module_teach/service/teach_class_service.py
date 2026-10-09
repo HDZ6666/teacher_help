@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 from uuid import uuid4
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from module_admin.entity.vo.common_vo import CrudResponseModel
 from module_teach.dao.teach_class_dao import TeachClassDao
@@ -658,7 +659,8 @@ class TeachClassService:
         page_object: SubmitTeachClassAttendanceModel,
         current_user_name: str,
     ):
-        class_obj = await TeachClassDao.get_teach_class_by_id(query_db, class_id)
+        # 锁定班级行，串行化同一班级的点名提交，防止并发重复扣课和完成课次丢失更新
+        class_obj = await TeachClassDao.get_teach_class_by_id(query_db, class_id, for_update=True)
         if not class_obj:
             raise ServiceException(message='班级不存在')
         event = None
@@ -671,7 +673,7 @@ class TeachClassService:
                 raise ServiceException(message='排课课次不属于当前班级')
             if event.status == '3':
                 raise ServiceException(message='已取消课次不能点名')
-            if await TeachClassDao.get_class_attendance_by_event_id(query_db, page_object.event_id):
+            if await TeachClassDao.get_class_attendance_by_event_id(query_db, page_object.event_id, for_update=True):
                 raise ServiceException(message='该课次已完成点名')
             schedule_attendances = await TeachScheduleAttendanceDao.get_attendances_by_event(
                 query_db, page_object.event_id
@@ -743,7 +745,12 @@ class TeachClassService:
                 if item.status in [3, 4]:
                     deduct_quantity = 0
                 if deduct_quantity > 0:
-                    account = account or await TeachClassDao.get_course_account_by_id(query_db, class_student.course_account_id)
+                    # 扣课前加锁重新读取课程账户，防止同一账户被并发扣减
+                    account = await TeachClassDao.get_course_account_by_id(
+                        query_db, account.id if account else class_student.course_account_id, for_update=True
+                    )
+                    if not account or (account.remaining_quantity or 0) < deduct_quantity:
+                        raise ServiceException(message=f'{class_student.student_name}剩余课时不足')
                     before_remaining = account.remaining_quantity or 0
                     account.consumed_quantity = (account.consumed_quantity or 0) + deduct_quantity
                     account.remaining_quantity = before_remaining - deduct_quantity
@@ -800,6 +807,12 @@ class TeachClassService:
             attendance_id = attendance.id
             await query_db.commit()
             return CrudResponseModel(is_success=True, message='点名完成', result={'id': attendance_id})
+        except IntegrityError as e:
+            await query_db.rollback()
+            # uk_class_attendance_event 唯一约束兜底：同一课次并发重复提交
+            if page_object.event_id:
+                raise ServiceException(message='该课次已完成点名') from e
+            raise e
         except Exception as e:
             await query_db.rollback()
             raise e

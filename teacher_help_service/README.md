@@ -52,7 +52,7 @@ teacher_help_service/
 - **UploadSettings**: 文件上传配置
 
 ### 环境变量加载
-- 支持 `.env.dev`, `.env.prod` 等环境文件
+- 支持 `.env.dev`, `.env.prod` 等环境文件（不入库，复制 `.env.example` 后填写真实配置）
 - 通过命令行参数 `--env` 指定运行环境
 
 ---

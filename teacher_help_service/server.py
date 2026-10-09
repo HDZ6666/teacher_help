@@ -31,6 +31,10 @@ from module_teach.controller.teach_course_controller import teachCourseControlle
 from module_teach.controller.teach_schedule_event_controller import teachScheduleEventController
 from module_teach.controller.teach_schedule_attendance_controller import teachScheduleAttendanceController
 from module_teach.controller.teach_class_record_controller import teachClassRecordController
+from module_teach.controller.teach_card_controller import teachCardController
+from module_teach.controller.teach_venue_controller import teachVenueController
+from module_teach.controller.teach_comment_controller import teachCommentController
+from module_teach.controller.teach_leave_controller import teachLeaveController
 from module_ast.controller.ast_item_controller import astItemController
 from module_ast.controller.ast_inventory_controller import astInventoryController
 from sub_applications.handle import handle_sub_applications
@@ -97,6 +101,10 @@ controller_list = [
     {'router': teachScheduleEventController, 'tags': ['教学管理-排课管理']},
     {'router': teachScheduleAttendanceController, 'tags': ['教学管理-考勤管理']},
     {'router': teachClassRecordController, 'tags': ['教学管理-上课记录']},
+    {'router': teachCardController, 'tags': ['教学管理-会员卡管理']},
+    {'router': teachVenueController, 'tags': ['教学管理-场地管理']},
+    {'router': teachCommentController, 'tags': ['教学管理-课后点评']},
+    {'router': teachLeaveController, 'tags': ['教学管理-请假管理']},
     {'router': astItemController, 'tags': ['物品费用管理-物品管理']},
     {'router': astInventoryController, 'tags': ['物品费用管理-出入库与费用']},
 ]

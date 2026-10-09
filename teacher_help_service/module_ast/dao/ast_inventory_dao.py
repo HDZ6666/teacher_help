@@ -40,12 +40,18 @@ class AstInventoryDao:
         return result.scalars().all()
 
     @classmethod
-    async def get_sku_with_item_by_id(cls, db: AsyncSession, sku_id: int):
-        result = await db.execute(
+    async def get_sku_with_item_by_id(cls, db: AsyncSession, sku_id: int, for_update: bool = False):
+        query = (
             select(AstItemSku, AstItem)
             .join(AstItem, AstItemSku.item_id == AstItem.id)
             .where(AstItemSku.id == sku_id, AstItemSku.del_flag == 0, AstItem.del_flag == 0)
         )
+        if for_update:
+            # 行锁 + 刷新会话中已加载的对象，保证读到的是最新库存
+            # 会话 autoflush=False，先 flush 未提交的修改，避免 populate_existing 覆盖内存中的变更
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
         return result.first()
 
     @classmethod
@@ -78,6 +84,25 @@ class AstInventoryDao:
     @classmethod
     async def update_item_sku_dao(cls, db: AsyncSession, sku_id: int, values: dict):
         await db.execute(update(AstItemSku).where(AstItemSku.id == sku_id).values(**values))
+
+    @classmethod
+    async def update_item_sku_stock_dao(
+        cls, db: AsyncSession, sku_id: int, stock_before: int, stock_after: int, values: dict
+    ):
+        """
+        条件更新SKU库存：仅当库存仍为 stock_before 且更新后不为负数时才更新
+
+        :return: 受影响行数，0 表示库存已被其他事务修改或库存不足
+        """
+        if stock_after < 0:
+            return 0
+        result = await db.execute(
+            update(AstItemSku)
+            .where(AstItemSku.id == sku_id, func.coalesce(AstItemSku.stock, 0) == stock_before)
+            .values(stock=stock_after, available_stock=stock_after, **values)
+            .execution_options(synchronize_session='fetch')
+        )
+        return result.rowcount
 
     @classmethod
     async def soft_delete_item_sku_dao(cls, db: AsyncSession, sku_id: int, update_by: str = ''):
