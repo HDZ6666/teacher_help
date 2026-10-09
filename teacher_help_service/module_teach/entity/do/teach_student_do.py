@@ -13,7 +13,7 @@ class TeachStudent(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, comment='主键ID')
     parent_id = Column(Integer, ForeignKey('teach_parents.id'), nullable=False, comment='关联家长ID')
     student_name = Column(String(50), nullable=False, comment='学生姓名')
-    gender = Column(String(1), nullable=True, default='0', comment='用户性别（0男 1女 2未知）')
+    gender = Column(String(1), nullable=True, default='0', comment='用户性别（0未知 1男 2女）')
     birthday = Column(Date, nullable=True, comment='出生日期')
     school_name = Column(String(100), nullable=True, comment='就读学校')
     grade = Column(String(20), nullable=True, comment='年级')

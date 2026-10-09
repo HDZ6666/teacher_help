@@ -24,8 +24,8 @@
             <el-descriptions-item label="学号">{{ studentInfo.studentIdInSchool || '未填写' }}</el-descriptions-item>
             <el-descriptions-item label="紧急联系人">{{ studentInfo.emergencyContact || '未填写' }}</el-descriptions-item>
             <el-descriptions-item label="状态">
-              <el-tag :type="studentInfo.status === 1 ? 'success' : 'danger'">
-                {{ studentInfo.status === 1 ? '正常' : '停用' }}
+              <el-tag :type="String(studentInfo.status) === '0' ? 'success' : 'warning'">
+                {{ ({ '0': '在读', '1': '休学', '2': '转学', '3': '毕业' })[String(studentInfo.status)] || '未知' }}
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="创建时间">{{ parseTime(studentInfo.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</el-descriptions-item>

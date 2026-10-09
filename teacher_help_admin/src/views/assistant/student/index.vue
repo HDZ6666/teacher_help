@@ -53,10 +53,10 @@
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 200px">
-          <el-option label="在读" value="1" />
-          <el-option label="休学" value="2" />
-          <el-option label="转学" value="3" />
-          <el-option label="毕业" value="4" />
+          <el-option label="在读" value="0" />
+          <el-option label="休学" value="1" />
+          <el-option label="转学" value="2" />
+          <el-option label="毕业" value="3" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -856,9 +856,15 @@ function buildStudentPayload() {
     studentIdInSchool: form.value.studentIdInSchool || null,
     personalityTraits: form.value.tags || [],
     emergencyContact: form.value.mainContactPhone || form.value.phone || null,
-    status: String(form.value.status || '1'),
+    status: normalizeStudentStatus(form.value.status),
     remark: form.value.remark || null
   };
+}
+
+/** 学员状态与后端口径一致：0在读 1休学 2转学 3毕业，空值默认在读 */
+function normalizeStudentStatus(status) {
+  const value = status === null || status === undefined || status === '' ? '0' : String(status);
+  return ['0', '1', '2', '3'].includes(value) ? value : '0';
 }
 
 function genderToValue(gender) {
@@ -986,7 +992,7 @@ function reset() {
     follower: null,
     advisor: null,
     tags: [],
-    status: '1',
+    status: '0',
     remark: null
   };
   proxy.resetForm("formRef");
@@ -1199,7 +1205,7 @@ function handleUpdate(row) {
       tags: data.personalityTraits || [],
       mainContactPhone: data.parentPhone || data.emergencyContact || '',
       studentIdInSchool: data.studentIdInSchool || null,
-      status: String(data.status || '1')
+      status: normalizeStudentStatus(data.status)
     };
     open.value = true;
     title.value = "修改学员";
