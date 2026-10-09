@@ -17,41 +17,7 @@ export function getAttendanceRecord(recordId) {
   })
 }
 
-// 新增点名记录
-export function addAttendanceRecord(data) {
-  return request({
-    url: '/teach/class-record/attendance',
-    method: 'post',
-    data: data
-  })
-}
-
-// 修改点名记录
-export function updateAttendanceRecord(data) {
-  return request({
-    url: '/teach/class-record/attendance',
-    method: 'put',
-    data: data
-  })
-}
-
-// 删除点名记录
-export function delAttendanceRecord(recordIds) {
-  return request({
-    url: '/teach/class-record/attendance/' + recordIds,
-    method: 'delete'
-  })
-}
-
-// 导出点名记录
-export function exportAttendanceRecord(query) {
-  return request({
-    url: '/teach/class-record/attendance/export',
-    method: 'post',
-    data: query,
-    responseType: 'blob'
-  })
-}
+// 点名记录的新增/修改/撤销/导出接口后端尚未实现（点名提交走 /teach/class/{id}/attendance），此处不再封装悬空接口
 
 // 查询超纲未点列表
 export function listOvertimeRecord(query) {
@@ -83,17 +49,42 @@ export function listAbsenceReminder(query) {
 // 查询请假申请列表
 export function listLeaveApplication(query) {
   return request({
-    url: '/assistant/classRecord/leave/list',
+    url: '/teach/leave/list',
     method: 'get',
     params: query
   })
 }
 
-// 查询请假由来列表
-export function listLeaveReason(query) {
+// 查询请假申请详细
+export function getLeaveApplication(leaveId) {
   return request({
-    url: '/assistant/classRecord/leaveReason/list',
-    method: 'get',
-    params: query
+    url: '/teach/leave/' + leaveId,
+    method: 'get'
+  })
+}
+
+// 新增请假申请（代请假）
+export function addLeaveApplication(data) {
+  return request({
+    url: '/teach/leave',
+    method: 'post',
+    data: data
+  })
+}
+
+// 审批请假申请
+export function approveLeaveApplication(data) {
+  return request({
+    url: '/teach/leave/approve',
+    method: 'put',
+    data: data
+  })
+}
+
+// 撤销请假申请
+export function delLeaveApplication(leaveIds) {
+  return request({
+    url: '/teach/leave/' + leaveIds,
+    method: 'delete'
   })
 }

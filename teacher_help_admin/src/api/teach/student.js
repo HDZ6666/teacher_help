@@ -87,7 +87,4 @@ export function getStudentOrders(studentId) {
   })
 }
 
-// 退课能力待课程消耗/财务闭环补齐后实现
-export function withdrawCourse() {
-  return Promise.resolve({ code: 200, msg: 'success' })
-}
+// 退课接口（退课退款、库存回滚）后端尚未实现，不提供前端假成功封装

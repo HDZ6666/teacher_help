@@ -116,15 +116,11 @@
         </el-table-column>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template #default="scope">
-            <el-button 
-              v-if="scope.row.status === 1" 
-              link 
-              type="danger" 
-              @click="handleWithdraw(scope.row)"
-              v-hasPermi="['teach:student:withdraw']"
-            >
-              退课
-            </el-button>
+            <el-tooltip v-if="scope.row.status === 1" content="退课退款功能暂未接入后端" placement="top">
+              <span>
+                <el-button link type="danger" disabled>退课（未接入）</el-button>
+              </span>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -133,7 +129,7 @@
 </template>
 
 <script setup name="StudentDetail">
-import { getStudent, getStudentCourses, withdrawCourse } from "@/api/teach/student";
+import { getStudent, getStudentCourses } from "@/api/teach/student";
 
 const route = useRoute();
 const router = useRouter();
@@ -173,16 +169,6 @@ function calculateAge(birthday) {
     age--;
   }
   return age;
-}
-
-/** 退课操作 */
-function handleWithdraw(row) {
-  proxy.$modal.confirm('是否确认退课"' + row.courseName + '"？').then(function() {
-    return withdrawCourse(row.id);
-  }).then(() => {
-    getStudentCourseList();
-    proxy.$modal.msgSuccess("退课成功");
-  }).catch(() => {});
 }
 
 /** 返回 */
