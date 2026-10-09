@@ -1,0 +1,106 @@
+# 老师帮 CI：后端语法/静态检查/单元测试 + PC 端生产构建
+# 不连接任何数据库或 Redis，不需要任何 Secrets；teacher_help_uniapp 不在 CI 范围内。
+name: CI
+
+on:
+  push:
+    branches: [master, 'refactor/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: backend (py_compile / ruff / pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: teacher_help_service
+    env:
+      # 现有代码的 ruff(E,F,W) 告警基线；新增改动不允许超过该数量，清理存量告警后请同步调低
+      RUFF_BASELINE: '306'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: teacher_help_service/requirements*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: py_compile
+        run: python -m compileall -q -x '(^|/)(venv|\.venv|env)/' .
+
+      - name: ruff (syntax errors / undefined names, whole service)
+        run: ruff check --select E9,F63,F7,F82 --line-length 120 .
+
+      - name: ruff (strict on tests and migration tooling)
+        run: ruff check --select E,F,W --line-length 120 tests sql/migrate.py
+
+      - name: ruff (no new E,F,W warnings vs baseline)
+        run: |
+          count=$(ruff check --select E,F,W --line-length 120 --output-format concise -q . | grep -c ':[0-9]*:[0-9]*:' || true)
+          echo "ruff E,F,W warnings: ${count} (baseline ${RUFF_BASELINE})"
+          test "${count}" -le "${RUFF_BASELINE}"
+
+      - name: pytest
+        run: python -m pytest -q
+
+      - name: route import check (prod config)
+        env:
+          JWT_SECRET_KEY: ci-only-not-a-real-secret
+        run: |
+          python - <<'PY'
+          import sys
+          sys.argv = [sys.argv[0], '--env=prod']
+          import server
+          assert server.app.docs_url is None and server.app.openapi_url is None, 'prod 环境应关闭接口文档'
+          paths = {getattr(route, 'path', '') for route in server.app.routes}
+          for path in ['/teach/card/list', '/teach/venue/list', '/teach/comment/list', '/teach/leave/list']:
+              assert path in paths, path
+          print(f'routes: {len(server.app.routes)}')
+          PY
+
+      - name: SQL parse check (sqlglot, mysql)
+        run: |
+          python - <<'PY'
+          import glob
+          import sqlglot
+          files = sorted(glob.glob('sql/migrations/*.sql') + glob.glob('sql/data_fix/*.sql')) + [
+              'sql/teacher_help_teach_tables.sql',
+              'sql/teacher_help_menu.sql',
+          ]
+          for path in files:
+              with open(path, encoding='utf-8') as f:
+                  statements = [s for s in sqlglot.parse(f.read(), read='mysql') if s is not None]
+              print(f'{path}: {len(statements)} statements')
+          PY
+
+  pc:
+    name: pc (pnpm build:prod)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: teacher_help_admin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+          cache-dependency-path: teacher_help_admin/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build:prod

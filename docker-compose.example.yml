@@ -1,0 +1,58 @@
+# 老师帮 本地/演示用 docker-compose 示例（只包含占位值，不要提交真实口令）
+# 使用：
+#   1. cp docker-compose.example.yml docker-compose.yml，并把所有 CHANGE_ME 替换为真实值（docker-compose.yml 不要提交）
+#   2. docker compose up -d mysql redis
+#   3. 初始化数据库（按 doc/P1修复记录-2026-10-09.md 中的顺序导入 SQL），再执行：
+#      docker compose run --rm backend python sql/migrate.py --env=prod baseline
+#      docker compose run --rm backend python sql/migrate.py --env=prod up
+#   4. docker compose up -d backend
+# PC 前端请按 teacher_help_admin/README.md 构建后由 Nginx 等静态服务器托管，并把 /prod-api 反向代理到 backend:9099。
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: CHANGE_ME_ROOT_PASSWORD
+      MYSQL_DATABASE: ruoyi-fastapi
+      MYSQL_USER: teacher_help
+      MYSQL_PASSWORD: CHANGE_ME_DB_PASSWORD
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # 不对外暴露端口；需要本机调试时再临时映射，禁止公网开放
+    expose:
+      - '3306'
+
+  redis:
+    image: redis:7
+    command: ['redis-server', '--requirepass', 'CHANGE_ME_REDIS_PASSWORD']
+    expose:
+      - '6379'
+
+  backend:
+    build: ./teacher_help_service
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      APP_ENV: prod
+      APP_ROOT_PATH: /prod-api
+      APP_RELOAD: 'false'
+      # APP_DOCS_ENABLED: 'false'   # 生产默认关闭 /docs /redoc /openapi.json
+      # DB_AUTO_INIT: 'false'       # 生产默认不自动建表，表结构使用 sql/migrate.py
+      JWT_SECRET_KEY: CHANGE_ME_TO_A_RANDOM_64_HEX_SECRET
+      DB_TYPE: mysql
+      DB_HOST: mysql
+      DB_PORT: '3306'
+      DB_USERNAME: teacher_help
+      DB_PASSWORD: CHANGE_ME_DB_PASSWORD
+      DB_DATABASE: ruoyi-fastapi
+      DB_ECHO: 'false'
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      REDIS_PASSWORD: CHANGE_ME_REDIS_PASSWORD
+      REDIS_DATABASE: '2'
+    ports:
+      - '9099:9099'
+
+volumes:
+  mysql-data:

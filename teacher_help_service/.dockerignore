@@ -1,0 +1,15 @@
+# 禁止把本地环境配置、秘钥、缓存打进镜像
+.env
+.env.*
+!.env.example
+1.json
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+venv/
+.venv/
+logs/
+vf_admin/
+caches/
+tests/
