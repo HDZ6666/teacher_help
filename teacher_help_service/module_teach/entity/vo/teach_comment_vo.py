@@ -17,6 +17,7 @@ class TeachCommentPageQueryModel(BaseModel):
 
     page_num: int = Field(default=1, description='页码')
     page_size: int = Field(default=10, description='每页数量')
+    attendance_id: Optional[int] = Field(default=None, description='点名记录ID')
     class_id: Optional[int] = Field(default=None, description='班级ID')
     student_id: Optional[int] = Field(default=None, description='学员ID')
     student_name: Optional[str] = Field(default=None, description='学员姓名')
