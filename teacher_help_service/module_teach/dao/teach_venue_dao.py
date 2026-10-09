@@ -105,8 +105,13 @@ class TeachVenueDao:
         return result.scalars().all()
 
     @classmethod
-    async def get_court_by_id(cls, db: AsyncSession, court_id: int):
-        result = await db.execute(select(TeachCourt).where(TeachCourt.id == court_id, TeachCourt.del_flag == 0))
+    async def get_court_by_id(cls, db: AsyncSession, court_id: int, for_update: bool = False):
+        query = select(TeachCourt).where(TeachCourt.id == court_id, TeachCourt.del_flag == 0)
+        if for_update:
+            # 锁定场地行，串行化同一场地的预订/锁场，避免并发撞场
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
         return result.scalars().first()
 
     @classmethod
@@ -197,10 +202,13 @@ class TeachVenueDao:
         return await PageUtil.paginate(db, query, query_object.page_num, query_object.page_size, is_page)
 
     @classmethod
-    async def get_booking_by_id(cls, db: AsyncSession, booking_id: int):
-        result = await db.execute(
-            select(TeachCourtBooking).where(TeachCourtBooking.id == booking_id, TeachCourtBooking.del_flag == 0)
-        )
+    async def get_booking_by_id(cls, db: AsyncSession, booking_id: int, for_update: bool = False):
+        query = select(TeachCourtBooking).where(TeachCourtBooking.id == booking_id, TeachCourtBooking.del_flag == 0)
+        if for_update:
+            # 核销/取消前加锁读取，防止并发重复核销或核销与取消交叉
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
         return result.scalars().first()
 
     @classmethod
@@ -223,6 +231,7 @@ class TeachVenueDao:
         """
         同场地同日时间段冲突查询：返回与[start_time, end_time)重叠的有效预订单。
         重叠判定：existing.start_time < end_time AND existing.end_time > start_time
+        时间均为补零后的 HH:MM 字符串（Service 层 normalize_time 保证，存量数据由 V002 迁移补零），字典序即时间先后
         有效状态：booking_status in (1已预订, 2已核销)
         """
         result = await db.execute(

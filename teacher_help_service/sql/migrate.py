@@ -6,7 +6,8 @@
 
 用法（在 teacher_help_service 目录下执行，读取 .env.<env> 中的数据库配置）：
     python sql/migrate.py --env=prod status      查看各版本执行状态
-    python sql/migrate.py --env=prod baseline    把 V001 基线标记为已执行（新库执行完初始化 SQL 后、或存量库首次接入时执行一次）
+    python sql/migrate.py --env=prod baseline    把 V001 基线标记为已执行
+                                                 （新库执行完初始化 SQL 后、或存量库首次接入时执行一次）
     python sql/migrate.py --env=prod up          按版本顺序执行全部未执行的迁移
     python sql/migrate.py --env=prod up --dry-run  只打印将要执行的语句
 
