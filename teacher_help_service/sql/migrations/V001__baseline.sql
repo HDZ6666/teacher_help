@@ -1,0 +1,12 @@
+-- ----------------------------
+-- V001 基线（不包含可执行语句，只用于 `python sql/migrate.py baseline` 标记起点）
+--
+-- 基线 = refactor/v2（P0）时点的完整表结构，由以下初始化脚本建立：
+--   1. sql/ruoyi-fastapi.sql                                   若依系统表
+--   2. sql/teacher_help_teach_tables.sql                       全部 teach_* 表（含启动补丁曾补齐的字段）
+--   3. doc/数据库设计/SQL/04-物品费用管理模块建表语句.sql        ast_* 表（含 enable_stock/warning_stock/online_sale/available_stock）
+--   4. sql/teacher_help_menu.sql                               teach/ast/common:file 菜单按钮权限
+--
+-- 存量库（曾以 create_all + 启动补丁方式建表）视为已处于基线，直接执行 baseline 即可。
+-- 之后的所有表结构/数据修正都写成 V002、V003 ... 文件，通过 `python sql/migrate.py up` 执行。
+-- ----------------------------

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from functools import lru_cache
 from pydantic import computed_field
 from pydantic_settings import BaseSettings
-from typing import Literal
+from typing import Literal, Optional
 
 
 class AppSettings(BaseSettings):
@@ -23,9 +23,18 @@ class AppSettings(BaseSettings):
     app_reload: bool = True
     app_ip_location_query: bool = True
     app_same_time_login: bool = True
+    # 是否开放 /docs、/redoc、/openapi.json；未设置时生产环境(APP_ENV=prod)关闭，其他环境开启
+    app_docs_enabled: Optional[bool] = None
 
 
 JWT_SECRET_PLACEHOLDER = 'CHANGE_ME_TO_A_RANDOM_64_HEX_SECRET'
+
+
+def is_prod_env():
+    """
+    当前是否为生产环境（APP_ENV=prod）
+    """
+    return os.environ.get('APP_ENV', 'dev') == 'prod'
 
 
 class JwtSettings(BaseSettings):
@@ -56,6 +65,9 @@ class DataBaseSettings(BaseSettings):
     db_pool_size: int = 50
     db_pool_recycle: int = 3600
     db_pool_timeout: int = 30
+    # 启动时是否自动执行 create_all 与补列 ALTER；未设置时生产环境(APP_ENV=prod)关闭，其他环境开启
+    # 生产环境请使用 sql/migrations 下的版本化脚本 + sql/migrate.py 管理表结构
+    db_auto_init: Optional[bool] = None
 
     @computed_field
     @property
@@ -164,7 +176,10 @@ class GetConfig:
         获取应用配置
         """
         # 实例化应用配置模型
-        return AppSettings()
+        app_settings = AppSettings()
+        if app_settings.app_docs_enabled is None:
+            app_settings.app_docs_enabled = not is_prod_env()
+        return app_settings
 
     @lru_cache()
     def get_jwt_config(self):
@@ -174,7 +189,7 @@ class GetConfig:
         # 实例化Jwt配置模型
         jwt_settings = JwtSettings()
         if jwt_settings.jwt_secret_key in ('', JWT_SECRET_PLACEHOLDER):
-            if os.environ.get('APP_ENV', 'dev') == 'prod':
+            if is_prod_env():
                 raise ValueError('生产环境必须设置 JWT_SECRET_KEY，禁止使用占位值')
             warnings.warn('JWT_SECRET_KEY 未设置，当前使用占位值，仅允许在开发环境使用', stacklevel=2)
         return jwt_settings
@@ -185,7 +200,10 @@ class GetConfig:
         获取数据库配置
         """
         # 实例化数据库配置模型
-        return DataBaseSettings()
+        database_settings = DataBaseSettings()
+        if database_settings.db_auto_init is None:
+            database_settings.db_auto_init = not is_prod_env()
+        return database_settings
 
     @lru_cache()
     def get_redis_config(self):
