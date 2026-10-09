@@ -305,3 +305,22 @@ async def test_card_template_validation(db):
     )
     card = await db.get(TeachCard, result.result['id'])
     assert card.discount_rate == Decimal('0.8')
+
+
+async def test_grant_list_carries_card_type(db):
+    from module_teach.entity.do.teach_card_do import TeachCardGrant
+    from module_teach.entity.vo.teach_card_vo import TeachCardGrantPageQueryModel
+
+    card = TeachCard(card_name='场地卡', card_type='venue_discount', discount_rate=Decimal('0.8'))
+    db.add(card)
+    await db.flush()
+    db.add(TeachCardGrant(card_id=card.id, card_name=card.card_name, student_id=1, grant_status=1))
+    await db.commit()
+    page = await TeachCardService.get_teach_card_grant_list_services(
+        db, TeachCardGrantPageQueryModel(pageNum=1, pageSize=10), '', is_page=True
+    )
+    row = page.rows[0]
+    assert row['cardType'] == 'venue_discount' and row['cardTypeName'] == '场地折扣卡'
+    assert row['grantStatusName'] == '有效'
+    cards = await TeachCardService.get_student_cards_services(db, 1)
+    assert cards[0]['cardType'] == 'venue_discount'

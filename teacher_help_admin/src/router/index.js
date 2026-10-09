@@ -144,6 +144,12 @@ export const constantRoutes = [
         meta: { title: '物品/费用', icon: 'shopping' }
       },
       {
+        path: 'card',
+        component: () => import('@/views/assistant/card/index'),
+        name: 'AssistantCard',
+        meta: { title: '会员卡', icon: 'money' }
+      },
+      {
         path: 'schedule',
         component: () => import('@/views/assistant/schedule/index'),
         name: 'AssistantSchedule',

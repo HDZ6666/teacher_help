@@ -337,10 +337,25 @@ class TeachCardService:
     ):
         page_result = await TeachCardDao.get_teach_card_grant_list(query_db, query_object, data_scope_sql, is_page)
         if hasattr(page_result, 'rows'):
-            page_result.rows = [cls.fill_grant_labels(row) for row in page_result.rows]
+            page_result.rows = await cls.attach_grant_card_info(query_db, page_result.rows)
         else:
-            page_result = [cls.fill_grant_labels(row) for row in page_result]
+            page_result = await cls.attach_grant_card_info(query_db, page_result)
         return page_result
+
+    @classmethod
+    async def attach_grant_card_info(cls, query_db: AsyncSession, grant_rows: list):
+        """
+        发放记录补充卡类型与折扣率，供 PC 端区分课程卡核销 / 场地折扣卡
+        """
+        card_ids = list({row.get('cardId') for row in grant_rows if row.get('cardId')})
+        card_map = {card.id: card for card in await TeachCardDao.get_cards_by_ids(query_db, card_ids)}
+        for row in grant_rows:
+            card = card_map.get(row.get('cardId'))
+            row['cardType'] = card.card_type if card else None
+            row['cardTypeName'] = cls.CARD_TYPE_LABELS.get(row['cardType'], row['cardType']) if card else None
+            row['discountRate'] = card.discount_rate if card else None
+            cls.fill_grant_labels(row)
+        return grant_rows
 
     @classmethod
     async def void_teach_card_grant_services(
@@ -548,7 +563,7 @@ class TeachCardService:
         grants = await TeachCardDao.get_grants_by_student_id(query_db, student_id)
         rows = CamelCaseUtil.transform_result(grants)
         rows = rows if isinstance(rows, list) else [rows]
-        return [cls.fill_grant_labels(row) for row in rows]
+        return await cls.attach_grant_card_info(query_db, [row for row in rows if row])
 
     # ------------------------ 操作记录 ------------------------
     @classmethod
