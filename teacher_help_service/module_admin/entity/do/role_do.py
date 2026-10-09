@@ -24,9 +24,9 @@ class SysRole(Base):
     status = Column(String(1), nullable=False, default='0', comment='角色状态（0正常 1停用）')
     del_flag = Column(String(1), default='0', comment='删除标志（0代表存在 2代表删除）')
     create_by = Column(String(64), default='', comment='创建者')
-    create_time = Column(DateTime, default=datetime.now(), comment='创建时间')
+    create_time = Column(DateTime, default=datetime.now, comment='创建时间')
     update_by = Column(String(64), default='', comment='更新者')
-    update_time = Column(DateTime, default=datetime.now(), comment='更新时间')
+    update_time = Column(DateTime, default=datetime.now, comment='更新时间')
     remark = Column(String(500), default=None, comment='备注')
 
 

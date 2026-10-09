@@ -30,9 +30,9 @@ class GenTable(Base):
     gen_path = Column(String(200), nullable=True, default='/', comment='生成路径（不填默认项目路径）')
     options = Column(String(1000), nullable=True, comment='其它生成选项')
     create_by = Column(String(64), default='', comment='创建者')
-    create_time = Column(DateTime, nullable=True, default=datetime.now(), comment='创建时间')
+    create_time = Column(DateTime, nullable=True, default=datetime.now, comment='创建时间')
     update_by = Column(String(64), default='', comment='更新者')
-    update_time = Column(DateTime, nullable=True, default=datetime.now(), comment='更新时间')
+    update_time = Column(DateTime, nullable=True, default=datetime.now, comment='更新时间')
     remark = Column(String(500), nullable=True, default=None, comment='备注')
 
     columns = relationship('GenTableColumn', order_by='GenTableColumn.sort', back_populates='tables')
@@ -67,8 +67,8 @@ class GenTableColumn(Base):
     dict_type = Column(String(200), nullable=True, default='', comment='字典类型')
     sort = Column(Integer, nullable=True, comment='排序')
     create_by = Column(String(64), default='', comment='创建者')
-    create_time = Column(DateTime, nullable=True, default=datetime.now(), comment='创建时间')
+    create_time = Column(DateTime, nullable=True, default=datetime.now, comment='创建时间')
     update_by = Column(String(64), default='', comment='更新者')
-    update_time = Column(DateTime, nullable=True, default=datetime.now(), comment='更新时间')
+    update_time = Column(DateTime, nullable=True, default=datetime.now, comment='更新时间')
 
     tables = relationship('GenTable', back_populates='columns')
