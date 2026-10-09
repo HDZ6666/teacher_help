@@ -150,6 +150,12 @@ export const constantRoutes = [
         meta: { title: '会员卡', icon: 'money' }
       },
       {
+        path: 'venue',
+        component: () => import('@/views/assistant/venue/index'),
+        name: 'AssistantVenue',
+        meta: { title: '场地预订', icon: 'date' }
+      },
+      {
         path: 'schedule',
         component: () => import('@/views/assistant/schedule/index'),
         name: 'AssistantSchedule',
