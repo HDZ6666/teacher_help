@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import warnings
 from dotenv import load_dotenv
 from functools import lru_cache
 from pydantic import computed_field
@@ -24,12 +25,16 @@ class AppSettings(BaseSettings):
     app_same_time_login: bool = True
 
 
+JWT_SECRET_PLACEHOLDER = 'CHANGE_ME_TO_A_RANDOM_64_HEX_SECRET'
+
+
 class JwtSettings(BaseSettings):
     """
     Jwt配置
     """
 
-    jwt_secret_key: str = 'b01c66dc2c58dc6a0aabfe2144256be36226de378bf87f72c0c795dda67f4d55'
+    # 不再内置真实秘钥，必须通过 .env.* 或环境变量 JWT_SECRET_KEY 设置
+    jwt_secret_key: str = JWT_SECRET_PLACEHOLDER
     jwt_algorithm: str = 'HS256'
     jwt_expire_minutes: int = 1440
     jwt_redis_expire_minutes: int = 30
@@ -44,9 +49,9 @@ class DataBaseSettings(BaseSettings):
     db_host: str = '127.0.0.1'
     db_port: int = 3306
     db_username: str = 'root'
-    db_password: str = '123456'
+    db_password: str = ''
     db_database: str = 'ruoyi-fastapi'
-    db_echo: bool = True
+    db_echo: bool = False
     db_max_overflow: int = 10
     db_pool_size: int = 50
     db_pool_recycle: int = 3600
@@ -98,6 +103,8 @@ class UploadSettings:
     UPLOAD_PREFIX = '/profile'
     UPLOAD_PATH = 'vf_admin/upload_path'
     UPLOAD_MACHINE = 'A'
+    # 单个上传文件大小上限（字节），默认 50MB
+    UPLOAD_MAX_SIZE = 50 * 1024 * 1024
     DEFAULT_ALLOWED_EXTENSION = [
         # 图片
         'bmp',
@@ -112,8 +119,6 @@ class UploadSettings:
         'xlsx',
         'ppt',
         'pptx',
-        'html',
-        'htm',
         'txt',
         # 压缩文件
         'rar',
@@ -167,7 +172,12 @@ class GetConfig:
         获取Jwt配置
         """
         # 实例化Jwt配置模型
-        return JwtSettings()
+        jwt_settings = JwtSettings()
+        if jwt_settings.jwt_secret_key in ('', JWT_SECRET_PLACEHOLDER):
+            if os.environ.get('APP_ENV', 'dev') == 'prod':
+                raise ValueError('生产环境必须设置 JWT_SECRET_KEY，禁止使用占位值')
+            warnings.warn('JWT_SECRET_KEY 未设置，当前使用占位值，仅允许在开发环境使用', stacklevel=2)
+        return jwt_settings
 
     @lru_cache()
     def get_database_config(self):
