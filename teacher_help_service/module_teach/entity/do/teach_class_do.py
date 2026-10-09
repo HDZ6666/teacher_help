@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Date, DateTime, DECIMAL, ForeignKey, Integer, SMALLINT, String
+from sqlalchemy import Column, Date, DateTime, DECIMAL, ForeignKey, Integer, SMALLINT, String, UniqueConstraint
 from config.database import Base
 
 
@@ -99,6 +99,9 @@ class TeachClassAttendance(Base):
     """
 
     __tablename__ = 'teach_class_attendance'
+    # 同一排课课次只允许一条点名记录（event_id 为空的临时点名不受限制）
+    # 后续实现撤销点名时需物理删除或清空 event_id，否则无法重新点名
+    __table_args__ = (UniqueConstraint('event_id', name='uk_class_attendance_event'),)
 
     id = Column(Integer, primary_key=True, autoincrement=True, comment='主键ID')
     event_id = Column(Integer, nullable=True, comment='排课事件ID')

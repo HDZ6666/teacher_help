@@ -679,7 +679,8 @@ class AstInventoryService:
         remark: str | None = None,
         actual_stock: int | None = None,
     ):
-        sku_item = await AstInventoryDao.get_sku_with_item_by_id(query_db, sku_id)
+        # 加行锁读取最新库存，防止并发请求或同一订单重复SKU导致超卖
+        sku_item = await AstInventoryDao.get_sku_with_item_by_id(query_db, sku_id, for_update=True)
         if not sku_item:
             raise ServiceException(message=f'SKU({sku_id})不存在')
         sku, item = sku_item
@@ -689,17 +690,26 @@ class AstInventoryService:
             quantity = stock_after - stock_before
         else:
             stock_after = stock_before + quantity
+        if stock_after < 0:
+            raise ServiceException(
+                message=f'物品({item.item_name}-{sku.sku_name})库存不足，当前库存{stock_before}'
+            )
 
-        await AstInventoryDao.update_item_sku_dao(
+        # 条件更新兜底：库存在读取后被修改或会变为负数时拒绝
+        affected_rows = await AstInventoryDao.update_item_sku_stock_dao(
             query_db,
             sku.id,
+            stock_before,
+            stock_after,
             {
-                'stock': stock_after,
-                'available_stock': stock_after,
                 'update_by': create_by,
                 'update_time': datetime.now(),
             },
         )
+        if not affected_rows:
+            raise ServiceException(
+                message=f'物品({item.item_name}-{sku.sku_name})库存已变化或不足，请刷新后重试'
+            )
         record = AstItemStockRecord(
             record_no=cls.make_no('SR'),
             item_id=item.id,
