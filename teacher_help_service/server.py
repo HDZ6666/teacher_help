@@ -64,6 +64,10 @@ app = FastAPI(
     description=f'{AppConfig.app_name}接口文档',
     version=AppConfig.app_version,
     lifespan=lifespan,
+    # 生产环境默认关闭接口文档，可通过 APP_DOCS_ENABLED 显式开启
+    docs_url='/docs' if AppConfig.app_docs_enabled else None,
+    redoc_url='/redoc' if AppConfig.app_docs_enabled else None,
+    openapi_url='/openapi.json' if AppConfig.app_docs_enabled else None,
 )
 
 # 挂载子应用

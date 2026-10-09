@@ -164,19 +164,33 @@ uvicorn app:app --host 0.0.0.0 --port 9099 --reload=false
 python app.py --env prod
 ```
 
+### 数据库初始化与迁移（2026-10-09 P1 起）
+- `DB_AUTO_INIT`：启动时是否执行 `create_all` + 补列 ALTER。未设置时 **生产环境（APP_ENV=prod）关闭**，其他环境开启。
+- 生产环境表结构只通过版本化 SQL 管理：`sql/migrations/V<版本>__<说明>.sql` + `python sql/migrate.py`（记录表 `sys_schema_version`）。
+- 新库：依次导入 `sql/ruoyi-fastapi.sql` → `sql/teacher_help_teach_tables.sql` → `doc/数据库设计/SQL/04-物品费用管理模块建表语句.sql` → `sql/teacher_help_menu.sql`，然后执行 `python sql/migrate.py --env=prod baseline` 和 `python sql/migrate.py --env=prod up`。
+- 存量库：先 `baseline`（视为已处于 V001），再 `up`。`status` 可查看执行情况，`up --dry-run` 只打印语句。
+- 人工数据修正脚本放在 `sql/data_fix/`，不会被 `migrate.py` 自动执行。
+
+### 测试
+```bash
+pip install -r requirements-dev.txt
+python -m pytest -q        # 使用 aiosqlite 临时库，不依赖 MySQL/Redis
+```
+
 ---
 
 ## 📝 API 文档
 
 - **Swagger UI**: `http://localhost:9099/docs`
 - **ReDoc**: `http://localhost:9099/redoc`
+- 生产环境（APP_ENV=prod）默认关闭 `/docs`、`/redoc`、`/openapi.json`，如确需开放可设置 `APP_DOCS_ENABLED=true`。
 
 ---
 
 ## 🔄 生命周期事件
 
 应用启动时执行的初始化流程:
-1. 初始化数据库表结构
+1. 初始化数据库连接；`DB_AUTO_INIT=true` 时才自动建表/补列（生产默认关闭）
 2. 创建 Redis 连接池
 3. 初始化系统字典和参数到 Redis
 4. 初始化定时任务调度器

@@ -26,6 +26,8 @@ class TeachCommentDao:
         获取课后点评分页列表
         """
         query = select(TeachStudentComment).where(TeachStudentComment.del_flag == 0)
+        if query_object.attendance_id:
+            query = query.where(TeachStudentComment.attendance_id == query_object.attendance_id)
         if query_object.class_id:
             query = query.where(TeachStudentComment.class_id == query_object.class_id)
         if query_object.student_id:

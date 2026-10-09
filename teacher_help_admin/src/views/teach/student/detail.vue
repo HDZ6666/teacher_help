@@ -14,7 +14,7 @@
             <el-descriptions-item label="学生ID">{{ studentInfo.id }}</el-descriptions-item>
             <el-descriptions-item label="学生姓名">{{ studentInfo.studentName }}</el-descriptions-item>
             <el-descriptions-item label="性别">
-              <dict-tag :options="sys_user_sex" :value="studentInfo.gender"/>
+              <dict-tag :options="STUDENT_GENDER_OPTIONS" :value="studentInfo.gender"/>
             </el-descriptions-item>
             <el-descriptions-item label="出生日期">{{ parseTime(studentInfo.birthday, '{y}-{m}-{d}') }}</el-descriptions-item>
             <el-descriptions-item label="年龄">{{ calculateAge(studentInfo.birthday) }}岁</el-descriptions-item>
@@ -130,11 +130,12 @@
 
 <script setup name="StudentDetail">
 import { getStudent, getStudentCourses } from "@/api/teach/student";
+import { STUDENT_GENDER_OPTIONS } from "@/utils/studentGender";
 
 const route = useRoute();
 const router = useRouter();
 const { proxy } = getCurrentInstance();
-const { sys_user_sex } = proxy.useDict('sys_user_sex');
+// 学员性别使用独立口径（0未知 1男 2女），不能用若依 sys_user_sex（0男 1女）
 
 const studentInfo = ref({});
 const courseList = ref([]);

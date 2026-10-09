@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +9,7 @@ from module_teach.entity.do.teach_card_do import TeachCard, TeachCardCourse, Tea
 from module_teach.entity.vo.teach_card_vo import (
     AddTeachCardModel,
     ChangeTeachCardStatusModel,
+    ConsumeTeachCardGrantModel,
     DeleteTeachCardModel,
     EditTeachCardModel,
     GrantTeachCardModel,
@@ -342,14 +343,15 @@ class TeachCardService:
     async def void_teach_card_grant_services(
         cls, query_db: AsyncSession, page_object: VoidTeachCardGrantModel, operator_id: int, operator_name: str
     ):
-        grant = await TeachCardDao.get_teach_card_grant_by_id(query_db, page_object.id)
-        if not grant:
-            raise ServiceException(message='发放记录不存在')
-        if grant.grant_status == cls.GRANT_STATUS_VOID:
-            raise ServiceException(message='该发放记录已作废')
-        now = datetime.now()
-        before_count = cls.to_int(grant.remaining_count, 0)
         try:
+            # 加锁读取，避免作废与核销并发时剩余次数记录错乱
+            grant = await TeachCardDao.get_teach_card_grant_by_id(query_db, page_object.id, for_update=True)
+            if not grant:
+                raise ServiceException(message='发放记录不存在')
+            if grant.grant_status == cls.GRANT_STATUS_VOID:
+                raise ServiceException(message='该发放记录已作废')
+            now = datetime.now()
+            before_count = cls.to_int(grant.remaining_count, 0)
             grant.grant_status = cls.GRANT_STATUS_VOID
             grant.remaining_count = 0
             grant.update_by = operator_name
@@ -374,6 +376,140 @@ class TeachCardService:
             )
             await query_db.commit()
             return CrudResponseModel(is_success=True, message='作废成功')
+        except Exception as e:
+            await query_db.rollback()
+            raise e
+
+    # ------------------------ 核销 / 消耗 ------------------------
+    @classmethod
+    def resolve_pay_ratio(cls, discount_rate):
+        """
+        场地折扣卡折扣率换算为实付比例：
+        0 < rate <= 1 视为比例（0.8 = 八折）；1 < rate <= 10 视为“几折”（8.5 = 八五折）；其他值视为配置错误
+        """
+        rate = cls.to_decimal(discount_rate, 0)
+        if Decimal('0') < rate <= Decimal('1'):
+            return rate
+        if Decimal('1') < rate <= Decimal('10'):
+            return rate / Decimal('10')
+        raise ServiceException(message='场地折扣卡折扣率配置不正确')
+
+    @classmethod
+    async def lock_usable_grant(
+        cls, query_db: AsyncSession, grant_id: int, student_id: int | None = None, card_type: str | None = None
+    ):
+        """
+        加锁读取发放记录并校验可用性（归属、状态、卡类型、有效期）
+        首次使用后生效的卡在这里起算有效期。调用方负责提交事务。
+
+        :return: (grant, card)
+        """
+        grant = await TeachCardDao.get_teach_card_grant_by_id(query_db, grant_id, for_update=True)
+        if not grant:
+            raise ServiceException(message='会员卡发放记录不存在')
+        if student_id is not None and grant.student_id != student_id:
+            raise ServiceException(message='该会员卡不属于当前学员')
+        if grant.grant_status != cls.GRANT_STATUS_VALID:
+            status_name = cls.GRANT_STATUS_LABELS.get(grant.grant_status, grant.grant_status)
+            raise ServiceException(message=f'会员卡当前状态为“{status_name}”，不能使用')
+        card = await TeachCardDao.get_teach_card_by_id(query_db, grant.card_id)
+        if not card:
+            raise ServiceException(message='会员卡不存在')
+        if card_type and card.card_type != card_type:
+            raise ServiceException(message=f'请选择{cls.CARD_TYPE_LABELS.get(card_type, card_type)}')
+        today = date.today()
+        if grant.valid_start_date is None:
+            # 首次使用后生效：以首次核销日期起算
+            grant.valid_start_date = today
+            valid_days = cls.to_int(card.valid_days, 0)
+            grant.valid_end_date = today + timedelta(days=valid_days) if valid_days > 0 else None
+        if today < grant.valid_start_date:
+            raise ServiceException(message='会员卡尚未生效')
+        if grant.valid_end_date and today > grant.valid_end_date:
+            raise ServiceException(message='会员卡已过期')
+        return grant, card
+
+    @classmethod
+    async def consume_grant_in_transaction(
+        cls,
+        query_db: AsyncSession,
+        grant: TeachCardGrant,
+        card: TeachCard,
+        consume_count: int,
+        operator_id,
+        operator_name: str,
+        remark: str | None = None,
+        course_id: int | None = None,
+    ):
+        """
+        在调用方事务中核销会员卡（不提交）：
+        课程卡按次数条件扣减（发放行已加锁 + remaining_count >= n 条件更新双重保护），场地折扣卡只记录使用日志
+
+        :return: (before_count, after_count)
+        """
+        before_count = cls.to_int(grant.remaining_count, 0)
+        if card.card_type == 'course':
+            if consume_count <= 0:
+                raise ServiceException(message='课程卡消耗次数必须大于0')
+            if course_id:
+                card_courses = await TeachCardDao.get_courses_by_card_id(query_db, card.id)
+                if card_courses and course_id not in [item.course_id for item in card_courses]:
+                    raise ServiceException(message='该课程卡不适用于当前课程')
+            if before_count < consume_count:
+                raise ServiceException(message=f'会员卡剩余次数不足（剩余{before_count}次）')
+            # 先写入首次使用时起算的有效期等内存修改，再执行条件扣减
+            await query_db.flush()
+            affected = await TeachCardDao.deduct_grant_count(
+                query_db, grant.id, consume_count, cls.GRANT_STATUS_USED_UP, operator_name
+            )
+            if affected != 1:
+                raise ServiceException(message='会员卡剩余次数不足或状态已变化，请刷新后重试')
+            await query_db.refresh(grant)
+            after_count = cls.to_int(grant.remaining_count, 0)
+        else:
+            consume_count = 0
+            after_count = before_count
+            grant.update_by = operator_name
+            await TeachCardDao.edit_teach_card_grant(query_db, grant)
+        await TeachCardDao.add_teach_card_log(
+            query_db,
+            TeachCardLog(
+                card_id=card.id,
+                grant_id=grant.id,
+                student_id=grant.student_id,
+                action='consume',
+                change_count=consume_count,
+                before_count=before_count,
+                after_count=after_count,
+                operator_id=operator_id,
+                operator_name=operator_name,
+                create_by=operator_name,
+                create_time=datetime.now(),
+                remark=remark,
+            ),
+        )
+        return before_count, after_count
+
+    @classmethod
+    async def consume_teach_card_grant_services(
+        cls, query_db: AsyncSession, page_object: ConsumeTeachCardGrantModel, operator_id: int, operator_name: str
+    ):
+        try:
+            grant, card = await cls.lock_usable_grant(query_db, page_object.grant_id, page_object.student_id)
+            if card.card_type != 'course':
+                raise ServiceException(message='场地折扣卡请在订场时使用')
+            _, after_count = await cls.consume_grant_in_transaction(
+                query_db,
+                grant,
+                card,
+                cls.to_int(page_object.consume_count, 1),
+                operator_id,
+                operator_name,
+                page_object.remark,
+                page_object.course_id,
+            )
+            await query_db.commit()
+            return CrudResponseModel(is_success=True, message='核销成功', result={'remainingCount': after_count})
         except Exception as e:
             await query_db.rollback()
             raise e

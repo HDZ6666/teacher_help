@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from module_admin.entity.vo.common_vo import CrudResponseModel
 from module_teach.dao.teach_class_dao import TeachClassDao
 from module_teach.dao.teach_course_dao import TeachCourseDao
+from module_teach.dao.teach_leave_dao import TeachLeaveDao
 from module_teach.dao.teach_schedule_attendance_dao import TeachScheduleAttendanceDao
 from module_teach.dao.teach_schedule_event_dao import TeachScheduleEventDao
 from module_teach.dao.teach_student_dao import TeachStudentDao
@@ -546,6 +547,40 @@ class TeachClassService:
             raise e
 
     @classmethod
+    async def get_approved_leave_map(
+        cls, query_db: AsyncSession, class_id: int, student_ids: list[int], event_id: int | None, class_date
+    ):
+        """
+        点名时生效的已通过请假，按学员ID索引（同一学员多条时取最先提交的一条）
+        """
+        leaves = await TeachLeaveDao.get_approved_leaves_for_roll_call(
+            query_db, class_id, student_ids, event_id, class_date
+        )
+        leave_map = {}
+        for leave in leaves:
+            leave_map.setdefault(leave.student_id, leave)
+        return leave_map
+
+    @classmethod
+    def resolve_attendance_item(cls, status: int, deduct_quantity, leave=None):
+        """
+        计算点名明细的最终到课状态与扣课数量：
+        - 有已通过请假且提交为“未到”时，按“请假”记录（已到课/迟到按实际到课处理）
+        - 请假：仅当已通过的请假单标记“扣课时(is_deduct=1)”时按提交数量扣课，否则不扣
+        - 未到：不扣课；到课/迟到：按提交数量扣课
+
+        :return: (status, deduct_quantity)
+        """
+        deduct_quantity = max(cls.to_int(deduct_quantity, 0), 0)
+        if leave is not None and status == 4:
+            status = 3
+        if status == 3:
+            deduct_quantity = deduct_quantity if leave is not None and leave.is_deduct == 1 else 0
+        elif status == 4:
+            deduct_quantity = 0
+        return status, deduct_quantity
+
+    @classmethod
     async def get_attendance_prepare_services(cls, query_db: AsyncSession, class_id: int, event_id: int | None = None):
         class_obj = await TeachClassDao.get_teach_class_by_id(query_db, class_id)
         if not class_obj:
@@ -570,6 +605,13 @@ class TeachClassService:
         default_end_time = '10:00'
         start_time = event.start_time.strftime('%H:%M') if event else default_start_time
         end_time = event.end_time.strftime('%H:%M') if event else default_end_time
+        leave_map = await cls.get_approved_leave_map(
+            query_db,
+            class_id,
+            [student.get('studentId') for student in students],
+            event_id,
+            event.event_date if event else date.today(),
+        )
         prepared_students = []
         for student in students:
             schedule_attendance = schedule_attendance_map.get(student.get('studentId'))
@@ -583,16 +625,21 @@ class TeachClassService:
                 if raw_schedule_status is not None
                 else 1
             )
+            leave = leave_map.get(student.get('studentId'))
+            if leave is not None:
+                # 已通过的请假默认带出“请假”状态
+                attendance_status = 3
+            can_deduct = bool(student.get('courseAccountId')) and (student.get('remainingQuantity') or 0) > 0
+            deduct_by_rule = attendance_status in [1, 2] or (attendance_status == 3 and leave and leave.is_deduct == 1)
             prepared_students.append(
                 {
                     **student,
                     'attendanceStatus': attendance_status,
                     'attendanceStatusName': cls.ATTENDANCE_STATUS_LABELS.get(attendance_status, '到课'),
-                    'deductQuantity': 1
-                    if attendance_status in [1, 2]
-                    and student.get('courseAccountId')
-                    and (student.get('remainingQuantity') or 0) > 0
-                    else 0,
+                    'deductQuantity': 1 if deduct_by_rule and can_deduct else 0,
+                    'leaveId': leave.id if leave else None,
+                    'leaveNo': leave.leave_no if leave else None,
+                    'leaveIsDeduct': leave.is_deduct if leave else None,
                     'remark': schedule_attendance.notes if schedule_attendance else '',
                 }
             )
@@ -685,6 +732,11 @@ class TeachClassService:
         detail_items = page_object.details
         status_count = {1: 0, 2: 0, 3: 0, 4: 0}
         deduct_total = 0
+        # 已通过的请假：未到 -> 请假；请假是否扣课按请假单 is_deduct
+        leave_map = await cls.get_approved_leave_map(
+            query_db, class_id, [item.student_id for item in detail_items], page_object.event_id, page_object.class_date
+        )
+        resolved_map = {}
         try:
             for item in detail_items:
                 if item.student_id not in member_map:
@@ -693,9 +745,12 @@ class TeachClassService:
                     raise ServiceException(message='点名学员不在该课次名单中')
                 if item.status not in cls.ATTENDANCE_STATUS_LABELS:
                     raise ServiceException(message='到课状态不正确')
-                deduct_quantity = max(cls.to_int(item.deduct_quantity, 0), 0)
-                if item.status in [3, 4]:
-                    deduct_quantity = 0
+                if item.student_id in resolved_map:
+                    raise ServiceException(message='点名学员重复')
+                item_status, deduct_quantity = cls.resolve_attendance_item(
+                    item.status, item.deduct_quantity, leave_map.get(item.student_id)
+                )
+                resolved_map[item.student_id] = (item_status, deduct_quantity)
                 class_student, _, _, account = member_map[item.student_id]
                 if deduct_quantity > 0:
                     account = account or (
@@ -707,7 +762,7 @@ class TeachClassService:
                         raise ServiceException(message=f'{class_student.student_name}未绑定课程账户，不能扣课')
                     if (account.remaining_quantity or 0) < deduct_quantity:
                         raise ServiceException(message=f'{class_student.student_name}剩余课时不足')
-                status_count[item.status] += 1
+                status_count[item_status] += 1
                 deduct_total += deduct_quantity
 
             attendance = await TeachClassDao.add_class_attendance(
@@ -741,9 +796,7 @@ class TeachClassService:
             )
             for item in detail_items:
                 class_student, student, _, account = member_map[item.student_id]
-                deduct_quantity = max(cls.to_int(item.deduct_quantity, 0), 0)
-                if item.status in [3, 4]:
-                    deduct_quantity = 0
+                item_status, deduct_quantity = resolved_map[item.student_id]
                 if deduct_quantity > 0:
                     # 扣课前加锁重新读取课程账户，防止同一账户被并发扣减
                     account = await TeachClassDao.get_course_account_by_id(
@@ -768,7 +821,7 @@ class TeachClassService:
                         student_id=student.id,
                         student_name=student.student_name,
                         course_account_id=account.id if account else class_student.course_account_id,
-                        status=item.status,
+                        status=item_status,
                         deduct_quantity=deduct_quantity,
                         before_remaining=before_remaining,
                         after_remaining=after_remaining,
@@ -783,7 +836,7 @@ class TeachClassService:
                 if page_object.event_id:
                     schedule_attendance = schedule_attendance_map[item.student_id]
                     # 新表枚举与旧表枚举不同, 必须显式映射后再反写, 避免跨表串味
-                    schedule_attendance.status = cls.map_class_status_to_schedule(item.status)
+                    schedule_attendance.status = cls.map_class_status_to_schedule(item_status)
                     schedule_attendance.check_in_time = datetime.now()
                     schedule_attendance.check_in_method = 'M'
                     schedule_attendance.notes = item.remark

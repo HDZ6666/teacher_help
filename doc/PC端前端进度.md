@@ -2,7 +2,7 @@
 
 > 适用范围：仅统计 PC 管理端 `teacher_help_admin`。移动端进度不在本文范围内。
 > 依据：`doc/产品图片` 9 个 PC 原型目录及各模块目录内的 `*_模块总结报告.md`、`teacher_help_admin/src/router/index.js`、`teacher_help_admin/src/views/assistant`、`teacher_help_admin/src/api`。
-> 更新日期：2026-06-25；2026-10-09 P0 修复后更新（学员状态口径、评价页接入真实接口、去掉假成功），详见 `doc/P0修复记录-2026-10-09.md`
+> 更新日期：2026-06-25；2026-10-09 P0 修复后更新（学员状态口径、评价页接入真实接口、去掉假成功），详见 `doc/P0修复记录-2026-10-09.md`；同日 P1 更新（点评详情页接入真实接口、点名页显示已请假、旧学员页性别口径），详见 `doc/P1修复记录-2026-10-09.md`
 
 ## 1. 总结
 
@@ -157,7 +157,7 @@ PC 原型实际有 9 个业务模块，仍缺 3 个完整模块入口：
 
 - 上课记录列表：`assistant/classRecord/index.vue`
 - 点名详情：`assistant/classRecord/detail.vue`
-- 点评详情：`assistant/classRecord/comment.vue`
+- 点评详情：`assistant/classRecord/comment.vue`（2026-10-09 P1 起接入 `/teach/class-record/attendance/{id}`、`/teach/comment/list?attendanceId=`、`/teach/comment/pending`、撤销点评，不再使用示例数据）
 - 评价学员：`assistant/classRecord/evaluate.vue`
 
 已完成：

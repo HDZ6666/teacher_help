@@ -68,6 +68,13 @@ ACTION_LABELS = {
     'stat': '统计',
     'upload': '上传',
     'download': '下载',
+    'consume': '核销',
+}
+
+# P0 之后新增的权限使用固定菜单ID（5900 起），避免插入到顺序编号中间导致已有按钮ID整体后移、
+# 已分配给角色的 sys_role_menu 关系错位。新增权限请在这里追加，ID 只增不改。
+PINNED_BUTTON_IDS = {
+    'teach:card:consume': 5900,
 }
 
 
@@ -182,13 +189,19 @@ def generate_menu_sql(perms):
         group_id = MENU_GROUP_START_ID + index
         group_ids[prefix] = group_id
         rows.append(menu_row(group_id, name, MENU_ROOT_ID, index + 1, path, 'M', None, '#', f'{prefix}:*'))
-        for order_num, perm in enumerate(group_perms, start=1):
+        sequential_perms = [perm for perm in group_perms if perm not in PINNED_BUTTON_IDS]
+        pinned_perms = [perm for perm in group_perms if perm in PINNED_BUTTON_IDS]
+        for order_num, perm in enumerate(sequential_perms + pinned_perms, start=1):
             action = perm.rsplit(':', 1)[1]
+            if perm in PINNED_BUTTON_IDS:
+                menu_id = PINNED_BUTTON_IDS[perm]
+            else:
+                menu_id = button_id
+                button_id += 1
             rows.append(
-                menu_row(button_id, f'{name}{ACTION_LABELS.get(action, action)}', group_id, order_num, '#', 'F', perm)
+                menu_row(menu_id, f'{name}{ACTION_LABELS.get(action, action)}', group_id, order_num, '#', 'F', perm)
             )
             used_perms.add(perm)
-            button_id += 1
     unmatched = sorted(set(perms) - used_perms)
     if unmatched:
         raise ValueError(f'以下权限没有归属模块，请在 PERM_GROUPS 中补充：{unmatched}')

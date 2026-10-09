@@ -198,9 +198,9 @@ class AddTeachBookingModel(BaseModel):
     customer_phone: Optional[str] = Field(default=None, description='客户电话', max_length=20)
     booking_type: Optional[str] = Field(default='normal', description='预订类型(normal/lock)')
     origin: Optional[str] = Field(default='admin', description='来源(admin/online)')
-    amount: Optional[Decimal] = Field(default=0, description='应收金额')
-    discount_amount: Optional[Decimal] = Field(default=0, description='优惠金额')
-    card_grant_id: Optional[int] = Field(default=None, description='会员卡发放ID(会员卡折扣)')
+    amount: Optional[Decimal] = Field(default=0, description='应收金额(已弃用，后端按场地价格计算)')
+    discount_amount: Optional[Decimal] = Field(default=0, description='人工减免金额(不含会员卡折扣)')
+    card_grant_id: Optional[int] = Field(default=None, description='场地折扣卡发放ID(须属于 customer_id 对应学员)')
     pay_status: Optional[int] = Field(default=0, description='支付状态')
     remark: Optional[str] = Field(default=None, description='备注', max_length=500)
 

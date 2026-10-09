@@ -12,8 +12,7 @@
       </el-form-item>
       <el-form-item label="性别" prop="gender">
         <el-select v-model="queryParams.gender" placeholder="请选择性别" clearable style="width: 240px">
-          <el-option label="男" value="1" />
-          <el-option label="女" value="2" />
+          <el-option v-for="item in STUDENT_GENDER_OPTIONS" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="学校名称" prop="schoolName">
@@ -98,7 +97,7 @@
       <el-table-column label="学生姓名" align="center" prop="studentName" />
       <el-table-column label="性别" align="center" prop="gender">
         <template #default="scope">
-          <dict-tag :options="sys_user_sex" :value="scope.row.gender"/>
+          <dict-tag :options="STUDENT_GENDER_OPTIONS" :value="scope.row.gender"/>
         </template>
       </el-table-column>
       <el-table-column label="出生日期" align="center" prop="birthday" width="120">
@@ -162,9 +161,7 @@
           <el-col :span="12">
             <el-form-item label="性别" prop="gender">
               <el-radio-group v-model="form.gender">
-                <el-radio :label="1">男</el-radio>
-                <el-radio :label="2">女</el-radio>
-                <el-radio :label="0">未知</el-radio>
+                <el-radio v-for="item in STUDENT_GENDER_OPTIONS" :key="item.value" :label="item.value">{{ item.label }}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -307,9 +304,11 @@
 
 <script setup name="Student">
 import { listStudent, getStudent, delStudent, addStudent, updateStudent, listParents, exportStudent } from "@/api/teach/student";
+import { STUDENT_GENDER_OPTIONS } from "@/utils/studentGender";
 
 const { proxy } = getCurrentInstance();
-const { sys_user_sex, teach_grade, teach_learning_style, teach_subjects } = proxy.useDict('sys_user_sex', 'teach_grade', 'teach_learning_style', 'teach_subjects');
+// 学员性别使用独立口径（0未知 1男 2女），不能用若依 sys_user_sex（0男 1女）
+const { teach_grade, teach_learning_style, teach_subjects } = proxy.useDict('teach_grade', 'teach_learning_style', 'teach_subjects');
 
 const studentList = ref([]);
 const parentList = ref([]);

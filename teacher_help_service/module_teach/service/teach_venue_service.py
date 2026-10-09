@@ -1,9 +1,12 @@
-from datetime import date, datetime
-from decimal import Decimal
+import math
+import re
+from datetime import date, datetime, time
+from decimal import ROUND_HALF_UP, Decimal
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from module_admin.entity.vo.common_vo import CrudResponseModel
 from module_teach.dao.teach_venue_dao import TeachVenueDao
+from module_teach.service.teach_card_service import TeachCardService
 from module_teach.entity.do.teach_venue_do import (
     TeachCourt,
     TeachCourtBooking,
@@ -71,12 +74,87 @@ class TeachVenueService:
         except ValueError:
             raise ServiceException(message='预订日期格式不正确(应为YYYY-MM-DD)')
 
+    TIME_PATTERN = re.compile(r'^(\d{1,2}):(\d{2})(?::(\d{2}))?$')
+
+    @classmethod
+    def normalize_time(cls, value, field_name: str = '时间'):
+        """
+        把时间统一为补零的 HH:MM 字符串（如 9:00 -> 09:00），保证字符串字典序与时间先后一致
+        允许 24:00 作为一天的结束时间
+        """
+        if isinstance(value, time):
+            return value.strftime('%H:%M')
+        if value is None or str(value).strip() == '':
+            raise ServiceException(message=f'{field_name}不能为空')
+        match = cls.TIME_PATTERN.match(str(value).strip())
+        if not match:
+            raise ServiceException(message=f'{field_name}格式不正确(应为HH:MM)')
+        hour, minute = int(match.group(1)), int(match.group(2))
+        second = int(match.group(3) or 0)
+        if (hour == 24 and minute == 0 and second == 0) or (0 <= hour <= 23 and 0 <= minute <= 59 and second <= 59):
+            return f'{hour:02d}:{minute:02d}'
+        raise ServiceException(message=f'{field_name}超出范围(00:00-24:00)')
+
     @classmethod
     def validate_time_range(cls, start_time: str, end_time: str):
+        """
+        校验并返回规范化后的 (start_time, end_time)
+        """
         if not start_time or not end_time:
             raise ServiceException(message='开始时间和结束时间不能为空')
+        start_time = cls.normalize_time(start_time, '开始时间')
+        end_time = cls.normalize_time(end_time, '结束时间')
+        if start_time == '24:00':
+            raise ServiceException(message='开始时间不能为24:00')
         if start_time >= end_time:
             raise ServiceException(message='结束时间必须晚于开始时间')
+        return start_time, end_time
+
+    @classmethod
+    def time_to_minutes(cls, value: str):
+        hour, minute = value.split(':')
+        return int(hour) * 60 + int(minute)
+
+    @classmethod
+    def safe_normalize_time(cls, value):
+        """读取存量数据时使用：无法解析时原样返回，避免历史脏数据导致整页报错"""
+        try:
+            return cls.normalize_time(value)
+        except ServiceException:
+            return value
+
+    @classmethod
+    def calc_booking_amount(cls, court: TeachCourt, start_time: str, end_time: str):
+        """
+        按场地价格由后端计算应收金额（不信任前端传入金额）：
+        配置了半小时价格时按半小时向上取整计费；否则按小时价格按分钟折算；均未配置时为 0
+        """
+        minutes = cls.time_to_minutes(end_time) - cls.time_to_minutes(start_time)
+        half_price = cls.to_decimal(court.price_per_half_hour, 0)
+        hour_price = cls.to_decimal(court.price_per_hour, 0)
+        if half_price > 0:
+            amount = half_price * math.ceil(minutes / 30)
+        elif hour_price > 0:
+            amount = hour_price * Decimal(minutes) / Decimal(60)
+        else:
+            amount = Decimal('0')
+        return amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+    @classmethod
+    async def lock_bookable_court(cls, query_db: AsyncSession, court_id: int):
+        """
+        加锁读取场地并校验场地、场馆均为启用状态
+        同一场地的预订/锁场在场地行锁上串行，配合冲突查询防止并发撞场
+        """
+        court = await TeachVenueDao.get_court_by_id(query_db, court_id, for_update=True)
+        if not court:
+            raise ServiceException(message='场地不存在')
+        if court.status != 1:
+            raise ServiceException(message='场地已停用，无法预订')
+        venue = await TeachVenueDao.get_venue_by_id(query_db, court.venue_id)
+        if not venue or venue.status != 1:
+            raise ServiceException(message='所属场馆不存在或已停用，无法预订')
+        return court
 
     # ======================== 场馆 ========================
     @classmethod
@@ -213,7 +291,7 @@ class TeachVenueService:
             end_time = getattr(t, 'end_time', None)
             if week_day is None or not start_time or not end_time:
                 continue
-            cls.validate_time_range(start_time, end_time)
+            start_time, end_time = cls.validate_time_range(start_time, end_time)
             await TeachVenueDao.add_court_time(
                 query_db,
                 TeachCourtTime(
@@ -323,24 +401,28 @@ class TeachVenueService:
         time_map: dict[int, list] = {}
         for t in times:
             if t.week_day == week_day:
-                time_map.setdefault(t.court_id, []).append(t)
+                time_map.setdefault(t.court_id, []).append(
+                    (cls.safe_normalize_time(t.start_time), cls.safe_normalize_time(t.end_time))
+                )
         booking_map: dict[int, list] = {}
         for b in bookings:
-            booking_map.setdefault(b.court_id, []).append(b)
+            booking_map.setdefault(b.court_id, []).append(
+                (cls.safe_normalize_time(b.start_time), cls.safe_normalize_time(b.end_time), b)
+            )
 
         grid = []
         for court in courts:
             slots = []
-            for t in time_map.get(court.id, []):
+            for slot_start, slot_end in sorted(time_map.get(court.id, [])):
                 occupied = None
-                for b in booking_map.get(court.id, []):
-                    if b.start_time < t.end_time and b.end_time > t.start_time:
+                for booking_start, booking_end, b in booking_map.get(court.id, []):
+                    if booking_start < slot_end and booking_end > slot_start:
                         occupied = b
                         break
                 slots.append(
                     {
-                        'startTime': t.start_time,
-                        'endTime': t.end_time,
+                        'startTime': slot_start,
+                        'endTime': slot_end,
                         'status': 'occupied' if occupied else 'available',
                         'bookingId': occupied.id if occupied else None,
                         'bookingType': occupied.booking_type if occupied else None,
@@ -365,32 +447,45 @@ class TeachVenueService:
     async def add_booking_services(
         cls, query_db: AsyncSession, page_object: AddTeachBookingModel, operator_id, operator_name: str
     ):
-        court = await TeachVenueDao.get_court_by_id(query_db, page_object.court_id)
-        if not court:
-            raise ServiceException(message='场地不存在')
         booking_date = cls.parse_date(page_object.booking_date)
-        cls.validate_time_range(page_object.start_time, page_object.end_time)
+        start_time, end_time = cls.validate_time_range(page_object.start_time, page_object.end_time)
         try:
-            await cls.assert_no_conflict(
-                query_db, court.id, booking_date, page_object.start_time, page_object.end_time
-            )
+            court = await cls.lock_bookable_court(query_db, page_object.court_id)
+            await cls.assert_no_conflict(query_db, court.id, booking_date, start_time, end_time)
             now = datetime.now()
             booking_type = page_object.booking_type or 'normal'
+            amount = cls.calc_booking_amount(court, start_time, end_time)
+            discount_amount = cls.to_decimal(page_object.discount_amount, 0)
+            if discount_amount < 0 or discount_amount > amount:
+                raise ServiceException(message='减免金额不能小于0且不能超过应收金额')
+            card_grant = card = None
+            if page_object.card_grant_id:
+                # 场地折扣卡：校验归属/状态/有效期（发放行加锁），按折后价计算优惠，订单创建后记录使用日志
+                if not page_object.customer_id:
+                    raise ServiceException(message='使用会员卡时必须选择学员')
+                card_grant, card = await TeachCardService.lock_usable_grant(
+                    query_db, page_object.card_grant_id, page_object.customer_id, 'venue_discount'
+                )
+                pay_ratio = TeachCardService.resolve_pay_ratio(card.discount_rate)
+                card_discount = ((amount - discount_amount) * (Decimal('1') - pay_ratio)).quantize(
+                    Decimal('0.01'), rounding=ROUND_HALF_UP
+                )
+                discount_amount += card_discount
             booking = TeachCourtBooking(
                 booking_no=cls.make_booking_no(),
                 court_id=court.id,
                 court_name=court.court_name,
                 venue_id=court.venue_id,
                 booking_date=booking_date,
-                start_time=page_object.start_time,
-                end_time=page_object.end_time,
+                start_time=start_time,
+                end_time=end_time,
                 customer_id=page_object.customer_id,
                 customer_name=page_object.customer_name,
                 customer_phone=page_object.customer_phone,
                 booking_type=booking_type,
                 origin=page_object.origin or 'admin',
-                amount=cls.to_decimal(page_object.amount, 0),
-                discount_amount=cls.to_decimal(page_object.discount_amount, 0),
+                amount=amount,
+                discount_amount=discount_amount,
                 card_grant_id=page_object.card_grant_id,
                 pay_status=page_object.pay_status if page_object.pay_status is not None else 0,
                 booking_status=1,
@@ -403,9 +498,20 @@ class TeachVenueService:
                 remark=page_object.remark,
             )
             booking = await TeachVenueDao.add_booking(query_db, booking)
+            if card_grant:
+                await TeachCardService.consume_grant_in_transaction(
+                    query_db, card_grant, card, 0, operator_id, operator_name, f'订场使用：{booking.booking_no}'
+                )
             await query_db.commit()
             return CrudResponseModel(
-                is_success=True, message='预订成功', result={'id': booking.id, 'bookingNo': booking.booking_no}
+                is_success=True,
+                message='预订成功',
+                result={
+                    'id': booking.id,
+                    'bookingNo': booking.booking_no,
+                    'amount': booking.amount,
+                    'discountAmount': booking.discount_amount,
+                },
             )
         except Exception as e:
             await query_db.rollback()
@@ -415,15 +521,11 @@ class TeachVenueService:
     async def lock_court_services(
         cls, query_db: AsyncSession, page_object: LockCourtBookingModel, operator_id, operator_name: str
     ):
-        court = await TeachVenueDao.get_court_by_id(query_db, page_object.court_id)
-        if not court:
-            raise ServiceException(message='场地不存在')
         booking_date = cls.parse_date(page_object.booking_date)
-        cls.validate_time_range(page_object.start_time, page_object.end_time)
+        start_time, end_time = cls.validate_time_range(page_object.start_time, page_object.end_time)
         try:
-            await cls.assert_no_conflict(
-                query_db, court.id, booking_date, page_object.start_time, page_object.end_time
-            )
+            court = await cls.lock_bookable_court(query_db, page_object.court_id)
+            await cls.assert_no_conflict(query_db, court.id, booking_date, start_time, end_time)
             now = datetime.now()
             booking = TeachCourtBooking(
                 booking_no=cls.make_booking_no(),
@@ -431,8 +533,8 @@ class TeachVenueService:
                 court_name=court.court_name,
                 venue_id=court.venue_id,
                 booking_date=booking_date,
-                start_time=page_object.start_time,
-                end_time=page_object.end_time,
+                start_time=start_time,
+                end_time=end_time,
                 booking_type='lock',
                 origin='admin',
                 amount=Decimal('0'),
@@ -485,14 +587,16 @@ class TeachVenueService:
     async def verify_booking_services(
         cls, query_db: AsyncSession, page_object: VerifyBookingModel, operator_name: str
     ):
-        booking = await TeachVenueDao.get_booking_by_id(query_db, page_object.id)
-        if not booking:
-            raise ServiceException(message='预订单不存在')
-        if booking.booking_status == 2:
-            raise ServiceException(message='该预订单已核销')
-        if booking.booking_status == 3:
-            raise ServiceException(message='该预订单已取消，无法核销')
         try:
+            booking = await TeachVenueDao.get_booking_by_id(query_db, page_object.id, for_update=True)
+            if not booking:
+                raise ServiceException(message='预订单不存在')
+            if booking.booking_type == 'lock':
+                raise ServiceException(message='锁场记录无需核销')
+            if booking.booking_status == 2:
+                raise ServiceException(message='该预订单已核销')
+            if booking.booking_status == 3:
+                raise ServiceException(message='该预订单已取消，无法核销')
             booking.booking_status = 2
             booking.verify_time = datetime.now()
             booking.update_by = operator_name
@@ -507,13 +611,22 @@ class TeachVenueService:
     async def cancel_booking_services(
         cls, query_db: AsyncSession, page_object: CancelBookingModel, operator_name: str
     ):
-        booking = await TeachVenueDao.get_booking_by_id(query_db, page_object.id)
-        if not booking:
-            raise ServiceException(message='预订单不存在')
-        if booking.booking_status == 3:
-            raise ServiceException(message='该预订单已取消')
         try:
+            booking = await TeachVenueDao.get_booking_by_id(query_db, page_object.id, for_update=True)
+            if not booking:
+                raise ServiceException(message='预订单不存在')
+            if booking.booking_status == 3:
+                raise ServiceException(message='该预订单已取消')
+            if booking.booking_status == 2:
+                raise ServiceException(message='该预订单已核销，不能取消')
             refund_amount = cls.to_decimal(page_object.refund_amount, 0)
+            paid_amount = cls.to_decimal(booking.amount, 0) - cls.to_decimal(booking.discount_amount, 0)
+            if refund_amount < 0:
+                raise ServiceException(message='退款金额不能小于0')
+            if refund_amount > 0 and booking.pay_status != 1:
+                raise ServiceException(message='未付款的预订单不能退款')
+            if refund_amount > paid_amount:
+                raise ServiceException(message=f'退款金额不能超过实收金额{paid_amount}')
             booking.booking_status = 3
             booking.cancel_reason = page_object.cancel_reason
             booking.refund_amount = refund_amount
