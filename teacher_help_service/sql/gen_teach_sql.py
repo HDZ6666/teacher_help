@@ -12,6 +12,7 @@
 import ast
 import glob
 import os
+import re
 import sys
 from datetime import date
 
@@ -28,6 +29,7 @@ from config.get_db import import_business_do_modules  # noqa: E402
 
 TABLE_SQL_FILE = os.path.join(BASE_DIR, 'sql', 'teacher_help_teach_tables.sql')
 MENU_SQL_FILE = os.path.join(BASE_DIR, 'sql', 'teacher_help_menu.sql')
+TABLE_OPTION_PATTERN = r"^\)COMMENT=('(?:[^']|'')*') ENGINE=InnoDB CHARSET=utf8mb4$"
 
 # 菜单ID段：5000 根目录，5001-5099 模块目录，5100 起按钮
 MENU_ROOT_ID = 5000
@@ -135,6 +137,10 @@ def generate_table_sql():
         lines.append(f'-- {table.name} {table_doc.get(table.name, "")}'.rstrip())
         lines.append('-- ----------------------------')
         ddl_lines = [line.replace('\t', '  ').rstrip() for line in ddl.splitlines()]
+        # 不同 SQLAlchemy 版本表选项顺序不同，统一为 ENGINE/CHARSET 在前、COMMENT 在后，避免无意义的 diff
+        ddl_lines = [
+            re.sub(TABLE_OPTION_PATTERN, r')ENGINE=InnoDB CHARSET=utf8mb4 COMMENT=\1', line) for line in ddl_lines
+        ]
         lines.append('\n'.join(ddl_lines) + ';')
         lines.append('')
     lines.extend(

@@ -77,6 +77,20 @@ class DataBaseSettings(BaseSettings):
         return self.db_type
 
 
+class BusinessRuleSettings(BaseSettings):
+    """
+    业务规则开关（P2）
+    以下规则尚待产品确认，默认值保持当前的保守行为，仅在确认后通过环境变量调整
+    """
+
+    # 场地折扣卡折扣率口径：auto=0<r<=1 视为比例、1<r<=10 视为“几折”（默认）；ratio=只接受比例；zhe=只接受“几折”
+    card_discount_rate_mode: Literal['auto', 'ratio', 'zhe'] = 'auto'
+    # 预订/锁场是否必须完全落在场地的“可约时段”内；默认 false（不强制，与 P1 行为一致）
+    venue_booking_require_open_time: bool = False
+    # 批量锁场单次最多生成的锁场记录数（日期数 x 场地数）
+    venue_lock_batch_max: int = 500
+
+
 class RedisSettings(BaseSettings):
     """
     Redis配置
@@ -206,6 +220,13 @@ class GetConfig:
         return database_settings
 
     @lru_cache()
+    def get_business_rule_config(self):
+        """
+        获取业务规则开关
+        """
+        return BusinessRuleSettings()
+
+    @lru_cache()
     def get_redis_config(self):
         """
         获取Redis配置
@@ -270,3 +291,5 @@ RedisConfig = get_config.get_redis_config()
 GenConfig = get_config.get_gen_config()
 # 上传配置
 UploadConfig = get_config.get_upload_config()
+# 业务规则开关
+BusinessRuleConfig = get_config.get_business_rule_config()

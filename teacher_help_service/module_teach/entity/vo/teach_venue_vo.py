@@ -90,6 +90,22 @@ class TeachCourtTimeModel(BaseModel):
     end_time: str = Field(description='结束时间')
 
 
+class TeachCourtPriceRuleModel(BaseModel):
+    """
+    场地分时价格规则模型（按星期 + 时段覆盖场地默认价格）
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True)
+
+    id: Optional[int] = Field(default=None, description='规则ID')
+    court_id: Optional[int] = Field(default=None, description='场地ID')
+    week_day: int = Field(description='星期(1-7)')
+    start_time: str = Field(description='开始时间')
+    end_time: str = Field(description='结束时间')
+    price_per_hour: Optional[Decimal] = Field(default=0, description='该时段每小时价格')
+    price_per_half_hour: Optional[Decimal] = Field(default=0, description='该时段每半小时价格')
+
+
 class TeachCourtQueryModel(BaseModel):
     """
     场地查询模型
@@ -119,6 +135,9 @@ class AddTeachCourtModel(BaseModel):
     status: Optional[int] = Field(default=1, description='启用状态')
     remark: Optional[str] = Field(default=None, description='备注', max_length=500)
     times: Optional[List[TeachCourtTimeModel]] = Field(default_factory=list, description='可约时段')
+    price_rules: Optional[List[TeachCourtPriceRuleModel]] = Field(
+        default=None, description='分时价格规则(不传则编辑时保持不变，传空数组则清空)'
+    )
 
     @Xss(field_name='court_name', message='场地名称不能包含脚本字符')
     @NotBlank(field_name='court_name', message='场地名称不能为空')
@@ -178,8 +197,25 @@ class TeachBookingPageQueryModel(BaseModel):
     booking_status: Optional[int] = Field(default=None, description='预订状态')
     pay_status: Optional[int] = Field(default=None, description='支付状态')
     booking_date: Optional[str] = Field(default=None, description='预订日期')
+    booking_date_start: Optional[str] = Field(default=None, description='预订日期起')
+    booking_date_end: Optional[str] = Field(default=None, description='预订日期止')
+    lock_group_no: Optional[str] = Field(default=None, description='批量锁场批次号')
     begin_time: Optional[str] = Field(default=None, description='开始时间')
     end_time: Optional[str] = Field(default=None, description='结束时间')
+
+
+@as_query
+class TeachBookingQuoteQueryModel(BaseModel):
+    """
+    预订报价查询模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True)
+
+    court_id: int = Field(description='场地ID')
+    booking_date: str = Field(description='预订日期(YYYY-MM-DD)')
+    start_time: str = Field(description='开始时间')
+    end_time: str = Field(description='结束时间')
 
 
 class AddTeachBookingModel(BaseModel):
@@ -213,11 +249,26 @@ class LockCourtBookingModel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel)
 
     court_id: int = Field(description='场地ID')
-    booking_date: str = Field(description='预订日期(YYYY-MM-DD)')
+    booking_date: str = Field(description='预订日期(YYYY-MM-DD)；批量锁场时为开始日期')
+    end_date: Optional[str] = Field(default=None, description='批量锁场结束日期(YYYY-MM-DD，含当天)')
+    week_days: Optional[List[int]] = Field(default=None, description='批量锁场只锁这些星期(1-7)，不传为每天')
+    court_ids: Optional[List[int]] = Field(default=None, description='批量锁场的场地ID列表，不传为 court_id')
     start_time: str = Field(description='开始时间')
     end_time: str = Field(description='结束时间')
     cancel_reason: Optional[str] = Field(default=None, description='锁场原因', max_length=255)
     remark: Optional[str] = Field(default=None, description='备注', max_length=500)
+
+
+class CancelLockGroupModel(BaseModel):
+    """
+    按批次解除锁场模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel)
+
+    lock_group_no: str = Field(description='批量锁场批次号')
+    from_date: Optional[str] = Field(default=None, description='只解除该日期(含)之后的锁场，不传为全部未取消的')
+    cancel_reason: Optional[str] = Field(default=None, description='解除原因', max_length=255)
 
 
 class VerifyBookingModel(BaseModel):
@@ -261,6 +312,7 @@ class TeachBookingModel(BaseModel):
     customer_name: Optional[str] = Field(default=None, description='客户姓名')
     customer_phone: Optional[str] = Field(default=None, description='客户电话')
     booking_type: Optional[str] = Field(default=None, description='预订类型')
+    lock_group_no: Optional[str] = Field(default=None, description='批量锁场批次号')
     origin: Optional[str] = Field(default=None, description='来源')
     amount: Optional[Decimal] = Field(default=0, description='应收金额')
     discount_amount: Optional[Decimal] = Field(default=0, description='优惠金额')
