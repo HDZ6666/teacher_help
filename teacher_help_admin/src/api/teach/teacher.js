@@ -55,28 +55,28 @@ export function exportTeacher(query) {
   })
 }
 
-// 获取教师课程列表
-export function getTeacherCourses(teacherId) {
+// 批量获取老师课时统计（上月/本月/累计课次与课时、授课班级数）
+export function getTeacherStats(teacherIds) {
   return request({
-    url: '/teach/teacher/' + teacherId + '/courses',
+    url: '/teach/teacher/stats',
+    method: 'get',
+    params: { teacher_ids: (teacherIds || []).join(',') }
+  })
+}
+
+// 老师详情概览：课时统计 + 授课班级
+export function getTeacherOverview(teacherId) {
+  return request({
+    url: '/teach/teacher/' + teacherId + '/overview',
     method: 'get'
   })
 }
 
-// 获取教师学生列表
-export function getTeacherStudents(teacherId) {
+// 老师上课记录（按点名记录分页）
+export function listTeacherRecords(teacherId, query) {
   return request({
-    url: '/teach/teacher/' + teacherId + '/students',
-    method: 'get'
+    url: '/teach/teacher/' + teacherId + '/records',
+    method: 'get',
+    params: query
   })
 }
-
-// 获取教师统计信息
-export function getTeacherStats(teacherId) {
-  return request({
-    url: '/teach/teacher/' + teacherId + '/stats',
-    method: 'get'
-  })
-}
-
-

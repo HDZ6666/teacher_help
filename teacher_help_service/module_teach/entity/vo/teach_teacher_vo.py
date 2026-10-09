@@ -43,7 +43,7 @@ class TeachTeacherPageQueryModel(BaseModel):
     teacher_name: Optional[str] = Field(default=None, description='教师姓名')
     phone: Optional[str] = Field(default=None, description='手机号')
     teaching_subjects: Optional[str] = Field(default=None, description='教学科目')
-    status: Optional[Literal['1', '2', '3']] = Field(default=None, description='状态')
+    status: Optional[Literal['0', '1', '2']] = Field(default=None, description='状态（0正常 1停用 2已注销）')
     begin_time: Optional[str] = Field(default=None, description='开始时间')
     end_time: Optional[str] = Field(default=None, description='结束时间')
 
