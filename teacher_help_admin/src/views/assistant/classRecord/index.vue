@@ -314,8 +314,8 @@
         />
       </el-tab-pane>
 
-      <el-tab-pane label="请假申请" name="leave">
-        <el-empty description="请假申请审批流程后续接入" />
+      <el-tab-pane label="请假申请" name="leave" lazy>
+        <leave-panel />
       </el-tab-pane>
     </el-tabs>
 
@@ -341,6 +341,7 @@ import { parseTime } from '@/utils/ruoyi'
 import { listClassOptions } from '@/api/assistant/class'
 import { listCourseOptions } from '@/api/assistant/course'
 import { listTeacher } from '@/api/teach/teacher'
+import LeavePanel from '@/views/assistant/leave/components/LeavePanel'
 import {
   listAbsenceReminder,
   listAttendanceRecord,

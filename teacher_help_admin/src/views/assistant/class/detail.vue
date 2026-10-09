@@ -142,9 +142,10 @@
             </template>
           </el-table-column>
           <el-table-column label="加入日期" prop="joinDate" width="120" align="center" />
-          <el-table-column label="操作" width="180" align="center" fixed="right">
+          <el-table-column label="操作" width="220" align="center" fixed="right">
             <template #default="{ row }">
               <el-button link type="primary" @click="handleViewStudent(row)">学员详情</el-button>
+              <el-button link type="warning" @click="handleStudentLeave(row)" v-hasPermi="['teach:leave:add']">请假</el-button>
               <el-button link type="danger" @click="handleRemoveStudent(row)">移出</el-button>
             </template>
           </el-table-column>
@@ -286,6 +287,7 @@
         </template>
       </el-skeleton>
     </el-drawer>
+    <leave-apply-dialog v-model="leaveOpen" :preset="leavePreset" />
   </div>
 </template>
 
@@ -302,6 +304,7 @@ import {
   removeClassStudents
 } from '@/api/assistant/class';
 import { delScheduleEvent, getScheduleEvent, listScheduleEvent } from '@/api/teach/schedule';
+import LeaveApplyDialog from '@/views/assistant/leave/components/LeaveApplyDialog';
 
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -522,8 +525,12 @@ async function handleViewAttendance(row) {
   }
 }
 
-function handleTodo(name) {
-  proxy.$modal.msgInfo(`${name}功能将在排课/点名阶段接入`);
+const leaveOpen = ref(false);
+const leavePreset = ref({});
+
+function handleStudentLeave(row) {
+  leavePreset.value = { studentId: row.studentId, studentName: row.studentName, classId: classId.value };
+  leaveOpen.value = true;
 }
 
 function goBack() {
