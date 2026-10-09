@@ -12,7 +12,8 @@ from utils.common_util import CamelCaseUtil
 class TeachTeacherStatService:
     """
     老师课时统计服务层：上月/本月/累计已上课次与课时、授课班级、上课记录
-    课时口径：班级点名记录(teach_class_attendance)的授课课时 lesson_hours，按点名记录上的上课老师归属；已撤销的点名不计入
+    课时口径：班级点名记录(teach_class_attendance)的授课课时 lesson_hours，
+    按点名记录上的上课老师归属；已撤销的点名不计入
     """
 
     @classmethod
