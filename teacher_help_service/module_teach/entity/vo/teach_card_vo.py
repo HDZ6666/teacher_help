@@ -187,6 +187,20 @@ class VoidTeachCardGrantModel(BaseModel):
     remark: Optional[str] = Field(default=None, description='作废原因', max_length=500)
 
 
+class ConsumeTeachCardGrantModel(BaseModel):
+    """
+    会员卡核销(消耗次数)模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel)
+
+    grant_id: int = Field(description='发放记录ID')
+    student_id: Optional[int] = Field(default=None, description='学员ID(传入时校验卡归属)')
+    course_id: Optional[int] = Field(default=None, description='上课课程ID(传入时校验课程卡适用课程)')
+    consume_count: int = Field(default=1, description='消耗次数(课程卡必须大于0)')
+    remark: Optional[str] = Field(default=None, description='核销备注', max_length=500)
+
+
 @as_query
 class TeachCardLogPageQueryModel(BaseModel):
     """

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, desc, select, update
+from sqlalchemy import and_, case, desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from module_teach.entity.do.teach_card_do import TeachCard, TeachCardCourse, TeachCardGrant, TeachCardLog
 from module_teach.entity.vo.teach_card_vo import (
@@ -137,11 +137,44 @@ class TeachCardDao:
         return await PageUtil.paginate(db, query, query_object.page_num, query_object.page_size, is_page)
 
     @classmethod
-    async def get_teach_card_grant_by_id(cls, db: AsyncSession, grant_id: int):
-        result = await db.execute(
-            select(TeachCardGrant).where(TeachCardGrant.id == grant_id, TeachCardGrant.del_flag == 0)
-        )
+    async def get_teach_card_grant_by_id(cls, db: AsyncSession, grant_id: int, for_update: bool = False):
+        query = select(TeachCardGrant).where(TeachCardGrant.id == grant_id, TeachCardGrant.del_flag == 0)
+        if for_update:
+            # 核销/作废前加锁读取最新剩余次数，串行化同一张卡的并发操作
+            await db.flush()
+            query = query.with_for_update().execution_options(populate_existing=True)
+        result = await db.execute(query)
         return result.scalars().first()
+
+    @classmethod
+    async def deduct_grant_count(cls, db: AsyncSession, grant_id: int, count: int, used_up_status: int, update_by: str):
+        """
+        条件扣减剩余次数：仅当发放记录有效且剩余次数足够时扣减，扣完置为“用完”状态
+
+        :return: 受影响行数，0 表示状态已变化或次数不足
+        """
+        result = await db.execute(
+            update(TeachCardGrant)
+            .where(
+                TeachCardGrant.id == grant_id,
+                TeachCardGrant.del_flag == 0,
+                TeachCardGrant.grant_status == 1,
+                TeachCardGrant.remaining_count >= count,
+            )
+            # MySQL 单表 UPDATE 的 SET 按书写顺序求值，后面的表达式会读到前面已更新的值，
+            # 这里显式先算状态、再扣次数，保证各数据库语义一致
+            .ordered_values(
+                (
+                    TeachCardGrant.grant_status,
+                    case((TeachCardGrant.remaining_count - count <= 0, used_up_status), else_=1),
+                ),
+                (TeachCardGrant.remaining_count, TeachCardGrant.remaining_count - count),
+                (TeachCardGrant.update_by, update_by),
+                (TeachCardGrant.update_time, datetime.now()),
+            )
+            .execution_options(synchronize_session=False)
+        )
+        return result.rowcount
 
     @classmethod
     async def get_grants_by_student_id(cls, db: AsyncSession, student_id: int):

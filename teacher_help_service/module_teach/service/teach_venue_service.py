@@ -6,6 +6,7 @@ from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from module_admin.entity.vo.common_vo import CrudResponseModel
 from module_teach.dao.teach_venue_dao import TeachVenueDao
+from module_teach.service.teach_card_service import TeachCardService
 from module_teach.entity.do.teach_venue_do import (
     TeachCourt,
     TeachCourtBooking,
@@ -457,6 +458,19 @@ class TeachVenueService:
             discount_amount = cls.to_decimal(page_object.discount_amount, 0)
             if discount_amount < 0 or discount_amount > amount:
                 raise ServiceException(message='减免金额不能小于0且不能超过应收金额')
+            card_grant = card = None
+            if page_object.card_grant_id:
+                # 场地折扣卡：校验归属/状态/有效期（发放行加锁），按折后价计算优惠，订单创建后记录使用日志
+                if not page_object.customer_id:
+                    raise ServiceException(message='使用会员卡时必须选择学员')
+                card_grant, card = await TeachCardService.lock_usable_grant(
+                    query_db, page_object.card_grant_id, page_object.customer_id, 'venue_discount'
+                )
+                pay_ratio = TeachCardService.resolve_pay_ratio(card.discount_rate)
+                card_discount = ((amount - discount_amount) * (Decimal('1') - pay_ratio)).quantize(
+                    Decimal('0.01'), rounding=ROUND_HALF_UP
+                )
+                discount_amount += card_discount
             booking = TeachCourtBooking(
                 booking_no=cls.make_booking_no(),
                 court_id=court.id,
@@ -484,6 +498,10 @@ class TeachVenueService:
                 remark=page_object.remark,
             )
             booking = await TeachVenueDao.add_booking(query_db, booking)
+            if card_grant:
+                await TeachCardService.consume_grant_in_transaction(
+                    query_db, card_grant, card, 0, operator_id, operator_name, f'订场使用：{booking.booking_no}'
+                )
             await query_db.commit()
             return CrudResponseModel(
                 is_success=True,

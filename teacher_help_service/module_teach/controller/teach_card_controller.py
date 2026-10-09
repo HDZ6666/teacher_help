@@ -10,6 +10,7 @@ from module_admin.service.login_service import CurrentUserModel, LoginService
 from module_teach.entity.vo.teach_card_vo import (
     AddTeachCardModel,
     ChangeTeachCardStatusModel,
+    ConsumeTeachCardGrantModel,
     DeleteTeachCardModel,
     EditTeachCardModel,
     GrantTeachCardModel,
@@ -89,6 +90,21 @@ async def void_teach_card_grant(
     )
     logger.info(result.message)
     return ResponseUtil.success(msg=result.message)
+
+
+@teachCardController.put('/grant/consume', dependencies=[Depends(CheckUserInterfaceAuth('teach:card:consume'))])
+@Log(title='会员卡核销', business_type=BusinessType.UPDATE)
+async def consume_teach_card_grant(
+    request: Request,
+    consume_form: ConsumeTeachCardGrantModel,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user),
+):
+    result = await TeachCardService.consume_teach_card_grant_services(
+        query_db, consume_form, current_user.user.user_id, current_user.user.user_name
+    )
+    logger.info(result.message)
+    return ResponseUtil.success(msg=result.message, data=result.result)
 
 
 # ------------------------ 操作记录 ------------------------
