@@ -1,4 +1,5 @@
 import os
+import uuid
 from datetime import datetime
 from fastapi import BackgroundTasks, Request, UploadFile
 from config.env import UploadConfig
@@ -24,18 +25,32 @@ class CommonService:
         if not UploadUtil.check_file_extension(file):
             raise ServiceException(message='文件类型不合法')
         else:
-            relative_path = f'upload/{datetime.now().strftime("%Y")}/{datetime.now().strftime("%m")}/{datetime.now().strftime("%d")}'
+            now = datetime.now()
+            relative_path = f'upload/{now.strftime("%Y")}/{now.strftime("%m")}/{now.strftime("%d")}'
             dir_path = os.path.join(UploadConfig.UPLOAD_PATH, relative_path)
-            try:
-                os.makedirs(dir_path)
-            except FileExistsError:
-                pass
-            filename = f'{file.filename.rsplit(".", 1)[0]}_{datetime.now().strftime("%Y%m%d%H%M%S")}{UploadConfig.UPLOAD_MACHINE}{UploadUtil.generate_random_number()}.{file.filename.rsplit(".")[-1]}'
+            os.makedirs(dir_path, exist_ok=True)
+            # 文件名由服务端生成，不使用客户端传入的文件名，避免路径穿越
+            file_extension = UploadUtil.get_file_extension(file.filename)
+            filename = (
+                f'{uuid.uuid4().hex[:8]}_{now.strftime("%Y%m%d%H%M%S")}'
+                f'{UploadConfig.UPLOAD_MACHINE}{UploadUtil.generate_random_number()}.{file_extension}'
+            )
             filepath = os.path.join(dir_path, filename)
-            with open(filepath, 'wb') as f:
-                # 流式写出大型文件，这里的10代表10MB
-                for chunk in iter(lambda: file.file.read(1024 * 1024 * 10), b''):
-                    f.write(chunk)
+            written_size = 0
+            try:
+                with open(filepath, 'wb') as f:
+                    # 流式写出文件，每次读取1MB，超过大小上限立即中止
+                    for chunk in iter(lambda: file.file.read(1024 * 1024), b''):
+                        written_size += len(chunk)
+                        if written_size > UploadConfig.UPLOAD_MAX_SIZE:
+                            raise ServiceException(
+                                message=f'文件大小不能超过{UploadConfig.UPLOAD_MAX_SIZE // (1024 * 1024)}MB'
+                            )
+                        f.write(chunk)
+            except ServiceException:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                raise
 
             return CrudResponseModel(
                 is_success=True,
@@ -58,10 +73,10 @@ class CommonService:
         :param delete: 是否在下载完成后删除文件
         :return: 上传结果
         """
-        filepath = os.path.join(UploadConfig.DOWNLOAD_PATH, file_name)
-        if '..' in file_name:
+        filepath = UploadUtil.resolve_safe_path(UploadConfig.DOWNLOAD_PATH, file_name)
+        if not filepath:
             raise ServiceException(message='文件名称不合法')
-        elif not UploadUtil.check_file_exists(filepath):
+        elif not os.path.isfile(filepath):
             raise ServiceException(message='文件不存在')
         else:
             if delete:
@@ -76,16 +91,20 @@ class CommonService:
         :param resource: 下载的文件名称
         :return: 上传结果
         """
-        filepath = os.path.join(resource.replace(UploadConfig.UPLOAD_PREFIX, UploadConfig.UPLOAD_PATH))
+        if not resource.startswith(f'{UploadConfig.UPLOAD_PREFIX}/'):
+            raise ServiceException(message='文件名称不合法')
+        filepath = UploadUtil.resolve_safe_path(
+            UploadConfig.UPLOAD_PATH, resource[len(UploadConfig.UPLOAD_PREFIX) + 1 :]
+        )
         filename = resource.rsplit('/', 1)[-1]
         if (
-            '..' in filename
+            not filepath
             or not UploadUtil.check_file_timestamp(filename)
             or not UploadUtil.check_file_machine(filename)
             or not UploadUtil.check_file_random_code(filename)
         ):
             raise ServiceException(message='文件名称不合法')
-        elif not UploadUtil.check_file_exists(filepath):
+        elif not os.path.isfile(filepath):
             raise ServiceException(message='文件不存在')
         else:
             return CrudResponseModel(is_success=True, result=UploadUtil.generate_file(filepath), message='下载成功')
