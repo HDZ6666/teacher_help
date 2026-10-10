@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
@@ -37,6 +37,7 @@ class ClassRecordOvertimeQueryModel(ClassRecordQueryBaseModel):
 @as_query
 class ClassRecordMakeupQueryModel(ClassRecordQueryBaseModel):
     student_keyword: Optional[str] = Field(default=None, description='student name or phone')
+    makeup_flag: Optional[int] = Field(default=None, description='makeup flag 0=not made up 1=made up')
 
 
 @as_query
@@ -60,3 +61,14 @@ class RevokeClassAttendanceModel(BaseModel):
 
     id: int = Field(description='点名记录ID')
     reason: Optional[str] = Field(default=None, description='撤销原因', max_length=200)
+
+
+class MarkMakeupModel(BaseModel):
+    """
+    缺课标记已补模型
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True, populate_by_name=True)
+
+    ids: List[int] = Field(min_length=1, max_length=500, description='点名明细ID列表')
+    remark: Optional[str] = Field(default=None, max_length=200, description='补课说明')

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.enums import BusinessType
@@ -11,10 +11,12 @@ from module_teach.entity.vo.teach_class_record_vo import (
     ClassRecordAttendanceQueryModel,
     ClassRecordMakeupQueryModel,
     ClassRecordOvertimeQueryModel,
+    MarkMakeupModel,
     RevokeClassAttendanceModel,
 )
 from module_teach.service.teach_class_record_service import TeachClassRecordService
 from module_teach.service.teach_class_service import TeachClassService
+from utils.common_util import bytes2file_response
 from utils.log_util import logger
 from utils.page_util import PageResponseModel
 from utils.response_util import ResponseUtil
@@ -114,3 +116,74 @@ async def get_absence_record_list(
     result = await TeachClassRecordService.get_absence_list_services(query_db, query_object)
     logger.info('获取成功')
     return ResponseUtil.success(model_content=result)
+
+
+async def _export_records(query_db: AsyncSession, record_type: str, query_object):
+    binary_data = await TeachClassRecordService.export_record_list_services(query_db, record_type, query_object)
+    logger.info('导出成功')
+    return ResponseUtil.streaming(data=bytes2file_response(binary_data))
+
+
+@teachClassRecordController.post(
+    '/attendance/export', dependencies=[Depends(CheckUserInterfaceAuth('teach:classRecord:export'))]
+)
+@Log(title='点名记录导出', business_type=BusinessType.EXPORT)
+async def export_attendance_record_list(
+    request: Request,
+    query_object: ClassRecordAttendanceQueryModel = Form(),
+    query_db: AsyncSession = Depends(get_db),
+):
+    return await _export_records(query_db, 'attendance', query_object)
+
+
+@teachClassRecordController.post(
+    '/overtime/export', dependencies=[Depends(CheckUserInterfaceAuth('teach:classRecord:export'))]
+)
+@Log(title='超时未点名导出', business_type=BusinessType.EXPORT)
+async def export_overtime_record_list(
+    request: Request,
+    query_object: ClassRecordOvertimeQueryModel = Form(),
+    query_db: AsyncSession = Depends(get_db),
+):
+    return await _export_records(query_db, 'overtime', query_object)
+
+
+@teachClassRecordController.post(
+    '/makeup/export', dependencies=[Depends(CheckUserInterfaceAuth('teach:classRecord:export'))]
+)
+@Log(title='补课记录导出', business_type=BusinessType.EXPORT)
+async def export_makeup_record_list(
+    request: Request,
+    query_object: ClassRecordMakeupQueryModel = Form(),
+    query_db: AsyncSession = Depends(get_db),
+):
+    return await _export_records(query_db, 'makeup', query_object)
+
+
+@teachClassRecordController.post(
+    '/absence/export', dependencies=[Depends(CheckUserInterfaceAuth('teach:classRecord:export'))]
+)
+@Log(title='缺课提醒导出', business_type=BusinessType.EXPORT)
+async def export_absence_record_list(
+    request: Request,
+    query_object: ClassRecordAbsenceQueryModel = Form(),
+    query_db: AsyncSession = Depends(get_db),
+):
+    return await _export_records(query_db, 'absence', query_object)
+
+
+@teachClassRecordController.put(
+    '/makeup/mark', dependencies=[Depends(CheckUserInterfaceAuth('teach:classRecord:makeup'))]
+)
+@Log(title='缺课标记已补', business_type=BusinessType.UPDATE)
+async def mark_makeup_record(
+    request: Request,
+    mark_form: MarkMakeupModel,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user),
+):
+    result = await TeachClassRecordService.mark_makeup_services(
+        query_db, mark_form.ids, mark_form.remark, current_user.user.user_name
+    )
+    logger.info(result.message)
+    return ResponseUtil.success(msg=result.message, data=result.result)

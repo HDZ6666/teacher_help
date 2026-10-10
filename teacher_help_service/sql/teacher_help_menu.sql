@@ -1,7 +1,7 @@
 -- ----------------------------
 -- 老师帮 teach:* / ast:* / common:file:* 菜单与按钮权限种子
 -- 由 sql/gen_teach_sql.py 扫描 Controller 中 CheckUserInterfaceAuth 生成
--- 生成日期 2026-10-09
+-- 生成日期 2026-10-10
 -- 菜单ID段 5000-5999；重复执行时按主键更新名称/权限，不影响已分配给角色的关系（sys_role_menu）
 -- 超级管理员拥有 *:*:*，无需分配；其他角色请在“角色管理”中勾选对应按钮
 -- ----------------------------
@@ -57,7 +57,9 @@ insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (5008, '上课记录', 5000, 8, 'class-record', null, null, '', 1, 0, 'M', '1', '0', null, '#', 'admin', sysdate(), '', null, 'teach:classRecord:*'),
 (5138, '上课记录列表', 5008, 1, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:list', '#', 'admin', sysdate(), '', null, ''),
 (5139, '上课记录查询', 5008, 2, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:query', '#', 'admin', sysdate(), '', null, ''),
-(5901, '上课记录撤销点名', 5008, 3, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:revoke', '#', 'admin', sysdate(), '', null, ''),
+(5903, '上课记录导出', 5008, 3, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:export', '#', 'admin', sysdate(), '', null, ''),
+(5904, '上课记录标记已补', 5008, 4, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:makeup', '#', 'admin', sysdate(), '', null, ''),
+(5901, '上课记录撤销点名', 5008, 5, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:revoke', '#', 'admin', sysdate(), '', null, ''),
 (5009, '会员卡管理', 5000, 9, 'card', null, null, '', 1, 0, 'M', '1', '0', null, '#', 'admin', sysdate(), '', null, 'teach:card:*'),
 (5140, '会员卡管理新增', 5009, 1, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:card:add', '#', 'admin', sysdate(), '', null, ''),
 (5141, '会员卡管理修改', 5009, 2, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:card:edit', '#', 'admin', sysdate(), '', null, ''),

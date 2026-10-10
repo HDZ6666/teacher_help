@@ -89,6 +89,8 @@ class TeachClassRecordDao:
         if query_object.student_keyword:
             keyword = f'%{query_object.student_keyword}%'
             query = query.where(or_(TeachStudent.student_name.like(keyword), TeachBaseUser.phone.like(keyword)))
+        if query_object.makeup_flag is not None:
+            query = query.where(TeachClassAttendanceDetail.makeup_flag == query_object.makeup_flag)
         if query_object.class_id:
             query = query.where(TeachClassAttendance.class_id == query_object.class_id)
         if query_object.course_id:

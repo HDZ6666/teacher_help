@@ -72,6 +72,7 @@ ACTION_LABELS = {
     'download': '下载',
     'consume': '核销',
     'revoke': '撤销点名',
+    'makeup': '标记已补',
 }
 
 # P0 之后新增的权限使用固定菜单ID（5900 起），避免插入到顺序编号中间导致已有按钮ID整体后移、
@@ -80,6 +81,8 @@ PINNED_BUTTON_IDS = {
     'teach:card:consume': 5900,
     'teach:classRecord:revoke': 5901,
     'teach:schedule:event:export': 5902,
+    'teach:classRecord:export': 5903,
+    'teach:classRecord:makeup': 5904,
 }
 
 
