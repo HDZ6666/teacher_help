@@ -115,6 +115,7 @@
           icon="User"
           :disabled="multiple"
           @click="handleAssignFollower"
+          v-hasPermi="['teach:student:assign']"
         >分配跟进人</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -124,6 +125,7 @@
           icon="UserFilled"
           :disabled="multiple"
           @click="handleAssignAdvisor"
+          v-hasPermi="['teach:student:assign']"
         >分配学管师</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -163,6 +165,7 @@
           icon="UserFilled"
           :disabled="multiple"
           @click="handleAssignAdvisor"
+          v-hasPermi="['teach:student:assign']"
         >分配学管师</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -518,23 +521,9 @@
         <!-- 其他信息 -->
         <el-divider content-position="left">其他信息</el-divider>
         <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="跟进人" prop="follower">
-              <el-select v-model="form.follower" placeholder="请选择跟进人" style="width: 100%">
-                <el-option label="李老师" value="李老师" />
-                <el-option label="王老师" value="王老师" />
-                <el-option label="赵老师" value="赵老师" />
-                <el-option label="孙老师" value="孙老师" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="学管师" prop="advisor">
-              <el-select v-model="form.advisor" placeholder="请选择学管师" style="width: 100%">
-                <el-option label="王老师" value="王老师" />
-                <el-option label="李老师" value="李老师" />
-                <el-option label="赵老师" value="赵老师" />
-              </el-select>
+          <el-col :span="24">
+            <el-form-item label="跟进人/学管师">
+              <span class="text-muted">在学员列表勾选学员后，使用“分配跟进人 / 分配学管师”设置</span>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -686,7 +675,7 @@
 
 <script setup name="AssistantStudent">
 import { ArrowDown, Plus, Delete } from '@element-plus/icons-vue';
-import { listStudent, getStudent, delStudent, addStudent, updateStudent, listParents, getStudentCourses } from '@/api/teach/student';
+import { listStudent, getStudent, delStudent, addStudent, updateStudent, listParents, getStudentCourses, listStaffOptions, assignStudentStaff } from '@/api/teach/student';
 
 const { proxy } = getCurrentInstance();
 
@@ -717,6 +706,7 @@ const assignAdvisorOpen = ref(false); // 分配学管师弹窗
 const advisorSearchName = ref(""); // 学管师搜索关键词
 const selectedAdvisorId = ref(null); // 选中的学管师ID
 const advisorList = ref([]); // 学管师列表
+const selectedRows = ref([]); // 当前选中的行
 
 // 查询参数
 const data = reactive({
@@ -1055,22 +1045,31 @@ function handleAdd() {
   title.value = "添加学员";
 }
 
+/** 选中的学员ID（报读情况页签的行ID为“学员-课程”，取 studentId 去重） */
+function selectedStudentIds() {
+  return [...new Set(selectedRows.value.map(item => item.studentId ?? item.id))];
+}
+
+/** 加载跟进人/学管师候选员工（系统员工账号），第一项为“待分配”（清空） */
+async function loadStaffOptions(role) {
+  const res = await listStaffOptions(role);
+  return [{ id: 0, name: "待分配（清空）", phone: "-", assignedCount: "-" }, ...(res.data || [])];
+}
+
+async function submitAssign(role, userId, label) {
+  const studentIds = selectedStudentIds();
+  const res = await assignStudentStaff({ studentIds, role, userId: userId === 0 ? null : userId });
+  proxy.$modal.msgSuccess(res.msg || `${label}分配成功`);
+  getList();
+}
+
 /** 分配跟进人按钮操作 */
-function handleAssignFollower() {
+async function handleAssignFollower() {
   if (ids.value.length === 0) {
     proxy.$modal.msgWarning("请选择要分配的学员");
     return;
   }
-
-  // 批量分配接口待补齐，当前仅提供本地候选项。
-  followerList.value = [
-    { id: 0, name: "待分配", phone: "-", assignedCount: 332 },
-    { id: 1, name: "李老师", phone: "130****2483", assignedCount: 45 },
-    { id: 2, name: "王老师", phone: "150****9773", assignedCount: 38 },
-    { id: 3, name: "赵老师", phone: "138****5621", assignedCount: 52 },
-    { id: 4, name: "孙老师", phone: "186****7894", assignedCount: 29 }
-  ];
-
+  followerList.value = await loadStaffOptions('follower');
   selectedFollowerId.value = null;
   followerSearchName.value = "";
   assignFollowerOpen.value = true;
@@ -1082,34 +1081,22 @@ function handleFollowerRowClick(row) {
 }
 
 /** 确认分配跟进人 */
-function confirmAssignFollower() {
+async function confirmAssignFollower() {
   if (selectedFollowerId.value === null) {
     proxy.$modal.msgWarning("请选择跟进人");
     return;
   }
-
-  const follower = followerList.value.find(item => item.id === selectedFollowerId.value);
-
-  proxy.$modal.msgWarning(`已选择 ${follower.name}，批量分配跟进人接口待后端补齐`);
+  await submitAssign('follower', selectedFollowerId.value, '跟进人');
   assignFollowerOpen.value = false;
 }
 
 /** 分配学管师按钮操作 */
-function handleAssignAdvisor() {
+async function handleAssignAdvisor() {
   if (ids.value.length === 0) {
     proxy.$modal.msgWarning("请选择要分配的学员");
     return;
   }
-
-  // 批量分配接口待补齐，当前仅提供本地候选项。
-  advisorList.value = [
-    { id: 0, name: "待分配", phone: "-", assignedCount: 332 },
-    { id: 1, name: "迅优文化（黄老师）", phone: "130****2483", assignedCount: 1 },
-    { id: 2, name: "甘泉", phone: "150****9773", assignedCount: 21 },
-    { id: 3, name: "张老师", phone: "138****5621", assignedCount: 15 },
-    { id: 4, name: "刘老师", phone: "186****7894", assignedCount: 28 }
-  ];
-
+  advisorList.value = await loadStaffOptions('advisor');
   selectedAdvisorId.value = null;
   advisorSearchName.value = "";
   assignAdvisorOpen.value = true;
@@ -1121,15 +1108,12 @@ function handleAdvisorRowClick(row) {
 }
 
 /** 确认分配学管师 */
-function confirmAssignAdvisor() {
+async function confirmAssignAdvisor() {
   if (selectedAdvisorId.value === null) {
     proxy.$modal.msgWarning("请选择学管师");
     return;
   }
-
-  const advisor = advisorList.value.find(item => item.id === selectedAdvisorId.value);
-
-  proxy.$modal.msgWarning(`已选择 ${advisor.name}，批量分配学管师接口待后端补齐`);
+  await submitAssign('advisor', selectedAdvisorId.value, '学管师');
   assignAdvisorOpen.value = false;
 }
 
@@ -1155,6 +1139,7 @@ function resetQuery() {
 
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
+  selectedRows.value = selection;
   ids.value = selection.map(item => item.id);
   single.value = selection.length !== 1;
   multiple.value = !selection.length;
@@ -1162,32 +1147,32 @@ function handleSelectionChange(selection) {
 
 /** 导入学员 */
 function handleImport() {
-  proxy.$modal.msgSuccess("导入学员功能开发中...");
+  proxy.$modal.msgWarning("导入学员（Excel 模板）尚未接入，请先逐个新增学员");
 }
 
 /** 导入报读信息 */
 function handleImportEnrollment() {
-  proxy.$modal.msgSuccess("导入报读信息功能开发中...");
+  proxy.$modal.msgWarning("导入报读信息（Excel 模板）尚未接入，请通过“报名”办理报读");
 }
 
 /** 更多操作 */
 function handleMoreAction(command) {
   switch (command) {
     case 'batchUpdate':
-      proxy.$modal.msgSuccess("批量更新功能开发中...");
+      proxy.$modal.msgWarning("批量更新（转课/课时清零/改有效期）需与产品确认规则后接入");
       break;
     case 'batchDelete':
       handleDelete();
       break;
     case 'exportDetail':
-      proxy.$modal.msgSuccess("导出详情功能开发中...");
+      handleExport();
       break;
   }
 }
 
 /** 编辑报读信息 */
 function handleEditEnrollment(row) {
-  proxy.$modal.msgSuccess(`编辑学员 ${row.studentName} 的报读信息，功能开发中...`);
+  proxy.$router.push(`/assistant/student/detail/${row.studentId ?? row.id}`);
 }
 
 /** 修改按钮操作 */

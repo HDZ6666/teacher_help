@@ -26,6 +26,9 @@ class TeachStudent(Base):
     medical_notes = Column(Text, nullable=True, comment='医疗备注(过敏史等)')
     emergency_contact = Column(String(20), nullable=True, comment='紧急联系人电话')
     status = Column(String(1), nullable=False, default='0', comment='帐号状态（0在读 1休学 2转学 3毕业）')
+    # 跟进人/学管师（P2）：均为系统员工账号 sys_user.user_id，为空表示待分配
+    follower_user_id = Column(Integer, nullable=True, comment='跟进人(sys_user.user_id)')
+    advisor_user_id = Column(Integer, nullable=True, comment='学管师(sys_user.user_id)')
     del_flag = Column(String(1), nullable=False, default='0', comment='删除标志（0代表存在 2代表删除）')
     create_by = Column(String(64), nullable=True, default='', comment='创建者')
     create_time = Column(DateTime, nullable=False, default=datetime.now, comment='创建时间')

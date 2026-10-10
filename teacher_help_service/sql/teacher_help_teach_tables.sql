@@ -688,6 +688,8 @@ CREATE TABLE IF NOT EXISTS teach_students (
   medical_notes TEXT COMMENT '医疗备注(过敏史等)',
   emergency_contact VARCHAR(20) COMMENT '紧急联系人电话',
   status VARCHAR(1) NOT NULL COMMENT '帐号状态（0在读 1休学 2转学 3毕业）',
+  follower_user_id INTEGER COMMENT '跟进人(sys_user.user_id)',
+  advisor_user_id INTEGER COMMENT '学管师(sys_user.user_id)',
   del_flag VARCHAR(1) NOT NULL COMMENT '删除标志（0代表存在 2代表删除）',
   create_by VARCHAR(64) COMMENT '创建者',
   create_time DATETIME NOT NULL COMMENT '创建时间',
