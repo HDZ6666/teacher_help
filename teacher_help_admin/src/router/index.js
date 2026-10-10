@@ -162,6 +162,13 @@ export const constantRoutes = [
         meta: { title: '老师管理', icon: 'peoples' }
       },
       {
+        path: 'teacher/permission',
+        component: () => import('@/views/assistant/teacher/permission'),
+        name: 'AssistantTeacherPermission',
+        meta: { title: '老师权限', activeMenu: '/assistant/teacher' },
+        hidden: true
+      },
+      {
         path: 'teacher/detail/:id',
         component: () => import('@/views/assistant/teacher/detail'),
         name: 'AssistantTeacherDetail',

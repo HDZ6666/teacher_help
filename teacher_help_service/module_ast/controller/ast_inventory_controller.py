@@ -18,6 +18,7 @@ from module_ast.entity.vo.ast_inventory_vo import (
     EditAstFeeItemModel,
 )
 from module_ast.service.ast_inventory_service import AstInventoryService
+from module_ast.service.ast_sale_fee_service import AstSaleFeeService
 from utils.log_util import logger
 from utils.common_util import bytes2file_response
 from utils.page_util import PageResponseModel
@@ -272,3 +273,36 @@ async def delete_fee(
     result = await AstInventoryService.delete_fee_services(query_db, delete_form, current_user.user.user_name)
     logger.info(result.message)
     return ResponseUtil.success(msg=result.message)
+
+
+@astInventoryController.get(
+    '/sale-order/{order_id}', dependencies=[Depends(CheckUserInterfaceAuth(['ast:inventory:query', 'ast:item:query']))]
+)
+async def get_sale_order_detail(request: Request, order_id: int, query_db: AsyncSession = Depends(get_db)):
+    result = await AstSaleFeeService.get_sale_order_detail_services(query_db, order_id)
+    logger.info('获取成功')
+    return ResponseUtil.success(data=result)
+
+
+@astInventoryController.post('/fee/import/template', dependencies=[Depends(CheckUserInterfaceAuth('ast:fee:import'))])
+async def download_fee_import_template(request: Request):
+    result = AstSaleFeeService.get_fee_template_services()
+    logger.info('下载成功')
+    return ResponseUtil.streaming(data=bytes2file_response(result))
+
+
+@astInventoryController.post('/fee/import', dependencies=[Depends(CheckUserInterfaceAuth('ast:fee:import'))])
+@Log(title='费用导入', business_type=BusinessType.IMPORT)
+async def import_fee(
+    request: Request,
+    file: UploadFile = File(...),
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user),
+):
+    result = await AstSaleFeeService.import_fee_services(query_db, file, current_user.user.user_name)
+    if result['success']:
+        message = f'导入成功，共{result["successCount"]}个费用'
+    else:
+        message = f'校验未通过，共{result["errorCount"]}行有误，未导入任何数据'
+    logger.info(message)
+    return ResponseUtil.success(msg=message, data=result)

@@ -107,6 +107,8 @@ PINNED_BUTTON_IDS = {
     'teach:classRecord:editDetail': 5915,
     'teach:classRecord:edit': 5916,
     'teach:classRecord:makeupClass': 5917,
+    'ast:fee:import': 5918,
+    'teach:teacher:permission': 5919,
 }
 
 

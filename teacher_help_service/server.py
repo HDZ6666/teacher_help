@@ -40,6 +40,7 @@ from module_teach.controller.teach_student_follow_controller import teachStudent
 from module_teach.controller.teach_student_import_controller import teachStudentImportController
 from module_teach.controller.teach_class_batch_controller import teachClassBatchController
 from module_teach.controller.teach_lesson_controller import teachLessonController
+from module_teach.controller.teach_teacher_permission_controller import teachTeacherPermissionController
 from module_ast.controller.ast_item_controller import astItemController
 from module_ast.controller.ast_inventory_controller import astInventoryController
 from sub_applications.handle import handle_sub_applications
@@ -119,6 +120,7 @@ controller_list = [
     {'router': teachStudentImportController, 'tags': ['教学管理-学员导入']},
     {'router': teachClassBatchController, 'tags': ['教学管理-班级批量操作']},
     {'router': teachLessonController, 'tags': ['教学管理-课次操作']},
+    {'router': teachTeacherPermissionController, 'tags': ['教学管理-老师权限']},
     {'router': astItemController, 'tags': ['物品费用管理-物品管理']},
     {'router': astInventoryController, 'tags': ['物品费用管理-出入库与费用']},
 ]

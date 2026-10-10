@@ -175,3 +175,8 @@ export function delFee(feeIds) {
     method: 'delete'
   })
 }
+
+// 销售订单详情（报名/续费订单中的物品销售出库）
+export function getSaleOrder(orderId) {
+  return request({ url: '/ast/inventory/sale-order/' + orderId, method: 'get' })
+}
