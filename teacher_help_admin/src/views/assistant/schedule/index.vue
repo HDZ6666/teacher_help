@@ -27,6 +27,7 @@
 
       <div class="filter-right">
         <el-button type="warning" @click="handleAddSchedule">新建排课</el-button>
+        <el-button plain icon="Download" @click="handleExportSchedule" v-hasPermi="['teach:schedule:event:export']">导出课表</el-button>
         <el-button plain icon="Refresh" @click="loadActiveSchedule">刷新</el-button>
       </div>
     </div>
@@ -561,6 +562,13 @@ function buildScheduleQuery() {
     query.classId = selectedClassId.value;
   }
   return query;
+}
+
+function handleExportSchedule() {
+  const query = { ...buildScheduleQuery() };
+  delete query.pageNum;
+  delete query.pageSize;
+  proxy.download('teach/schedule/event/export', query, `课表_${formatDate(new Date())}.xlsx`);
 }
 
 async function loadActiveSchedule() {

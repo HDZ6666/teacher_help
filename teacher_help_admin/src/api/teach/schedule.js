@@ -52,12 +52,3 @@ export function getCalendarEvents(query) {
   })
 }
 
-// 导出排课
-export function exportScheduleEvent(query) {
-  return request({
-    url: '/teach/schedule/event/export',
-    method: 'get',
-    params: query
-  })
-}
-

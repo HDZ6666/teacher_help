@@ -79,6 +79,7 @@ ACTION_LABELS = {
 PINNED_BUTTON_IDS = {
     'teach:card:consume': 5900,
     'teach:classRecord:revoke': 5901,
+    'teach:schedule:event:export': 5902,
 }
 
 

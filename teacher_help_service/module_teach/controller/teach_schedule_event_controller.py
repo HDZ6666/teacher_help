@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic_validation_decorator import ValidateFields
 from config.get_db import get_db
@@ -16,12 +16,34 @@ from module_teach.entity.vo.teach_schedule_event_vo import (
     TeachScheduleEventDetailModel,
     CalendarQueryModel
 )
+from utils.common_util import bytes2file_response
 from utils.response_util import ResponseUtil
 from utils.page_util import PageResponseModel
 from utils.log_util import logger
 
 
 teachScheduleEventController = APIRouter(prefix='/teach/schedule/event', dependencies=[Depends(LoginService.get_current_user)])
+
+
+@teachScheduleEventController.post(
+    '/export', dependencies=[Depends(CheckUserInterfaceAuth('teach:schedule:event:export'))]
+)
+@Log(title='课表导出', business_type=BusinessType.EXPORT)
+async def export_teach_schedule_event_list(
+    request: Request,
+    event_page_query: TeachScheduleEventPageQueryModel = Form(),
+    query_db: AsyncSession = Depends(get_db),
+    data_scope_sql: str = Depends(GetDataScope('TeachScheduleEvent')),
+):
+    """
+    按查询条件导出课表（课次列表）Excel
+    """
+    rows = await TeachScheduleEventService.get_teach_schedule_event_list_services(
+        request, query_db, event_page_query, data_scope_sql, is_page=False
+    )
+    logger.info('导出成功')
+    binary_data = TeachScheduleEventService.export_schedule_event_list_services(rows)
+    return ResponseUtil.streaming(data=bytes2file_response(binary_data))
 
 
 @teachScheduleEventController.get(
