@@ -190,6 +190,7 @@ class TeachScheduleEventDetailModel(BaseModel):
     cached_rate: Optional[float] = Field(default=None, description='出勤率(%)')
     create_time: Optional[datetime] = Field(default=None, description='创建时间')
     remark: Optional[str] = Field(default=None, description='备注')
+    event_type: Optional[str] = Field(default=None, description='课次类型 normal常规 makeup补课')
     students: Optional[List[dict]] = Field(default=None, description='学生名单')
 
 

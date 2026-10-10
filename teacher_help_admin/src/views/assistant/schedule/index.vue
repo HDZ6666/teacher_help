@@ -232,8 +232,27 @@
             <div class="detail-title">
               <span>{{ selectedCourse.className || selectedCourse.name }}</span>
               <div class="detail-actions">
-                <el-button type="primary" size="small" @click="handleEditCourse">编辑课次</el-button>
-                <el-button type="warning" size="small" @click="handleStartAttendance(selectedCourse)">点名</el-button>
+                <el-button type="primary" size="small" :disabled="isLocked" @click="handleEditCourse">编辑课次</el-button>
+                <el-button
+                  size="small"
+                  :disabled="isLocked"
+                  :title="isLocked ? '已点名或已取消的课次不能调课' : ''"
+                  @click="openRescheduleDialog"
+                  v-hasPermi="['teach:schedule:event:reschedule']"
+                >调课</el-button>
+                <el-button
+                  type="warning"
+                  size="small"
+                  :disabled="isLocked"
+                  :title="isLocked ? '已点名或已取消；如需更正请到上课记录修改' : ''"
+                  @click="handleStartAttendance(selectedCourse)"
+                >点名</el-button>
+                <el-button
+                  size="small"
+                  :disabled="selectedCourse.status === '3' || !selectedCourse.classId"
+                  @click="tempDialogVisible = true"
+                  v-hasPermi="['teach:schedule:event:temp']"
+                >添加临时学员</el-button>
                 <el-button type="danger" size="small" @click="handleDeleteCourse">删除课次</el-button>
               </div>
             </div>
@@ -248,20 +267,84 @@
               <el-descriptions-item label="授课课时">{{ selectedCourse.lessonHours || '-' }}</el-descriptions-item>
               <el-descriptions-item label="上课教室">{{ selectedCourse.classroom || '-' }}</el-descriptions-item>
               <el-descriptions-item label="上课内容" :span="2">{{ selectedCourse.content || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="课次类型">{{ selectedCourse.eventType === 'makeup' ? '补课班' : '常规' }}</el-descriptions-item>
+              <el-descriptions-item label="状态">{{ selectedCourse.statusName || '-' }}</el-descriptions-item>
+              <el-descriptions-item v-if="selectedCourse.remark" label="备注" :span="2">{{ selectedCourse.remark }}</el-descriptions-item>
             </el-descriptions>
 
             <div class="sub-title">上课学员</div>
             <el-table :data="getStudentList(selectedCourse)" border>
-              <el-table-column label="学员" prop="studentName" min-width="120" />
+              <el-table-column label="学员" min-width="140">
+                <template #default="{ row }">
+                  {{ row.studentName }}
+                  <el-tag v-if="row.isTemp === 1" size="small" type="info">{{ row.makeupDetailId ? '补课' : '临时' }}</el-tag>
+                  <el-tag v-else-if="row.makeupDetailId" size="small" type="info">补课</el-tag>
+                </template>
+              </el-table-column>
               <el-table-column label="到课状态" prop="statusName" width="100" align="center" />
               <el-table-column label="签到时间" prop="checkInTime" width="180" align="center" />
               <el-table-column label="备注" prop="notes" min-width="140" show-overflow-tooltip />
+              <el-table-column label="操作" width="80" align="center">
+                <template #default="{ row }">
+                  <el-button
+                    v-if="row.isTemp === 1 && !isLocked"
+                    type="danger"
+                    link
+                    @click="handleRemoveTemp(row)"
+                    v-hasPermi="['teach:schedule:event:temp']"
+                  >移出</el-button>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
           <el-empty v-else description="课次不存在" />
         </template>
       </el-skeleton>
     </el-drawer>
+
+    <el-dialog v-model="rescheduleVisible" title="调课" width="560px" append-to-body>
+      <el-form ref="rescheduleFormRef" :model="rescheduleForm" :rules="rescheduleRules" label-width="96px">
+        <el-form-item label="上课日期" prop="courseDate">
+          <el-date-picker v-model="rescheduleForm.courseDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="上课时间" required>
+          <el-time-picker v-model="rescheduleForm.startClock" value-format="HH:mm" format="HH:mm" placeholder="开始" style="width: 45%" />
+          <span class="range-sep">-</span>
+          <el-time-picker v-model="rescheduleForm.endClock" value-format="HH:mm" format="HH:mm" placeholder="结束" style="width: 45%" />
+        </el-form-item>
+        <el-form-item label="上课老师" prop="teacherId">
+          <el-select v-model="rescheduleForm.teacherId" filterable style="width: 100%">
+            <el-option v-for="teacher in teacherList" :key="teacher.id" :label="teacher.name" :value="teacher.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="上课教室">
+          <el-select v-model="rescheduleForm.classroom" filterable allow-create clearable default-first-option style="width: 100%">
+            <el-option v-for="room in classroomList" :key="room.id" :label="room.name" :value="room.name" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="调课原因">
+          <el-input v-model="rescheduleForm.reason" maxlength="200" show-word-limit />
+        </el-form-item>
+        <div class="reschedule-tip">老师、班级、教室在新时间段有其他课次时将提示冲突，不会保存。</div>
+      </el-form>
+      <template #footer>
+        <el-button @click="rescheduleVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitLoading" @click="submitReschedule">确定调课</el-button>
+      </template>
+    </el-dialog>
+
+    <RollCallDialog
+      v-model="rollCallVisible"
+      :class-id="selectedCourse.classId"
+      :event-id="selectedCourse.id"
+      @success="handleLessonChanged"
+    />
+    <TempStudentDialog
+      v-model="tempDialogVisible"
+      :event-id="selectedCourse.id"
+      :attended="selectedCourse.status === '2'"
+      @success="handleLessonChanged"
+    />
   </div>
 </template>
 
@@ -270,6 +353,9 @@ import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { OfficeBuilding, School, User } from '@element-plus/icons-vue';
 import CourseSchedule from '@/components/CourseSchedule/index.vue';
+import RollCallDialog from '@/components/RollCallDialog/index.vue';
+import TempStudentDialog from '@/components/TempStudentDialog/index.vue';
+import { removeTempStudent, rescheduleLesson } from '@/api/teach/lesson';
 import {
   addScheduleEvent,
   delScheduleEvent,
@@ -834,10 +920,75 @@ function deleteCourse(course) {
 
 function handleStartAttendance(course) {
   if (!course.classId) {
-    proxy.$modal.msgWarning('当前课次未关联班级，不能进入班级点名');
+    proxy.$modal.msgWarning('当前课次未关联班级，不能点名');
     return;
   }
-  router.push({ path: `/assistant/class/attendance/${course.classId}`, query: { eventId: course.id } });
+  rollCallVisible.value = true;
+}
+
+const rollCallVisible = ref(false);
+const tempDialogVisible = ref(false);
+const rescheduleVisible = ref(false);
+const rescheduleFormRef = ref(null);
+const rescheduleForm = ref({});
+const rescheduleRules = {
+  courseDate: [{ required: true, message: '请选择上课日期', trigger: 'change' }],
+  teacherId: [{ required: true, message: '请选择上课老师', trigger: 'change' }]
+};
+// 已点名(2)或已取消(3)的课次不能再调课/点名
+const isLocked = computed(() => ['2', '3'].includes(String(selectedCourse.value.status)));
+
+function openRescheduleDialog() {
+  const course = selectedCourse.value;
+  rescheduleForm.value = {
+    courseDate: course.date,
+    startClock: course.startTime,
+    endClock: course.endTime,
+    teacherId: course.teacherId,
+    classroom: course.classroom || '',
+    reason: ''
+  };
+  rescheduleVisible.value = true;
+}
+
+async function submitReschedule() {
+  await rescheduleFormRef.value.validate();
+  const form = rescheduleForm.value;
+  if (!form.startClock || !form.endClock || form.endClock <= form.startClock) {
+    proxy.$modal.msgWarning('请正确选择上课时间');
+    return;
+  }
+  submitLoading.value = true;
+  try {
+    await rescheduleLesson({
+      eventId: selectedCourse.value.id,
+      startTime: buildDateTime(form.courseDate, form.startClock),
+      endTime: buildDateTime(form.courseDate, form.endClock),
+      teacherId: form.teacherId,
+      classroom: form.classroom,
+      reason: form.reason
+    });
+    proxy.$modal.msgSuccess('调课成功');
+    rescheduleVisible.value = false;
+    await handleLessonChanged();
+  } finally {
+    submitLoading.value = false;
+  }
+}
+
+function handleRemoveTemp(row) {
+  proxy.$modal.confirm(`确认将临时学员“${row.studentName}”移出本课次吗？`).then(async () => {
+    await removeTempStudent(selectedCourse.value.id, row.studentId);
+    proxy.$modal.msgSuccess('已移出');
+    await handleLessonChanged();
+  }).catch(() => {});
+}
+
+async function handleLessonChanged() {
+  if (selectedCourse.value.id) {
+    await handleCourseDetail({ id: selectedCourse.value.id });
+  }
+  await loadActiveSchedule();
 }
 
 function getStudentList(course) {
@@ -1027,5 +1178,14 @@ onMounted(async () => {
     font-weight: 600;
     color: #303133;
   }
+}
+.range-sep {
+  margin: 0 6px;
+}
+
+.reschedule-tip {
+  padding-left: 96px;
+  color: #909399;
+  font-size: 12px;
 }
 </style>

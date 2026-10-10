@@ -152,6 +152,9 @@ class TeachClassAttendanceDetail(Base):
     consume_method = Column(String(100), nullable=True, comment='消费方式快照')
     # 缺课补课标记（P2）：仅记录“已安排/已完成补课”，不影响课时扣减与课程账户
     makeup_flag = Column(SMALLINT, nullable=False, default=0, server_default='0', comment='补课标记(0=未补 1=已补)')
+    # P3：临时学员标记、补课来源（补课课次点名时指向原缺课明细）
+    is_temp = Column(SMALLINT, nullable=False, default=0, server_default='0', comment='是否临时学员(0=否 1=是)')
+    makeup_source_id = Column(Integer, nullable=True, comment='补课来源点名明细ID')
     makeup_time = Column(DateTime, nullable=True, comment='标记已补时间')
     makeup_by = Column(String(64), nullable=True, comment='标记已补操作人')
     makeup_remark = Column(String(200), nullable=True, comment='补课说明')

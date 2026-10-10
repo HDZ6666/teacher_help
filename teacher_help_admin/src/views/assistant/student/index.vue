@@ -90,6 +90,7 @@
           <el-option label="有效" value="active" />
           <el-option label="停课" value="stopped" />
           <el-option label="结课" value="completed" />
+          <el-option label="已转出" value="transferred" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -133,7 +134,8 @@
           type="info"
           plain
           icon="Upload"
-          @click="handleImport"
+          @click="openImport('student')"
+          v-hasPermi="['teach:student:import']"
         >导入学员</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -169,12 +171,17 @@
         >分配学管师</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="Upload"
-          @click="handleImportEnrollment"
-        >导入报读信息</el-button>
+        <el-dropdown @command="openImport" v-hasPermi="['teach:student:import']">
+          <el-button type="info" plain icon="Upload">
+            导入报读信息<el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="lesson">按课时导入</el-dropdown-item>
+              <el-dropdown-item command="month">按月导入</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -191,9 +198,13 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="batchUpdate">批量更新</el-dropdown-item>
-              <el-dropdown-item command="batchDelete">批量删除</el-dropdown-item>
-              <el-dropdown-item command="exportDetail">导出详情</el-dropdown-item>
+              <el-dropdown-item command="transfer" :disabled="multiple || !canAccountOp">批量转课</el-dropdown-item>
+              <el-dropdown-item command="clear" :disabled="multiple || !canAccountOp">批量课时清零</el-dropdown-item>
+              <el-dropdown-item command="validity" :disabled="multiple || !canAccountOp">批量修改有效期</el-dropdown-item>
+              <el-dropdown-item command="stop" :disabled="multiple || !canAccountOp">停课</el-dropdown-item>
+              <el-dropdown-item command="resume" :disabled="multiple || !canAccountOp">复课</el-dropdown-item>
+              <el-dropdown-item command="complete" :disabled="multiple || !canAccountOp">结课</el-dropdown-item>
+              <el-dropdown-item command="exportDetail" divided>导出学员</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -273,39 +284,52 @@
       border
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="学员姓名" align="center" prop="studentName" width="100" fixed="left" />
+      <el-table-column label="学员姓名" align="center" prop="studentName" width="100" fixed="left">
+        <template #default="scope">
+          <el-link type="primary" @click="handleEditEnrollment(scope.row)">{{ scope.row.studentName }}</el-link>
+        </template>
+      </el-table-column>
       <el-table-column label="手机号" align="center" prop="phone" width="120" />
       <el-table-column label="报读课程" align="center" prop="courseName" width="150" show-overflow-tooltip />
-      <el-table-column label="所在班级" align="center" prop="className" width="120" />
-      <el-table-column label="购买数量" align="center" prop="purchaseCount" width="100" />
-      <el-table-column label="赠送数量" align="center" prop="giftCount" width="100" />
-      <el-table-column label="已消耗数量" align="center" prop="consumedCount" width="110" />
-      <el-table-column label="退转数量" align="center" prop="refundCount" width="100" />
-      <el-table-column label="剩余数量" align="center" prop="remainingCount" width="100">
+      <el-table-column label="所在班级" align="center" prop="className" width="120">
+        <template #default="scope">{{ scope.row.className || '未选班' }}</template>
+      </el-table-column>
+      <el-table-column label="购买" align="center" width="80">
+        <template #default="scope">{{ scope.row.purchasedQuantity }}{{ scope.row.unit || '' }}</template>
+      </el-table-column>
+      <el-table-column label="赠送" align="center" width="80">
+        <template #default="scope">{{ scope.row.giftQuantity }}{{ scope.row.unit || '' }}</template>
+      </el-table-column>
+      <el-table-column label="已消耗" align="center" width="80">
+        <template #default="scope">{{ scope.row.consumedQuantity }}{{ scope.row.unit || '' }}</template>
+      </el-table-column>
+      <el-table-column label="退/转/清零" align="center" width="100">
         <template #default="scope">
-          <span :style="{ color: scope.row.remainingCount <= 5 ? 'red' : '' }">
-            {{ scope.row.remainingCount }}
+          {{ (scope.row.refundedQuantity || 0) + (scope.row.transferredQuantity || 0) + (scope.row.clearedQuantity || 0) }}{{ scope.row.unit || '' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="剩余" align="center" width="90">
+        <template #default="scope">
+          <span :style="{ color: scope.row.status === 'active' && scope.row.remainingQuantity <= 5 ? 'red' : '' }">
+            {{ scope.row.remainingQuantity }}{{ scope.row.unit || '' }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="课消金额" align="center" prop="consumedAmount" width="120">
+      <el-table-column label="有效期至" align="center" prop="validEndDate" width="110">
+        <template #default="scope">{{ scope.row.validEndDate || '未设置' }}</template>
+      </el-table-column>
+      <el-table-column label="状态" align="center" width="90">
         <template #default="scope">
-          ¥{{ scope.row.consumedAmount }}
+          <el-tag size="small" :type="{ active: 'success', stopped: 'warning' }[scope.row.status] || 'info'">{{ scope.row.statusName }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="剩余课消金额" align="center" prop="remainingAmount" width="130">
-        <template #default="scope">
-          ¥{{ scope.row.remainingAmount }}
-        </template>
+      <el-table-column label="停课日期" align="center" prop="stopDate" width="110">
+        <template #default="scope">{{ scope.row.stopDate || '-' }}</template>
       </el-table-column>
-      <el-table-column label="到期日期" align="center" prop="expireDate" width="120" />
-      <el-table-column label="缺课次数" align="center" prop="absenceCount" width="100" />
-      <el-table-column label="跟进人" align="center" prop="follower" width="100" />
-      <el-table-column label="学管师" align="center" prop="advisor" width="100" />
+      <el-table-column label="订单号" align="center" prop="orderNo" min-width="170" show-overflow-tooltip />
       <el-table-column label="操作" align="center" width="150" fixed="right" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button link type="primary" icon="View" @click="handleViewDetail(scope.row)">查看</el-button>
-          <el-button link type="primary" icon="Edit" @click="handleEditEnrollment(scope.row)">编辑</el-button>
+          <el-button link type="primary" icon="View" @click="handleEditEnrollment(scope.row)">学员详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -670,12 +694,27 @@
         </div>
       </template>
     </el-dialog>
+
+    <excel-import-dialog
+      v-model="importOpen"
+      :title="importConfig.title"
+      :template-url="importConfig.templateUrl"
+      :template-name="importConfig.templateName"
+      :upload-url="importConfig.uploadUrl"
+      :tips="importConfig.tips"
+      @success="getList"
+    />
+    <course-account-ops ref="accountOpsRef" @done="getList" />
   </div>
 </template>
 
 <script setup name="AssistantStudent">
 import { ArrowDown, Plus, Delete } from '@element-plus/icons-vue';
-import { listStudent, getStudent, delStudent, addStudent, updateStudent, listParents, getStudentCourses, listStaffOptions, assignStudentStaff } from '@/api/teach/student';
+import { listStudent, getStudent, delStudent, addStudent, updateStudent, listParents, listStaffOptions, assignStudentStaff } from '@/api/teach/student';
+import { listCourseAccount } from '@/api/teach/studentAccount';
+import ExcelImportDialog from '@/components/ExcelImportDialog/index.vue';
+import CourseAccountOps from './components/CourseAccountOps.vue';
+import { checkPermi } from '@/utils/permission';
 
 const { proxy } = getCurrentInstance();
 
@@ -805,34 +844,6 @@ function normalizeStudentRow(row = {}) {
   };
 }
 
-function normalizeEnrollmentRow(student, course) {
-  const purchased = Number(course.purchasedQuantity || 0);
-  const gift = Number(course.giftQuantity || 0);
-  const consumed = Number(course.consumedQuantity || 0);
-  const remaining = Number(course.remainingQuantity || 0);
-  return {
-    id: `${student.id}-${course.id}`,
-    studentId: student.id,
-    studentName: student.studentName,
-    phone: student.parentPhone || student.phone || '',
-    courseName: course.courseName || '-',
-    className: course.className || student.className || '-',
-    purchaseCount: purchased,
-    giftCount: gift,
-    consumedCount: consumed,
-    refundCount: 0,
-    remainingCount: remaining,
-    consumedAmount: 0,
-    remainingAmount: 0,
-    expireDate: course.validEndDate || '-',
-    absenceCount: 0,
-    follower: student.follower || '',
-    advisor: student.advisor || '',
-    courseStatus: course.status,
-    statusName: course.statusName || '-'
-  };
-}
-
 function buildStudentPayload() {
   return {
     id: form.value.id,
@@ -892,6 +903,7 @@ function getParentList() {
 function handleTabChange(tab) {
   activeTab.value = tab;
   ids.value = [];
+  selectedRows.value = [];
   single.value = true;
   multiple.value = true;
   getList();
@@ -916,33 +928,16 @@ function getList() {
 /** 查询报读情况 */
 async function getEnrollmentList() {
   try {
-    const response = await listStudent({
-      pageNum: enrollmentQueryParams.value.pageNum,
-      pageSize: enrollmentQueryParams.value.pageSize,
-      studentName: enrollmentQueryParams.value.studentName
+    const query = enrollmentQueryParams.value;
+    const response = await listCourseAccount({
+      pageNum: query.pageNum,
+      pageSize: query.pageSize,
+      studentName: query.studentName || null,
+      courseName: query.courseName || null,
+      status: query.courseStatus || null
     });
-    const students = response.rows || [];
-    const courseResults = await Promise.all(
-      students.map(student =>
-        getStudentCourses(student.id).then(courseResponse => ({
-          student,
-          courses: courseResponse.data || []
-        })).catch(() => ({
-          student,
-          courses: []
-        }))
-      )
-    );
-    const courseNameKeyword = (enrollmentQueryParams.value.courseName || '').trim();
-    const courseStatus = enrollmentQueryParams.value.courseStatus;
-    enrollmentList.value = courseResults.flatMap(({ student, courses }) => {
-      const studentRow = normalizeStudentRow(student);
-      return courses
-        .filter(course => !courseNameKeyword || (course.courseName || '').includes(courseNameKeyword))
-        .filter(course => !courseStatus || course.status === courseStatus)
-        .map(course => normalizeEnrollmentRow(studentRow, course));
-    });
-    total.value = response.total || enrollmentList.value.length;
+    enrollmentList.value = response.rows || [];
+    total.value = response.total || 0;
   } finally {
     loading.value = false;
   }
@@ -1145,29 +1140,38 @@ function handleSelectionChange(selection) {
   multiple.value = !selection.length;
 }
 
-/** 导入学员 */
-function handleImport() {
-  proxy.$modal.msgWarning("导入学员（Excel 模板）尚未接入，请先逐个新增学员");
-}
+/** 导入（student=学生基本信息 lesson=按课时报读 month=按月报读） */
+const IMPORT_CONFIGS = {
+  student: { title: '导入学员（学生基本信息）', templateName: '学生基本信息导入模板.xlsx' },
+  lesson: { title: '导入报读信息（按课时）', templateName: '按课时报读导入模板.xlsx' },
+  month: { title: '导入报读信息（按月）', templateName: '按月报读导入模板.xlsx' }
+};
+const importOpen = ref(false);
+const importConfig = ref({ templateUrl: '', uploadUrl: '', tips: [] });
+const accountOpsRef = ref();
+const canAccountOp = computed(() => checkPermi(['teach:student:account']));
 
-/** 导入报读信息 */
-function handleImportEnrollment() {
-  proxy.$modal.msgWarning("导入报读信息（Excel 模板）尚未接入，请通过“报名”办理报读");
+function openImport(kind) {
+  const config = IMPORT_CONFIGS[kind];
+  importConfig.value = {
+    ...config,
+    templateUrl: `teach/student-import/template/${kind}`,
+    uploadUrl: `/teach/student-import/${kind}`,
+    tips: [
+      '请先下载模板，按“填写说明”页填写；手机号+姓名识别学员，手机号无家长账号时自动创建（家长需找回密码登录）。',
+      kind === 'student' ? '已存在的学员不会被覆盖。' : '每行生成一张“导入”订单和一个课程账户，重复导入会重复生成，请勿重复上传。'
+    ]
+  };
+  importOpen.value = true;
 }
 
 /** 更多操作 */
 function handleMoreAction(command) {
-  switch (command) {
-    case 'batchUpdate':
-      proxy.$modal.msgWarning("批量更新（转课/课时清零/改有效期）需与产品确认规则后接入");
-      break;
-    case 'batchDelete':
-      handleDelete();
-      break;
-    case 'exportDetail':
-      handleExport();
-      break;
+  if (command === 'exportDetail') {
+    handleExport();
+    return;
   }
+  accountOpsRef.value.open(command, selectedRows.value);
 }
 
 /** 编辑报读信息 */

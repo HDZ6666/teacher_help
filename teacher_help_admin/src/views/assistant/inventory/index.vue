@@ -334,6 +334,9 @@
           <el-col :span="1.5">
             <el-button type="primary" plain icon="Plus" @click="handleAddFee">新建费用</el-button>
           </el-col>
+          <el-col :span="1.5">
+            <el-button plain icon="Upload" @click="feeImportVisible = true" v-hasPermi="['ast:fee:import']">导入费用</el-button>
+          </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getFeeList"></right-toolbar>
         </el-row>
 
@@ -719,7 +722,13 @@
         <el-table :data="stockRelatedRows" border class="stock-detail-table" table-layout="auto">
           <el-table-column label="业务单号" prop="businessNo" min-width="180" show-overflow-tooltip>
             <template #default="scope">
-              <el-button v-if="scope.row.businessNo" link type="primary">{{ scope.row.businessNo }}</el-button>
+              <el-button
+                v-if="scope.row.businessNo && scope.row.saleOrderId"
+                link
+                type="primary"
+                @click="openSaleOrder(scope.row.saleOrderId)"
+              >{{ scope.row.businessNo }}</el-button>
+              <span v-else-if="scope.row.businessNo">{{ scope.row.businessNo }}</span>
               <span v-else>-</span>
             </template>
           </el-table-column>
@@ -782,6 +791,56 @@
         </template>
       </div>
     </el-dialog>
+
+    <!-- 销售订单详情 -->
+    <el-dialog title="销售订单详情" v-model="saleOrderVisible" width="900px" append-to-body>
+      <div v-loading="saleOrderLoading">
+        <el-descriptions v-if="saleOrder.order" :column="3" border size="small">
+          <el-descriptions-item label="订单号">{{ saleOrder.order.orderNo }}</el-descriptions-item>
+          <el-descriptions-item label="订单类型">{{ saleOrder.order.orderTypeName || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="状态">{{ saleOrder.order.statusName || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="学员">{{ saleOrder.order.studentName }}</el-descriptions-item>
+          <el-descriptions-item label="家长手机">{{ saleOrder.order.parentPhone || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="经办日期">{{ formatDate(saleOrder.order.enrollDate) || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="订单总额">¥ {{ saleOrder.order.totalAmount }}</el-descriptions-item>
+          <el-descriptions-item label="应收">¥ {{ saleOrder.order.receivableAmount }}</el-descriptions-item>
+          <el-descriptions-item label="实收">¥ {{ saleOrder.order.paidAmount }}（欠费 ¥ {{ saleOrder.order.arrearsAmount }}）</el-descriptions-item>
+          <el-descriptions-item label="经办人">{{ saleOrder.order.createBy || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="备注" :span="2">{{ saleOrder.order.remark || '-' }}</el-descriptions-item>
+        </el-descriptions>
+        <el-divider content-position="left">订单明细</el-divider>
+        <el-table :data="saleOrder.items || []" border size="small">
+          <el-table-column label="类型" prop="itemTypeName" width="70" align="center" />
+          <el-table-column label="名称" prop="itemName" min-width="140" show-overflow-tooltip />
+          <el-table-column label="规格/定价" prop="specName" min-width="120" show-overflow-tooltip />
+          <el-table-column label="数量" prop="quantity" width="70" align="center" />
+          <el-table-column label="单价" width="100"><template #default="{ row }">¥ {{ row.unitPrice }}</template></el-table-column>
+          <el-table-column label="小计" width="100"><template #default="{ row }">¥ {{ row.subtotalPrice }}</template></el-table-column>
+          <el-table-column label="备注" prop="remark" min-width="120" show-overflow-tooltip />
+        </el-table>
+        <el-divider content-position="left">出库流水</el-divider>
+        <el-table :data="saleOrder.stockRecords || []" border size="small">
+          <el-table-column label="流水号" prop="recordNo" min-width="160" />
+          <el-table-column label="物品" prop="itemName" min-width="120" />
+          <el-table-column label="规格" prop="skuName" width="110" />
+          <el-table-column label="数量" prop="quantity" width="70" align="center" />
+          <el-table-column label="库存变化" width="110" align="center">
+            <template #default="{ row }">{{ row.stockBefore }} → {{ row.stockAfter }}</template>
+          </el-table-column>
+          <el-table-column label="状态" prop="recordStatusLabel" width="80" align="center" />
+        </el-table>
+      </div>
+    </el-dialog>
+
+    <ExcelImportDialog
+      v-model="feeImportVisible"
+      title="导入费用"
+      template-url="ast/inventory/fee/import/template"
+      template-name="费用导入模板.xlsx"
+      upload-url="/ast/inventory/fee/import"
+      :tips="['费用名称不能与已有费用重复（不做覆盖更新）', '关联课程填课程名称，多个用逗号或顿号分隔', '任一行有误则整批不导入']"
+      @success="getFeeList"
+    />
 
     <!-- 导入采购单对话框 -->
     <el-dialog title="导入采购" v-model="importPurchaseDialogVisible" width="680px" append-to-body>
@@ -1368,6 +1427,7 @@
 <script setup name="AssistantInventory">
 import { nextTick } from 'vue';
 import * as inventoryApi from '@/api/assistant/inventory';
+import ExcelImportDialog from '@/components/ExcelImportDialog/index.vue';
 import { listCourseOptions } from '@/api/assistant/course';
 import useUserStore from '@/store/modules/user';
 
@@ -1622,6 +1682,23 @@ const selectedCourseCount = computed(() => {
   return selectedCourses.value.length;
 });
 
+const feeImportVisible = ref(false);
+const saleOrderVisible = ref(false);
+const saleOrderLoading = ref(false);
+const saleOrder = ref({});
+
+async function openSaleOrder(orderId) {
+  saleOrderVisible.value = true;
+  saleOrderLoading.value = true;
+  saleOrder.value = {};
+  try {
+    const response = await inventoryApi.getSaleOrder(orderId);
+    saleOrder.value = response.data || {};
+  } finally {
+    saleOrderLoading.value = false;
+  }
+}
+
 const stockRelatedRows = computed(() => {
   const detail = stockDetail.value || {};
   if (detail.purchaseOrder) {
@@ -1632,6 +1709,17 @@ const stockRelatedRows = computed(() => {
       operator: detail.purchaseOrder.operatorName || detail.operator || '-',
       recordDate: detail.purchaseOrder.purchaseDate || detail.recordDate,
       createTime: detail.purchaseOrder.createTime || detail.createTime
+    }];
+  }
+  if (detail.saleOrderId) {
+    return [{
+      businessNo: `销售订单 #${detail.saleOrderId}`,
+      saleOrderId: detail.saleOrderId,
+      businessTypeLabel: detail.businessTypeLabel || '销售',
+      sourceLabel: '报名/续费订单',
+      operator: detail.operator || detail.operatorName || '-',
+      recordDate: detail.recordDate || detail.stockDate,
+      createTime: detail.createTime || detail.stockDate
     }];
   }
   if (detail.businessNo) {

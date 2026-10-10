@@ -25,6 +25,9 @@
       <el-col :span="1.5">
         <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['teach:teacher:export']">导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button plain icon="Lock" @click="$router.push('/assistant/teacher/permission')" v-hasPermi="['teach:teacher:permission']">老师权限</el-button>
+      </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
 

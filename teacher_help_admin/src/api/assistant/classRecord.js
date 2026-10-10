@@ -106,3 +106,18 @@ export function delLeaveApplication(leaveIds) {
     method: 'delete'
   })
 }
+
+// 修改单个学员点名（同一课次内改状态/扣课，后端自动退/补扣课时）
+export function editAttendanceDetail(data) {
+  return request({ url: '/teach/class-record/attendance/detail', method: 'put', data })
+}
+
+// 编辑课次（已点名记录的日期/时间/老师/教室/课时/内容）
+export function editAttendanceRecord(data) {
+  return request({ url: '/teach/class-record/attendance', method: 'put', data })
+}
+
+// 开补课班：从缺课记录生成补课课次
+export function createMakeupClass(data) {
+  return request({ url: '/teach/class-record/makeup/class', method: 'post', data })
+}

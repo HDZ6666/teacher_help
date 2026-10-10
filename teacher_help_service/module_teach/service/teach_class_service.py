@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from types import SimpleNamespace
 from decimal import Decimal
 from uuid import uuid4
 from sqlalchemy.exc import IntegrityError
@@ -381,6 +382,86 @@ class TeachClassService:
         return row
 
     @classmethod
+    async def load_temp_members(cls, query_db: AsyncSession, schedule_rows: list, exclude_student_ids=()):
+        """
+        课次中的临时学员/补课学员（不在班级在读名单内），返回 {student_id: (伪班级学员, 学员, 账号, 课程账户)}
+        伪班级学员只提供点名需要的 course_account_id / student_name / consume_method 三个属性
+        """
+        result = {}
+        for row in schedule_rows:
+            if row.is_temp != 1 or row.student_id in exclude_student_ids:
+                continue
+            student_result = await TeachStudentDao.get_teach_student_by_id(query_db, row.student_id)
+            if not student_result:
+                continue
+            student, _, base_user = student_result
+            account = (
+                await TeachClassDao.get_course_account_by_id(query_db, row.course_account_id)
+                if row.course_account_id
+                else None
+            )
+            pseudo = SimpleNamespace(
+                course_account_id=account.id if account else None,
+                student_name=student.student_name,
+                consume_method='补课学员' if row.makeup_detail_id else '临时学员',
+            )
+            result[row.student_id] = (pseudo, student, base_user, account)
+        return result
+
+    @classmethod
+    def format_temp_student_row(cls, pseudo, student, base_user, account):
+        return {
+            'studentId': student.id,
+            'studentName': student.student_name,
+            'phone': base_user.phone,
+            'courseAccountId': account.id if account else None,
+            'courseName': account.course_name if account else None,
+            'consumeMethod': f'{pseudo.consume_method}'
+            + (f'：{account.course_name}({account.remaining_quantity}{account.unit or ""})' if account else ''),
+            'remainingQuantity': account.remaining_quantity if account else None,
+            'remainingType': account.unit if account else None,
+            'isTemp': 1,
+        }
+
+    @classmethod
+    def check_account_deductible(cls, account, student_name: str, deduct_quantity: int):
+        """
+        扣课前校验课程账户：只有“有效”状态可扣课（停课/结课/已转出不能扣），剩余不足不能扣
+        """
+        if not account:
+            raise ServiceException(message=f'{student_name}未绑定课程账户，不能扣课')
+        if account.status not in (None, 'active'):
+            raise ServiceException(message=f'{student_name}的课程账户不是有效状态（停课/结课/已转出），不能扣课')
+        if (account.remaining_quantity or 0) < deduct_quantity:
+            raise ServiceException(message=f'{student_name}剩余课时不足')
+
+    @classmethod
+    async def sync_makeup_source(
+        cls, query_db: AsyncSession, source_detail_id: int | None, event_id: int | None, attended: bool, operator: str
+    ):
+        """
+        补课课次点名后同步原缺课记录的“已补”标记：
+        到课/迟到 -> 原缺课记录标记已补（说明写“补课课次#ID”）；改为请假/未到或撤销点名 -> 取消由本补课课次写入的标记
+        """
+        if not source_detail_id or not event_id:
+            return
+        source = await query_db.get(TeachClassAttendanceDetail, source_detail_id)
+        if not source or source.del_flag == 1:
+            return
+        marker = f'补课课次#{event_id}'
+        if attended:
+            if source.makeup_flag != 1:
+                source.makeup_flag = 1
+                source.makeup_time = datetime.now()
+                source.makeup_by = operator
+                source.makeup_remark = marker
+        elif source.makeup_flag == 1 and (source.makeup_remark or '').startswith(marker):
+            source.makeup_flag = 0
+            source.makeup_time = None
+            source.makeup_by = None
+            source.makeup_remark = None
+
+    @classmethod
     async def get_class_students_services(cls, query_db: AsyncSession, class_id: int):
         class_obj = await TeachClassDao.get_teach_class_by_id(query_db, class_id)
         if not class_obj:
@@ -600,6 +681,9 @@ class TeachClassService:
             event_teacher = await cls.resolve_teacher(query_db, event.teacher_id) if event.teacher_id else None
             schedule_attendances = await TeachScheduleAttendanceDao.get_attendances_by_event(query_db, event_id)
             schedule_attendance_map = {item.student_id: item for item in schedule_attendances}
+            member_ids = {student.get('studentId') for student in students}
+            temp_members = await cls.load_temp_members(query_db, schedule_attendances, member_ids)
+            students = students + [cls.format_temp_student_row(*value) for value in temp_members.values()]
 
         default_start_time = '09:00'
         default_end_time = '10:00'
@@ -641,6 +725,8 @@ class TeachClassService:
                     'leaveNo': leave.leave_no if leave else None,
                     'leaveIsDeduct': leave.is_deduct if leave else None,
                     'remark': schedule_attendance.notes if schedule_attendance else '',
+                    'isTemp': student.get('isTemp') or 0,
+                    'makeupDetailId': schedule_attendance.makeup_detail_id if schedule_attendance else None,
                 }
             )
 
@@ -659,6 +745,7 @@ class TeachClassService:
                 'lessonHours': event.lesson_hours if event else class_obj.lesson_hours or Decimal('1'),
                 'content': event.content if event else '',
             },
+            'eventType': event.event_type if event else 'normal',
             'students': prepared_students,
         }
 
@@ -729,6 +816,11 @@ class TeachClassService:
         teacher = await cls.resolve_teacher(query_db, page_object.teacher_id) if page_object.teacher_id else None
         member_rows = await TeachClassDao.get_class_students(query_db, class_id)
         member_map = {class_student.student_id: (class_student, student, base_user, account) for class_student, student, base_user, account in member_rows}
+        if page_object.event_id:
+            # 课次中的临时学员/补课学员也可点名扣课
+            member_map.update(
+                await cls.load_temp_members(query_db, list(schedule_attendance_map.values()), set(member_map))
+            )
         detail_items = page_object.details
         status_count = {1: 0, 2: 0, 3: 0, 4: 0}
         deduct_total = 0
@@ -758,10 +850,7 @@ class TeachClassService:
                         if class_student.course_account_id
                         else None
                     )
-                    if not account:
-                        raise ServiceException(message=f'{class_student.student_name}未绑定课程账户，不能扣课')
-                    if (account.remaining_quantity or 0) < deduct_quantity:
-                        raise ServiceException(message=f'{class_student.student_name}剩余课时不足')
+                    cls.check_account_deductible(account, class_student.student_name, deduct_quantity)
                 status_count[item_status] += 1
                 deduct_total += deduct_quantity
 
@@ -802,8 +891,7 @@ class TeachClassService:
                     account = await TeachClassDao.get_course_account_by_id(
                         query_db, account.id if account else class_student.course_account_id, for_update=True
                     )
-                    if not account or (account.remaining_quantity or 0) < deduct_quantity:
-                        raise ServiceException(message=f'{class_student.student_name}剩余课时不足')
+                    cls.check_account_deductible(account, class_student.student_name, deduct_quantity)
                     before_remaining = account.remaining_quantity or 0
                     account.consumed_quantity = (account.consumed_quantity or 0) + deduct_quantity
                     account.remaining_quantity = before_remaining - deduct_quantity
@@ -826,6 +914,10 @@ class TeachClassService:
                         before_remaining=before_remaining,
                         after_remaining=after_remaining,
                         consume_method=class_student.consume_method,
+                        is_temp=1 if isinstance(class_student, SimpleNamespace) else 0,
+                        makeup_source_id=(
+                            schedule_attendance_map[item.student_id].makeup_detail_id if page_object.event_id else None
+                        ),
                         create_by=current_user_name,
                         create_time=datetime.now(),
                         update_by=current_user_name,
@@ -842,6 +934,13 @@ class TeachClassService:
                     schedule_attendance.notes = item.remark
                     schedule_attendance.update_by = current_user_name
                     schedule_attendance.update_time = datetime.now()
+                    await cls.sync_makeup_source(
+                        query_db,
+                        schedule_attendance.makeup_detail_id,
+                        page_object.event_id,
+                        item_status in (1, 2),
+                        current_user_name,
+                    )
             class_obj.completed_lessons = (class_obj.completed_lessons or 0) + 1
             class_obj.completed_hours = cls.to_decimal((class_obj.completed_hours or 0) + cls.to_decimal(page_object.lesson_hours, 1), 0)
             class_obj.update_by = current_user_name
@@ -914,6 +1013,9 @@ class TeachClassService:
                 detail.del_flag = 1
                 detail.update_by = current_user_name
                 detail.update_time = now
+                await cls.sync_makeup_source(
+                    query_db, detail.makeup_source_id, attendance.event_id, False, current_user_name
+                )
             event_id = attendance.event_id
             note = f'撤销点名{f"(原课次ID {event_id})" if event_id else ""}：{reason or "无"}'
             attendance.remark = f'{attendance.remark}；{note}' if attendance.remark else note

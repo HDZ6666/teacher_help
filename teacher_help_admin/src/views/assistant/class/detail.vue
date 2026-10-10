@@ -74,6 +74,7 @@
       <el-tab-pane label="排课信息" name="schedule">
         <div class="toolbar-line">
           <el-button type="primary" size="small" icon="Plus" @click="handleScheduleClass">排课</el-button>
+          <el-button size="small" icon="Calendar" @click="openWeeklyDialog" v-hasPermi="['teach:schedule:event:batch']">按周重复排课</el-button>
           <el-button size="small" @click="loadScheduleList">刷新</el-button>
         </div>
         <el-table v-loading="scheduleLoading" :data="scheduleList" border>
@@ -288,6 +289,45 @@
       </el-skeleton>
     </el-drawer>
     <leave-apply-dialog v-model="leaveOpen" :preset="leavePreset" />
+
+    <el-dialog v-model="weeklyVisible" title="按周重复排课" width="620px" append-to-body>
+      <el-form ref="weeklyFormRef" :model="weeklyForm" :rules="weeklyRules" label-width="96px">
+        <el-form-item label="日期范围" prop="dateRange">
+          <el-date-picker
+            v-model="weeklyForm.dateRange"
+            type="daterange"
+            value-format="YYYY-MM-DD"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="每周" prop="weekdays">
+          <el-checkbox-group v-model="weeklyForm.weekdays">
+            <el-checkbox v-for="(label, index) in weekdayLabels" :key="index" :label="index + 1">{{ label }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="上课时间" required>
+          <el-time-picker v-model="weeklyForm.startClock" value-format="HH:mm" format="HH:mm" placeholder="开始" style="width: 45%" />
+          <span class="range-sep">-</span>
+          <el-time-picker v-model="weeklyForm.endClock" value-format="HH:mm" format="HH:mm" placeholder="结束" style="width: 45%" />
+        </el-form-item>
+        <el-form-item label="上课教室">
+          <el-input v-model="weeklyForm.classroom" maxlength="100" placeholder="不填则使用班级教室" />
+        </el-form-item>
+        <el-form-item label="授课课时">
+          <el-input-number v-model="weeklyForm.lessonHours" :min="0.5" :max="99" :step="0.5" :precision="2" />
+        </el-form-item>
+        <el-form-item label="上课内容">
+          <el-input v-model="weeklyForm.content" maxlength="500" />
+        </el-form-item>
+        <div class="weekly-tip">上课老师为班级主讲老师（{{ classInfo.teacherName || '未设置' }}）；名单为当前在读学员。任一日期与老师/班级/教室冲突时整批不生成，单次最多 100 节。</div>
+      </el-form>
+      <template #footer>
+        <el-button @click="weeklyVisible = false">取消</el-button>
+        <el-button type="primary" :loading="weeklySubmitting" @click="submitWeekly">生成课次</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -304,6 +344,7 @@ import {
   removeClassStudents
 } from '@/api/assistant/class';
 import { delScheduleEvent, getScheduleEvent, listScheduleEvent } from '@/api/teach/schedule';
+import { weeklySchedule } from '@/api/teach/lesson';
 import LeaveApplyDialog from '@/views/assistant/leave/components/LeaveApplyDialog';
 
 const { proxy } = getCurrentInstance();
@@ -386,6 +427,63 @@ function formatScheduleRow(row) {
     startClock: formatClock(row.startTime),
     endClock: formatClock(row.endTime),
   };
+}
+
+const weekdayLabels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+const weeklyVisible = ref(false);
+const weeklySubmitting = ref(false);
+const weeklyFormRef = ref(null);
+const weeklyForm = ref({});
+const weeklyRules = {
+  dateRange: [{ required: true, message: '请选择日期范围', trigger: 'change' }],
+  weekdays: [{ type: 'array', required: true, min: 1, message: '请选择星期', trigger: 'change' }]
+};
+
+function openWeeklyDialog() {
+  if (!classInfo.value.teacherId) {
+    proxy.$modal.msgWarning('请先在班级信息中设置主讲老师');
+    return;
+  }
+  weeklyForm.value = {
+    dateRange: [],
+    weekdays: [],
+    startClock: '',
+    endClock: '',
+    classroom: '',
+    lessonHours: Number(classInfo.value.lessonHours || 1),
+    content: ''
+  };
+  weeklyVisible.value = true;
+}
+
+function submitWeekly() {
+  weeklyFormRef.value.validate(async valid => {
+    if (!valid) return;
+    const form = weeklyForm.value;
+    if (!form.startClock || !form.endClock || form.endClock <= form.startClock) {
+      proxy.$modal.msgWarning('请正确选择上课时间');
+      return;
+    }
+    weeklySubmitting.value = true;
+    try {
+      const response = await weeklySchedule({
+        classId: classId.value,
+        startDate: form.dateRange[0],
+        endDate: form.dateRange[1],
+        weekdays: form.weekdays,
+        startClock: form.startClock,
+        endClock: form.endClock,
+        classroom: form.classroom || undefined,
+        lessonHours: form.lessonHours,
+        content: form.content || undefined
+      });
+      proxy.$modal.msgSuccess(response.msg || '排课成功');
+      weeklyVisible.value = false;
+      await Promise.all([loadScheduleList(), loadDetail()]);
+    } finally {
+      weeklySubmitting.value = false;
+    }
+  });
 }
 
 async function loadScheduleList() {
@@ -626,5 +724,15 @@ onMounted(() => {
     font-weight: 600;
     color: #303133;
   }
+}
+.range-sep {
+  margin: 0 6px;
+}
+
+.weekly-tip {
+  padding-left: 96px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
 }
 </style>

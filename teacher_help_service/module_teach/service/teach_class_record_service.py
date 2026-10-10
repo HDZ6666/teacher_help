@@ -134,7 +134,8 @@ class TeachClassRecordService:
                 'phone': base_user.phone,
                 'statusName': status_name,
                 'consumeType': detail.consume_method,
-                'makeupStatus': '待补课' if detail.status in [3, 4] else '-',
+                'makeupStatus': ('已补课' if detail.makeup_flag == 1 else '待补课') if detail.status in [3, 4] else '-',
+                'isTemp': detail.is_temp or 0,
                 'quota': f'{cls.format_decimal_text(detail.deduct_quantity)}课时',
             }
         )

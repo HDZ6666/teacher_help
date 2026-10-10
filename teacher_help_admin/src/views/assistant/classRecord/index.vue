@@ -197,7 +197,15 @@
             <el-button type="primary" plain icon="Check" :disabled="!makeupSelection.length" @click="handleBatchMarkMadeup" v-hasPermi="['teach:classRecord:makeup']">标记已补</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="warning" plain icon="Bell" disabled title="开补课班需与产品确认补课班规则后接入，暂不可用">开班补课</el-button>
+            <el-button
+              type="warning"
+              plain
+              icon="Plus"
+              :disabled="!makeupSelection.length"
+              title="勾选同一班级的请假/未到记录，生成一节补课课次"
+              @click="openMakeupClassDialog"
+              v-hasPermi="['teach:classRecord:makeupClass']"
+            >开班补课</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button type="success" plain icon="Download" @click="handleMakeupExport" v-hasPermi="['teach:classRecord:export']">导出</el-button>
@@ -353,6 +361,44 @@
         <el-descriptions-item label="上课内容">{{ currentRecord.classContent || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
+
+    <el-dialog v-model="makeupClassVisible" title="开班补课" width="620px" append-to-body>
+      <el-alert
+        type="info"
+        :closable="false"
+        show-icon
+        class="mb8"
+        :title="`已选 ${makeupSelection.length} 条缺课记录：${makeupClassNames}。生成的补课课次在课表中点名扣课，到课/迟到后原缺课记录自动标记已补。`"
+      />
+      <el-form ref="makeupClassFormRef" :model="makeupClassForm" :rules="makeupClassRules" label-width="96px">
+        <el-form-item label="补课日期" prop="courseDate">
+          <el-date-picker v-model="makeupClassForm.courseDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="上课时间" required>
+          <el-time-picker v-model="makeupClassForm.startClock" value-format="HH:mm" format="HH:mm" placeholder="开始" style="width: 45%" />
+          <span style="margin: 0 6px">-</span>
+          <el-time-picker v-model="makeupClassForm.endClock" value-format="HH:mm" format="HH:mm" placeholder="结束" style="width: 45%" />
+        </el-form-item>
+        <el-form-item label="上课老师" prop="teacherId">
+          <el-select v-model="makeupClassForm.teacherId" filterable style="width: 100%">
+            <el-option v-for="item in teacherList" :key="item.id" :label="item.teacherName" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="上课教室">
+          <el-input v-model="makeupClassForm.classroom" maxlength="100" placeholder="不填则使用班级教室" />
+        </el-form-item>
+        <el-form-item label="授课课时">
+          <el-input-number v-model="makeupClassForm.lessonHours" :min="0.5" :max="99" :step="0.5" :precision="2" />
+        </el-form-item>
+        <el-form-item label="上课内容">
+          <el-input v-model="makeupClassForm.content" maxlength="500" placeholder="默认“补课”" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="makeupClassVisible = false">取消</el-button>
+        <el-button type="primary" :loading="makeupClassSubmitting" @click="submitMakeupClass">生成补课课次</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -365,6 +411,7 @@ import { listCourseOptions } from '@/api/assistant/course'
 import { listTeacher } from '@/api/teach/teacher'
 import LeavePanel from '@/views/assistant/leave/components/LeavePanel'
 import {
+  createMakeupClass,
   listAbsenceReminder,
   listAttendanceRecord,
   listMakeupRecord,
@@ -652,6 +699,59 @@ function handleMarkMadeup(row) {
 
 function handleBatchMarkMadeup() {
   markMadeup(makeupSelection.value.map(item => item.id), `确认将选中的 ${makeupSelection.value.length} 条缺课标记为已补课吗`)
+}
+
+const makeupClassVisible = ref(false)
+const makeupClassSubmitting = ref(false)
+const makeupClassFormRef = ref(null)
+const makeupClassForm = ref({})
+const makeupClassNames = ref('')
+const makeupClassRules = {
+  courseDate: [{ required: true, message: '请选择补课日期', trigger: 'change' }],
+  teacherId: [{ required: true, message: '请选择上课老师', trigger: 'change' }]
+}
+
+function openMakeupClassDialog() {
+  const rows = makeupSelection.value
+  if (new Set(rows.map(item => item.classId)).size > 1) {
+    proxy.$modal.msgWarning('一次只能为同一个班级的缺课学员开补课班')
+    return
+  }
+  if (new Set(rows.map(item => item.studentId)).size !== rows.length) {
+    proxy.$modal.msgWarning('同一学员一次只能补一次缺课，请分开开班')
+    return
+  }
+  makeupClassNames.value = rows.map(item => item.studentName).join('、')
+  makeupClassForm.value = { courseDate: '', startClock: '', endClock: '', teacherId: null, classroom: '', lessonHours: 1, content: '' }
+  makeupClassVisible.value = true
+}
+
+function submitMakeupClass() {
+  makeupClassFormRef.value.validate(async valid => {
+    if (!valid) return
+    const form = makeupClassForm.value
+    if (!form.startClock || !form.endClock || form.endClock <= form.startClock) {
+      proxy.$modal.msgWarning('请正确选择上课时间')
+      return
+    }
+    makeupClassSubmitting.value = true
+    try {
+      const response = await createMakeupClass({
+        detailIds: makeupSelection.value.map(item => item.id),
+        startTime: `${form.courseDate} ${form.startClock}:00`,
+        endTime: `${form.courseDate} ${form.endClock}:00`,
+        teacherId: form.teacherId,
+        classroom: form.classroom || undefined,
+        lessonHours: form.lessonHours,
+        content: form.content || undefined
+      })
+      proxy.$modal.msgSuccess(response.msg || '补课课次已生成')
+      makeupClassVisible.value = false
+      getMakeupList()
+    } finally {
+      makeupClassSubmitting.value = false
+    }
+  })
 }
 
 function handleMakeupExport() {

@@ -462,6 +462,9 @@ class AstInventoryService:
         record_row['businessNo'] = purchase_order.order_no if purchase_order else record_row.get('recordNo')
         record_row['operator'] = record_row.get('operatorName')
         record_row['specText'] = record_row.get('skuName')
+        if source_type == 'enrollment_order' and source_id:
+            # 报名/续费订单中的物品销售出库，可查看销售订单详情
+            record_row['saleOrderId'] = source_id
         if purchase_order:
             record_row['purchaseOrderId'] = purchase_order.id
             record_row['purchaseOrderNo'] = purchase_order.order_no

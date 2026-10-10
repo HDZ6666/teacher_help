@@ -33,11 +33,19 @@ class TeachEnrollmentService:
     ORDER_TYPE_LABELS = {
         'enroll': '报名',
         'renew': '续费',
+        'transfer': '转课',
+        'import': '导入',
     }
     ORDER_STATUS_LABELS = {
         'pending': '待支付',
         'paid': '已支付',
         'cancelled': '已取消',
+    }
+    ACCOUNT_STATUS_LABELS = {
+        'active': '有效',
+        'stopped': '停课',
+        'completed': '结课',
+        'transferred': '已转出',
     }
     CHARGE_UNITS = {
         'class': '课时',
@@ -368,7 +376,7 @@ class TeachEnrollmentService:
         row = CamelCaseUtil.transform_result(account)
         row['orderNo'] = order_no
         row['chargeTypeName'] = cls.CHARGE_UNITS.get(row.get('chargeType'), row.get('chargeType'))
-        row['statusName'] = '有效' if row.get('status') == 'active' else row.get('status')
+        row['statusName'] = cls.ACCOUNT_STATUS_LABELS.get(row.get('status'), row.get('status'))
         return row
 
     @classmethod

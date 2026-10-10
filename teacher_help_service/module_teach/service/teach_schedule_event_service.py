@@ -165,6 +165,8 @@ class TeachScheduleEventService:
                     'statusName': cls.get_attendance_status_name(att.status),
                     'checkInTime': att.check_in_time,
                     'notes': att.notes,
+                    'isTemp': att.is_temp or 0,
+                    'makeupDetailId': att.makeup_detail_id,
                 }
             )
         detail.students = students
