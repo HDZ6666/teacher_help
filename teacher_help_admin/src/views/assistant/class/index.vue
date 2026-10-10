@@ -42,7 +42,7 @@
             </el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="info" plain icon="Upload" @click="handleTodo('导入班级')">导入班级</el-button>
+            <el-button type="info" plain icon="Upload" disabled title="批量导入班级（Excel 模板）后续接入">导入班级</el-button>
           </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -520,10 +520,6 @@ async function handleRechargeChange(row, value) {
   } catch (error) {
     row.allowRecharge = value === 1 ? 0 : 1;
   }
-}
-
-function handleTodo(name) {
-  proxy.$modal.msgInfo(`${name}功能将在批量导入阶段接入`);
 }
 
 onMounted(async () => {
