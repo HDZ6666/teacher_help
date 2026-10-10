@@ -6,6 +6,7 @@ from module_admin.entity.do.role_do import SysRoleDept  # noqa: F401
 from module_teach.entity.do.teach_venue_do import (
     TeachCourt,
     TeachCourtBooking,
+    TeachCourtPriceRule,
     TeachCourtTime,
     TeachVenue,
 )
@@ -14,6 +15,18 @@ from module_teach.entity.vo.teach_venue_vo import (
     TeachVenuePageQueryModel,
 )
 from utils.page_util import PageUtil
+
+
+def to_date(value):
+    """
+    查询参数中的日期字符串转为 date（无法解析时原样返回，交给数据库比较）
+    """
+    if isinstance(value, str):
+        try:
+            return datetime.strptime(value[:10], '%Y-%m-%d').date()
+        except ValueError:
+            return value
+    return value
 
 
 class TeachVenueDao:
@@ -168,6 +181,36 @@ class TeachVenueDao:
 
         await db.execute(delete(TeachCourtTime).where(TeachCourtTime.court_id == court_id))
 
+    # ======================== 分时价格规则 ========================
+    @classmethod
+    async def get_price_rules_by_court_ids(cls, db: AsyncSession, court_ids: list[int], week_day: int | None = None):
+        if not court_ids:
+            return []
+        query = select(TeachCourtPriceRule).where(TeachCourtPriceRule.court_id.in_(court_ids))
+        if week_day is not None:
+            query = query.where(TeachCourtPriceRule.week_day == week_day)
+        result = await db.execute(
+            query.order_by(
+                TeachCourtPriceRule.court_id,
+                TeachCourtPriceRule.week_day,
+                TeachCourtPriceRule.start_time,
+                TeachCourtPriceRule.id,
+            )
+        )
+        return result.scalars().all()
+
+    @classmethod
+    async def add_price_rule(cls, db: AsyncSession, rule: TeachCourtPriceRule):
+        db.add(rule)
+        await db.flush()
+        return rule
+
+    @classmethod
+    async def delete_price_rules_by_court_id(cls, db: AsyncSession, court_id: int):
+        from sqlalchemy import delete
+
+        await db.execute(delete(TeachCourtPriceRule).where(TeachCourtPriceRule.court_id == court_id))
+
     # ======================== 预订单 ========================
     @classmethod
     async def get_booking_list(
@@ -191,7 +234,13 @@ class TeachVenueDao:
         if query_object.pay_status is not None:
             query = query.where(TeachCourtBooking.pay_status == query_object.pay_status)
         if query_object.booking_date:
-            query = query.where(TeachCourtBooking.booking_date == query_object.booking_date)
+            query = query.where(TeachCourtBooking.booking_date == to_date(query_object.booking_date))
+        if query_object.booking_date_start:
+            query = query.where(TeachCourtBooking.booking_date >= to_date(query_object.booking_date_start))
+        if query_object.booking_date_end:
+            query = query.where(TeachCourtBooking.booking_date <= to_date(query_object.booking_date_end))
+        if query_object.lock_group_no:
+            query = query.where(TeachCourtBooking.lock_group_no == query_object.lock_group_no)
         if query_object.begin_time:
             query = query.where(TeachCourtBooking.create_time >= query_object.begin_time)
         if query_object.end_time:
@@ -258,3 +307,21 @@ class TeachVenueDao:
         booking.update_time = datetime.now()
         await db.flush()
         return booking
+
+    @classmethod
+    async def get_lock_group_bookings(cls, db: AsyncSession, lock_group_no: str, from_date=None):
+        """
+        加锁读取同一批次中仍有效(已预订)的锁场记录
+        """
+        await db.flush()
+        query = select(TeachCourtBooking).where(
+            TeachCourtBooking.lock_group_no == lock_group_no,
+            TeachCourtBooking.booking_type == 'lock',
+            TeachCourtBooking.booking_status == 1,
+            TeachCourtBooking.del_flag == 0,
+        )
+        if from_date is not None:
+            query = query.where(TeachCourtBooking.booking_date >= from_date)
+        query = query.order_by(TeachCourtBooking.booking_date, TeachCourtBooking.id)
+        result = await db.execute(query.with_for_update().execution_options(populate_existing=True))
+        return result.scalars().all()

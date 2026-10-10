@@ -12,6 +12,7 @@
 import ast
 import glob
 import os
+import re
 import sys
 from datetime import date
 
@@ -28,6 +29,7 @@ from config.get_db import import_business_do_modules  # noqa: E402
 
 TABLE_SQL_FILE = os.path.join(BASE_DIR, 'sql', 'teacher_help_teach_tables.sql')
 MENU_SQL_FILE = os.path.join(BASE_DIR, 'sql', 'teacher_help_menu.sql')
+TABLE_OPTION_PATTERN = r"^\)COMMENT=('(?:[^']|'')*') ENGINE=InnoDB CHARSET=utf8mb4$"
 
 # 菜单ID段：5000 根目录，5001-5099 模块目录，5100 起按钮
 MENU_ROOT_ID = 5000
@@ -69,12 +71,20 @@ ACTION_LABELS = {
     'upload': '上传',
     'download': '下载',
     'consume': '核销',
+    'revoke': '撤销点名',
+    'makeup': '标记已补',
+    'assign': '分配跟进人/学管师',
 }
 
 # P0 之后新增的权限使用固定菜单ID（5900 起），避免插入到顺序编号中间导致已有按钮ID整体后移、
 # 已分配给角色的 sys_role_menu 关系错位。新增权限请在这里追加，ID 只增不改。
 PINNED_BUTTON_IDS = {
     'teach:card:consume': 5900,
+    'teach:classRecord:revoke': 5901,
+    'teach:schedule:event:export': 5902,
+    'teach:classRecord:export': 5903,
+    'teach:classRecord:makeup': 5904,
+    'teach:student:assign': 5905,
 }
 
 
@@ -135,6 +145,10 @@ def generate_table_sql():
         lines.append(f'-- {table.name} {table_doc.get(table.name, "")}'.rstrip())
         lines.append('-- ----------------------------')
         ddl_lines = [line.replace('\t', '  ').rstrip() for line in ddl.splitlines()]
+        # 不同 SQLAlchemy 版本表选项顺序不同，统一为 ENGINE/CHARSET 在前、COMMENT 在后，避免无意义的 diff
+        ddl_lines = [
+            re.sub(TABLE_OPTION_PATTERN, r')ENGINE=InnoDB CHARSET=utf8mb4 COMMENT=\1', line) for line in ddl_lines
+        ]
         lines.append('\n'.join(ddl_lines) + ';')
         lines.append('')
     lines.extend(

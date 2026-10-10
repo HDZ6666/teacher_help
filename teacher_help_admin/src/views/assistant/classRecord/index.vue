@@ -37,7 +37,7 @@
 
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="success" plain icon="Download" @click="handleExport">导出</el-button>
+            <el-button type="success" plain icon="Download" @click="handleExport" v-hasPermi="['teach:classRecord:export']">导出</el-button>
           </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
         </el-row>
@@ -72,7 +72,7 @@
             <template #default="{ row }">
               <el-button type="primary" link @click="handleDetail(row)">详情</el-button>
               <el-button type="warning" link @click="handleComment(row)">课后点评</el-button>
-              <el-button type="danger" link @click="handleDelete(row)">撤销</el-button>
+              <el-button type="danger" link @click="handleDelete(row)" v-hasPermi="['teach:classRecord:revoke']">撤销</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -117,10 +117,10 @@
 
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="warning" plain icon="Bell" @click="handleBatchRemind">批量提醒</el-button>
+            <el-button type="warning" plain icon="Bell" disabled title="消息通知通道（短信/公众号）尚未接入，暂不可用">批量提醒</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="success" plain icon="Download" @click="handleOvertimeExport">导出</el-button>
+            <el-button type="success" plain icon="Download" @click="handleOvertimeExport" v-hasPermi="['teach:classRecord:export']">导出</el-button>
           </el-col>
         </el-row>
 
@@ -169,6 +169,12 @@
               <el-option v-for="item in classList" :key="item.id" :label="item.className" :value="item.id" />
             </el-select>
           </el-form-item>
+          <el-form-item label="补课状态">
+            <el-select v-model="makeupQueryParams.makeupFlag" placeholder="全部" clearable style="width: 120px">
+              <el-option label="未补" :value="0" />
+              <el-option label="已补课" :value="1" />
+            </el-select>
+          </el-form-item>
           <el-form-item label="上课日期">
             <el-date-picker
               v-model="makeupDateRange"
@@ -188,14 +194,18 @@
 
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="warning" plain icon="Bell" @click="handleBatchNotify">开班补课</el-button>
+            <el-button type="primary" plain icon="Check" :disabled="!makeupSelection.length" @click="handleBatchMarkMadeup" v-hasPermi="['teach:classRecord:makeup']">标记已补</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="success" plain icon="Download" @click="handleMakeupExport">导出</el-button>
+            <el-button type="warning" plain icon="Bell" disabled title="开补课班需与产品确认补课班规则后接入，暂不可用">开班补课</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="success" plain icon="Download" @click="handleMakeupExport" v-hasPermi="['teach:classRecord:export']">导出</el-button>
           </el-col>
         </el-row>
 
-        <el-table v-loading="makeupLoading" :data="makeupList" border>
+        <el-table v-loading="makeupLoading" :data="makeupList" border @selection-change="handleMakeupSelectionChange">
+          <el-table-column type="selection" width="55" align="center" :selectable="row => !row.madeupStatus" />
           <el-table-column label="学员姓名" align="center" prop="studentName" width="120" />
           <el-table-column label="手机号" align="center" prop="phone" width="130" />
           <el-table-column label="班级名称" align="center" prop="className" min-width="160" show-overflow-tooltip />
@@ -216,15 +226,27 @@
           <el-table-column label="实扣额度" align="center" prop="actualDeduct" width="100" />
           <el-table-column label="补课状态" align="center" width="100">
             <template #default="{ row }">
-              <el-tag v-if="row.madeupStatus" type="success">已补课</el-tag>
-              <span v-else>-</span>
+              <el-tooltip
+                v-if="row.madeupStatus"
+                :content="`${row.makeupBy || ''} ${parseTime(row.makeupTime) || ''} ${row.makeupDetail || ''}`"
+                placement="top"
+              >
+                <el-tag type="success">已补课</el-tag>
+              </el-tooltip>
+              <span v-else>未补</span>
             </template>
           </el-table-column>
           <el-table-column label="上课内容" align="center" prop="classContent" min-width="150" show-overflow-tooltip />
           <el-table-column label="操作" align="center" width="180" fixed="right">
             <template #default="{ row }">
-              <el-button type="warning" link @click="handleNotifyMakeup(row)">提醒补课</el-button>
-              <el-button type="primary" link @click="handleMarkMadeup(row)">标记已补</el-button>
+              <el-button type="warning" link disabled title="消息通知通道（短信/公众号）尚未接入，暂不可用">提醒补课</el-button>
+              <el-button
+                v-if="!row.madeupStatus"
+                type="primary"
+                link
+                @click="handleMarkMadeup(row)"
+                v-hasPermi="['teach:classRecord:makeup']"
+              >标记已补</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -274,10 +296,10 @@
 
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="warning" plain icon="Bell" @click="handleBatchRemindAbsence">提醒</el-button>
+            <el-button type="warning" plain icon="Bell" disabled title="消息通知通道（短信/公众号）尚未接入，暂不可用">提醒</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="success" plain icon="Download" @click="handleAbsenceExport">导出</el-button>
+            <el-button type="success" plain icon="Download" @click="handleAbsenceExport" v-hasPermi="['teach:classRecord:export']">导出</el-button>
           </el-col>
           <right-toolbar @queryTable="getAbsenceList" />
         </el-row>
@@ -299,8 +321,8 @@
           </el-table-column>
           <el-table-column label="操作" align="center" width="150" fixed="right">
             <template #default="{ row }">
-              <el-button type="warning" link @click="handleRemindAbsence(row)">提醒</el-button>
-              <el-button type="primary" link @click="handleMarkReminded(row)">不再提醒</el-button>
+              <el-button type="warning" link disabled title="消息通知通道（短信/公众号）尚未接入，暂不可用">提醒</el-button>
+              <el-button type="primary" link disabled title="不提醒名单需新增数据表，后续接入">不再提醒</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -314,8 +336,8 @@
         />
       </el-tab-pane>
 
-      <el-tab-pane label="请假申请" name="leave">
-        <el-empty description="请假申请审批流程后续接入" />
+      <el-tab-pane label="请假申请" name="leave" lazy>
+        <leave-panel />
       </el-tab-pane>
     </el-tabs>
 
@@ -341,11 +363,14 @@ import { parseTime } from '@/utils/ruoyi'
 import { listClassOptions } from '@/api/assistant/class'
 import { listCourseOptions } from '@/api/assistant/course'
 import { listTeacher } from '@/api/teach/teacher'
+import LeavePanel from '@/views/assistant/leave/components/LeavePanel'
 import {
   listAbsenceReminder,
   listAttendanceRecord,
   listMakeupRecord,
-  listOvertimeRecord
+  markMakeupRecord,
+  listOvertimeRecord,
+  revokeAttendanceRecord
 } from '@/api/assistant/classRecord'
 
 const { proxy } = getCurrentInstance()
@@ -379,8 +404,10 @@ const makeupQueryParams = ref({
   pageNum: 1,
   pageSize: 10,
   studentKeyword: '',
-  classId: ''
+  classId: '',
+  makeupFlag: ''
 })
+const makeupSelection = ref([])
 
 const absenceLoading = ref(false)
 const absenceList = ref([])
@@ -466,8 +493,15 @@ function resetQuery() {
   getList()
 }
 
+function exportRecords(type, params, label) {
+  const query = { ...params }
+  delete query.pageNum
+  delete query.pageSize
+  proxy.download(`teach/class-record/${type}/export`, query, `${label}_${new Date().getTime()}.xlsx`)
+}
+
 function handleExport() {
-  proxy.$modal.msgInfo('导出功能后续接入')
+  exportRecords('attendance', buildDateRangeParams(queryParams.value, dateRange.value), '点名记录')
 }
 
 function handleDetail(row) {
@@ -484,8 +518,18 @@ function handleComment(row) {
   })
 }
 
-function handleDelete() {
-  proxy.$modal.msgInfo('撤销点名记录后续接入')
+function handleDelete(row) {
+  proxy.$modal
+    .prompt(
+      `确认撤销 ${row.className || ''} ${row.classDate || ''} 的点名吗？已扣课时将退回，课次可重新点名；已有课后点评的需先撤销点评。请输入撤销原因`,
+      '撤销点名'
+    )
+    .then(async ({ value }) => {
+      const res = await revokeAttendanceRecord({ id: row.id, reason: value })
+      proxy.$modal.msgSuccess(res.msg || '撤销成功')
+      getList()
+    })
+    .catch(() => {})
 }
 
 async function initSelectOptions() {
@@ -528,12 +572,8 @@ function resetOvertimeQuery() {
   getOvertimeList()
 }
 
-function handleBatchRemind() {
-  proxy.$modal.msgInfo('批量提醒功能后续接入')
-}
-
 function handleOvertimeExport() {
-  proxy.$modal.msgInfo('导出功能后续接入')
+  exportRecords('overtime', buildDateRangeParams(overtimeQueryParams.value, overtimeDateRange.value), '超时未点名')
 }
 
 function handleRemind(row) {
@@ -575,7 +615,8 @@ function resetMakeupQuery() {
     pageNum: 1,
     pageSize: 10,
     studentKeyword: '',
-    classId: ''
+    classId: '',
+    makeupFlag: ''
   }
   getMakeupList()
 }
@@ -588,20 +629,33 @@ function getMakeupStatusType(status) {
   return typeMap[status] || 'info'
 }
 
-function handleNotifyMakeup(row) {
-  proxy.$modal.msgInfo(`${row.studentName || ''} 的补课提醒后续接入`)
+function handleMakeupSelectionChange(selection) {
+  makeupSelection.value = selection
 }
 
-function handleBatchNotify() {
-  proxy.$modal.msgInfo('开班补课功能后续接入')
+function markMadeup(ids, title) {
+  proxy.$modal
+    .prompt(`${title}（只记录补课标记，不改变扣课与课程账户）。可填写补课说明`, '标记已补', {
+      inputValidator: value => !value || value.length <= 200 || '补课说明不超过200字'
+    })
+    .then(async ({ value }) => {
+      const res = await markMakeupRecord({ ids, remark: value || undefined })
+      proxy.$modal.msgSuccess(res.msg || '标记成功')
+      getMakeupList()
+    })
+    .catch(() => {})
 }
 
 function handleMarkMadeup(row) {
-  proxy.$modal.msgInfo(`${row.studentName || ''} 的标记已补后续接入`)
+  markMadeup([row.id], `确认将 ${row.studentName || ''} ${row.classDate || ''} 的缺课标记为已补课吗`)
+}
+
+function handleBatchMarkMadeup() {
+  markMadeup(makeupSelection.value.map(item => item.id), `确认将选中的 ${makeupSelection.value.length} 条缺课标记为已补课吗`)
 }
 
 function handleMakeupExport() {
-  proxy.$modal.msgInfo('导出功能后续接入')
+  exportRecords('makeup', buildDateRangeParams(makeupQueryParams.value, makeupDateRange.value), '补课记录')
 }
 
 async function getAbsenceList() {
@@ -632,20 +686,8 @@ function resetAbsenceQuery() {
   getAbsenceList()
 }
 
-function handleRemindAbsence(row) {
-  proxy.$modal.msgInfo(`${row.studentName || ''} 的缺课提醒后续接入`)
-}
-
-function handleBatchRemindAbsence() {
-  proxy.$modal.msgInfo('批量提醒功能后续接入')
-}
-
-function handleMarkReminded(row) {
-  proxy.$modal.msgInfo(`${row.studentName || ''} 的不再提醒后续接入`)
-}
-
 function handleAbsenceExport() {
-  proxy.$modal.msgInfo('导出功能后续接入')
+  exportRecords('absence', cleanParams(absenceQueryParams.value), '缺课提醒')
 }
 
 onMounted(() => {

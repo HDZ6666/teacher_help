@@ -42,6 +42,16 @@ class TeachCardDao:
         return result.scalars().first()
 
     @classmethod
+    async def get_cards_by_ids(cls, db: AsyncSession, card_ids: list[int]):
+        """
+        按ID批量查询卡模板（含已删除，用于发放记录展示卡类型/折扣率）
+        """
+        if not card_ids:
+            return []
+        result = await db.execute(select(TeachCard).where(TeachCard.id.in_(card_ids)))
+        return result.scalars().all()
+
+    @classmethod
     async def get_teach_card_by_no(cls, db: AsyncSession, card_no: str):
         result = await db.execute(select(TeachCard).where(TeachCard.card_no == card_no, TeachCard.del_flag == 0))
         return result.scalars().first()

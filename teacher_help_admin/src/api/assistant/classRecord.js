@@ -17,7 +17,25 @@ export function getAttendanceRecord(recordId) {
   })
 }
 
-// 点名记录的新增/修改/撤销/导出接口后端尚未实现（点名提交走 /teach/class/{id}/attendance），此处不再封装悬空接口
+// 撤销点名（整次点名记录，退回已扣课时，课次可重新点名）
+export function revokeAttendanceRecord(data) {
+  return request({
+    url: '/teach/class-record/attendance/revoke',
+    method: 'put',
+    data: data
+  })
+}
+
+// 缺课明细标记已补（只记录补课标记，不影响扣课）
+export function markMakeupRecord(data) {
+  return request({
+    url: '/teach/class-record/makeup/mark',
+    method: 'put',
+    data: data
+  })
+}
+
+// 导出走 proxy.download('teach/class-record/{attendance|overtime|makeup|absence}/export')；点名提交走 /teach/class/{id}/attendance
 
 // 查询超纲未点列表
 export function listOvertimeRecord(query) {

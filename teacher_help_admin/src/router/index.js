@@ -144,6 +144,31 @@ export const constantRoutes = [
         meta: { title: '物品/费用', icon: 'shopping' }
       },
       {
+        path: 'card',
+        component: () => import('@/views/assistant/card/index'),
+        name: 'AssistantCard',
+        meta: { title: '会员卡', icon: 'money' }
+      },
+      {
+        path: 'venue',
+        component: () => import('@/views/assistant/venue/index'),
+        name: 'AssistantVenue',
+        meta: { title: '场地预订', icon: 'date' }
+      },
+      {
+        path: 'teacher',
+        component: () => import('@/views/assistant/teacher/index'),
+        name: 'AssistantTeacher',
+        meta: { title: '老师管理', icon: 'peoples' }
+      },
+      {
+        path: 'teacher/detail/:id',
+        component: () => import('@/views/assistant/teacher/detail'),
+        name: 'AssistantTeacherDetail',
+        meta: { title: '老师详情', activeMenu: '/assistant/teacher' },
+        hidden: true
+      },
+      {
         path: 'schedule',
         component: () => import('@/views/assistant/schedule/index'),
         name: 'AssistantSchedule',
@@ -274,9 +299,10 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'index/:id(\\d+)',
-        component: () => import('@/views/teach/user/detail'),
+        // 旧版教师详情调用的统计接口后端不存在，P2 起改用助教端老师详情（真实接口）
+        component: () => import('@/views/assistant/teacher/detail'),
         name: 'TeacherDetail',
-        meta: { title: '教师详情', activeMenu: '/teach/user' }
+        meta: { title: '教师详情', activeMenu: '/assistant/teacher' }
       }
     ]
   }

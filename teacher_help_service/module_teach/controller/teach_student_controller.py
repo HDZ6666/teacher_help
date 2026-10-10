@@ -8,6 +8,7 @@ from module_admin.annotation.log_annotation import Log
 from module_admin.aspect.interface_auth import CheckUserInterfaceAuth
 from module_admin.aspect.data_scope import GetDataScope
 from module_teach.service.teach_enrollment_service import TeachEnrollmentService
+from module_teach.service.teach_student_assign_service import TeachStudentAssignService
 from module_teach.service.teach_student_service import TeachStudentService
 from module_teach.entity.vo.teach_student_vo import (
     TeachStudentPageQueryModel,
@@ -16,7 +17,8 @@ from module_teach.entity.vo.teach_student_vo import (
     DeleteTeachStudentModel,
     TeachStudentResponseModel,
     TeachStudentDetailModel,
-    TeachStudentEnrollModel
+    TeachStudentEnrollModel,
+    AssignTeachStudentStaffModel,
 )
 from utils.response_util import ResponseUtil
 from utils.page_util import PageResponseModel
@@ -52,9 +54,44 @@ async def get_teach_student_list(
     student_page_query_result = await TeachStudentService.get_teach_student_list_services(
         query_db, student_page_query, data_scope_sql, is_page=True
     )
+    await TeachStudentAssignService.fill_staff_names(query_db, student_page_query_result.rows)
     logger.info('获取成功')
 
     return ResponseUtil.success(model_content=student_page_query_result)
+
+
+@teachStudentController.get(
+    '/staff-options', dependencies=[Depends(CheckUserInterfaceAuth(['teach:student:assign', 'teach:student:list']))]
+)
+async def get_teach_student_staff_options(
+    request: Request,
+    role: str,
+    keyword: str = None,
+    query_db: AsyncSession = Depends(get_db),
+):
+    """
+    跟进人/学管师候选员工（系统员工账号），附已分配在读学员数
+    """
+    result = await TeachStudentAssignService.get_staff_options_services(query_db, role, keyword)
+    return ResponseUtil.success(data=result)
+
+
+@teachStudentController.put('/assign', dependencies=[Depends(CheckUserInterfaceAuth('teach:student:assign'))])
+@Log(title='学员分配跟进人/学管师', business_type=BusinessType.UPDATE)
+async def assign_teach_student_staff(
+    request: Request,
+    assign_form: AssignTeachStudentStaffModel,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user),
+):
+    """
+    批量分配跟进人/学管师（userId 为空表示改为待分配）
+    """
+    result = await TeachStudentAssignService.assign_services(
+        query_db, assign_form.student_ids, assign_form.role, assign_form.user_id, current_user.user.user_name
+    )
+    logger.info(result.message)
+    return ResponseUtil.success(msg=result.message)
 
 
 @teachStudentController.post('/enroll', dependencies=[Depends(CheckUserInterfaceAuth('teach:student:edit'))])

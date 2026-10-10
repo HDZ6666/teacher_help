@@ -150,6 +150,11 @@ class TeachClassAttendanceDetail(Base):
     before_remaining = Column(Integer, nullable=True, comment='扣课前剩余')
     after_remaining = Column(Integer, nullable=True, comment='扣课后剩余')
     consume_method = Column(String(100), nullable=True, comment='消费方式快照')
+    # 缺课补课标记（P2）：仅记录“已安排/已完成补课”，不影响课时扣减与课程账户
+    makeup_flag = Column(SMALLINT, nullable=False, default=0, server_default='0', comment='补课标记(0=未补 1=已补)')
+    makeup_time = Column(DateTime, nullable=True, comment='标记已补时间')
+    makeup_by = Column(String(64), nullable=True, comment='标记已补操作人')
+    makeup_remark = Column(String(200), nullable=True, comment='补课说明')
     del_flag = Column(SMALLINT, nullable=True, default=0, comment='删除标志(0=存在 1=删除)')
     create_by = Column(String(64), nullable=True, default='', comment='创建者')
     create_time = Column(DateTime, nullable=True, default=datetime.now, comment='创建时间')

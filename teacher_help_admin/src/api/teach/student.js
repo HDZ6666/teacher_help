@@ -88,3 +88,21 @@ export function getStudentOrders(studentId) {
 }
 
 // 退课接口（退课退款、库存回滚）后端尚未实现，不提供前端假成功封装
+
+// 跟进人/学管师候选员工（role: follower | advisor）
+export function listStaffOptions(role, keyword) {
+  return request({
+    url: '/teach/student/staff-options',
+    method: 'get',
+    params: { role, keyword }
+  })
+}
+
+// 批量分配跟进人/学管师（userId 为空表示改为待分配）
+export function assignStudentStaff(data) {
+  return request({
+    url: '/teach/student/assign',
+    method: 'put',
+    data: data
+  })
+}

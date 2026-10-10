@@ -64,6 +64,24 @@ class TeachCourtTime(Base):
     create_time = Column(DateTime, nullable=True, default=datetime.now, comment='创建时间')
 
 
+class TeachCourtPriceRule(Base):
+    """
+    场地分时价格规则表
+    """
+
+    __tablename__ = 'teach_court_price_rule'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, comment='主键ID')
+    court_id = Column(Integer, ForeignKey('teach_court.id'), nullable=False, comment='场地ID')
+    week_day = Column(SMALLINT, nullable=False, comment='星期(1-7)')
+    start_time = Column(String(10), nullable=False, comment='开始时间(HH:MM)')
+    end_time = Column(String(10), nullable=False, comment='结束时间(HH:MM)')
+    price_per_hour = Column(DECIMAL(10, 2), nullable=True, default=0, comment='该时段每小时价格')
+    price_per_half_hour = Column(DECIMAL(10, 2), nullable=True, default=0, comment='该时段每半小时价格')
+    create_by = Column(String(64), nullable=True, default='', comment='创建者')
+    create_time = Column(DateTime, nullable=True, default=datetime.now, comment='创建时间')
+
+
 class TeachCourtBooking(Base):
     """
     场地预订单表
@@ -83,6 +101,7 @@ class TeachCourtBooking(Base):
     customer_name = Column(String(50), nullable=True, comment='客户姓名')
     customer_phone = Column(String(20), nullable=True, comment='客户电话')
     booking_type = Column(String(20), nullable=True, default='normal', comment='预订类型(normal=预订 lock=锁场)')
+    lock_group_no = Column(String(50), nullable=True, index=True, comment='批量锁场批次号')
     origin = Column(String(20), nullable=True, default='admin', comment='来源(admin=代预订 online=线上)')
     amount = Column(DECIMAL(10, 2), nullable=True, default=0, comment='应收金额')
     discount_amount = Column(DECIMAL(10, 2), nullable=True, default=0, comment='优惠金额')

@@ -8,6 +8,7 @@ from module_admin.annotation.log_annotation import Log
 from module_admin.aspect.interface_auth import CheckUserInterfaceAuth
 from module_admin.aspect.data_scope import GetDataScope
 from module_teach.service.teach_teacher_service import TeachTeacherService
+from module_teach.service.teach_teacher_stat_service import TeachTeacherStatService
 from module_teach.entity.vo.teach_teacher_vo import (
     TeachTeacherPageQueryModel,
     AddTeachTeacherModel,
@@ -43,6 +44,47 @@ async def get_teacher_list(
     logger.info('获取成功')
 
     return ResponseUtil.success(model_content=teacher_page_query_result)
+
+
+@teacherController.get('/stats', dependencies=[Depends(CheckUserInterfaceAuth('teach:teacher:list'))])
+async def get_teacher_stats(request: Request, teacher_ids: str = '', query_db: AsyncSession = Depends(get_db)):
+    """
+    批量获取老师课时统计（上月/本月/累计课次与课时、授课班级数），teacher_ids 逗号分隔
+    """
+    ids = [int(item) for item in teacher_ids.split(',') if item.strip().isdigit()]
+    result = await TeachTeacherStatService.get_teacher_stats_services(query_db, ids)
+    logger.info('获取成功')
+    return ResponseUtil.success(data=result)
+
+
+@teacherController.get('/{teacher_id}/overview', dependencies=[Depends(CheckUserInterfaceAuth('teach:teacher:query'))])
+async def get_teacher_overview(request: Request, teacher_id: int, query_db: AsyncSession = Depends(get_db)):
+    """
+    老师详情概览：课时统计 + 授课班级
+    """
+    result = await TeachTeacherStatService.get_teacher_overview_services(query_db, teacher_id)
+    logger.info('获取成功')
+    return ResponseUtil.success(data=result)
+
+
+@teacherController.get('/{teacher_id}/records', dependencies=[Depends(CheckUserInterfaceAuth('teach:teacher:query'))])
+async def get_teacher_records(
+    request: Request,
+    teacher_id: int,
+    page_num: int = 1,
+    page_size: int = 10,
+    begin_date: str | None = None,
+    end_date: str | None = None,
+    query_db: AsyncSession = Depends(get_db),
+):
+    """
+    老师上课记录（按点名记录分页）
+    """
+    result = await TeachTeacherStatService.get_teacher_records_services(
+        query_db, teacher_id, page_num, page_size, begin_date, end_date
+    )
+    logger.info('获取成功')
+    return ResponseUtil.success(model_content=result)
 
 
 @teacherController.get(

@@ -613,6 +613,7 @@ CREATE TABLE IF NOT EXISTS teach_court_booking (
   customer_name VARCHAR(50) COMMENT '客户姓名',
   customer_phone VARCHAR(20) COMMENT '客户电话',
   booking_type VARCHAR(20) COMMENT '预订类型(normal=预订 lock=锁场)',
+  lock_group_no VARCHAR(50) COMMENT '批量锁场批次号',
   origin VARCHAR(20) COMMENT '来源(admin=代预订 online=线上)',
   amount DECIMAL(10, 2) COMMENT '应收金额',
   discount_amount DECIMAL(10, 2) COMMENT '优惠金额',
@@ -634,6 +635,23 @@ CREATE TABLE IF NOT EXISTS teach_court_booking (
   UNIQUE (booking_no),
   FOREIGN KEY(court_id) REFERENCES teach_court (id)
 )ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='场地预订单表';
+
+-- ----------------------------
+-- teach_court_price_rule 场地分时价格规则表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS teach_court_price_rule (
+  id INTEGER NOT NULL COMMENT '主键ID' AUTO_INCREMENT,
+  court_id INTEGER NOT NULL COMMENT '场地ID',
+  week_day SMALLINT NOT NULL COMMENT '星期(1-7)',
+  start_time VARCHAR(10) NOT NULL COMMENT '开始时间(HH:MM)',
+  end_time VARCHAR(10) NOT NULL COMMENT '结束时间(HH:MM)',
+  price_per_hour DECIMAL(10, 2) COMMENT '该时段每小时价格',
+  price_per_half_hour DECIMAL(10, 2) COMMENT '该时段每半小时价格',
+  create_by VARCHAR(64) COMMENT '创建者',
+  create_time DATETIME COMMENT '创建时间',
+  PRIMARY KEY (id),
+  FOREIGN KEY(court_id) REFERENCES teach_court (id)
+)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='场地分时价格规则表';
 
 -- ----------------------------
 -- teach_court_time 场地可约时段表
@@ -670,6 +688,8 @@ CREATE TABLE IF NOT EXISTS teach_students (
   medical_notes TEXT COMMENT '医疗备注(过敏史等)',
   emergency_contact VARCHAR(20) COMMENT '紧急联系人电话',
   status VARCHAR(1) NOT NULL COMMENT '帐号状态（0在读 1休学 2转学 3毕业）',
+  follower_user_id INTEGER COMMENT '跟进人(sys_user.user_id)',
+  advisor_user_id INTEGER COMMENT '学管师(sys_user.user_id)',
   del_flag VARCHAR(1) NOT NULL COMMENT '删除标志（0代表存在 2代表删除）',
   create_by VARCHAR(64) COMMENT '创建者',
   create_time DATETIME NOT NULL COMMENT '创建时间',
@@ -695,6 +715,10 @@ CREATE TABLE IF NOT EXISTS teach_class_attendance_detail (
   before_remaining INTEGER COMMENT '扣课前剩余',
   after_remaining INTEGER COMMENT '扣课后剩余',
   consume_method VARCHAR(100) COMMENT '消费方式快照',
+  makeup_flag SMALLINT NOT NULL COMMENT '补课标记(0=未补 1=已补)' DEFAULT '0',
+  makeup_time DATETIME COMMENT '标记已补时间',
+  makeup_by VARCHAR(64) COMMENT '标记已补操作人',
+  makeup_remark VARCHAR(200) COMMENT '补课说明',
   del_flag SMALLINT COMMENT '删除标志(0=存在 1=删除)',
   create_by VARCHAR(64) COMMENT '创建者',
   create_time DATETIME COMMENT '创建时间',

@@ -1,7 +1,7 @@
 -- ----------------------------
 -- 老师帮 teach:* / ast:* / common:file:* 菜单与按钮权限种子
 -- 由 sql/gen_teach_sql.py 扫描 Controller 中 CheckUserInterfaceAuth 生成
--- 生成日期 2026-10-09
+-- 生成日期 2026-10-10
 -- 菜单ID段 5000-5999；重复执行时按主键更新名称/权限，不影响已分配给角色的关系（sys_role_menu）
 -- 超级管理员拥有 *:*:*，无需分配；其他角色请在“角色管理”中勾选对应按钮
 -- ----------------------------
@@ -15,6 +15,7 @@ insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (5103, '学员管理列表', 5001, 4, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:student:list', '#', 'admin', sysdate(), '', null, ''),
 (5104, '学员管理查询', 5001, 5, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:student:query', '#', 'admin', sysdate(), '', null, ''),
 (5105, '学员管理删除', 5001, 6, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:student:remove', '#', 'admin', sysdate(), '', null, ''),
+(5905, '学员管理分配跟进人/学管师', 5001, 7, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:student:assign', '#', 'admin', sysdate(), '', null, ''),
 (5002, '家长管理', 5000, 2, 'parent', null, null, '', 1, 0, 'M', '1', '0', null, '#', 'admin', sysdate(), '', null, 'teach:parent:*'),
 (5106, '家长管理新增', 5002, 1, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:parent:add', '#', 'admin', sysdate(), '', null, ''),
 (5107, '家长管理修改', 5002, 2, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:parent:edit', '#', 'admin', sysdate(), '', null, ''),
@@ -48,6 +49,7 @@ insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (5131, '排课管理列表', 5006, 3, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:schedule:event:list', '#', 'admin', sysdate(), '', null, ''),
 (5132, '排课管理查询', 5006, 4, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:schedule:event:query', '#', 'admin', sysdate(), '', null, ''),
 (5133, '排课管理删除', 5006, 5, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:schedule:event:remove', '#', 'admin', sysdate(), '', null, ''),
+(5902, '排课管理导出', 5006, 6, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:schedule:event:export', '#', 'admin', sysdate(), '', null, ''),
 (5007, '考勤管理', 5000, 7, 'schedule-attendance', null, null, '', 1, 0, 'M', '1', '0', null, '#', 'admin', sysdate(), '', null, 'teach:schedule:attendance:*'),
 (5134, '考勤管理签到', 5007, 1, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:schedule:attendance:checkin', '#', 'admin', sysdate(), '', null, ''),
 (5135, '考勤管理列表', 5007, 2, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:schedule:attendance:list', '#', 'admin', sysdate(), '', null, ''),
@@ -56,6 +58,9 @@ insert into sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (5008, '上课记录', 5000, 8, 'class-record', null, null, '', 1, 0, 'M', '1', '0', null, '#', 'admin', sysdate(), '', null, 'teach:classRecord:*'),
 (5138, '上课记录列表', 5008, 1, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:list', '#', 'admin', sysdate(), '', null, ''),
 (5139, '上课记录查询', 5008, 2, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:query', '#', 'admin', sysdate(), '', null, ''),
+(5903, '上课记录导出', 5008, 3, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:export', '#', 'admin', sysdate(), '', null, ''),
+(5904, '上课记录标记已补', 5008, 4, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:makeup', '#', 'admin', sysdate(), '', null, ''),
+(5901, '上课记录撤销点名', 5008, 5, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:classRecord:revoke', '#', 'admin', sysdate(), '', null, ''),
 (5009, '会员卡管理', 5000, 9, 'card', null, null, '', 1, 0, 'M', '1', '0', null, '#', 'admin', sysdate(), '', null, 'teach:card:*'),
 (5140, '会员卡管理新增', 5009, 1, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:card:add', '#', 'admin', sysdate(), '', null, ''),
 (5141, '会员卡管理修改', 5009, 2, '#', null, null, '', 1, 0, 'F', '0', '0', 'teach:card:edit', '#', 'admin', sysdate(), '', null, ''),

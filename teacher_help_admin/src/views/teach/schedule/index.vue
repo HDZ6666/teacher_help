@@ -62,7 +62,7 @@
           plain
           icon="Plus"
           @click="handleAdd"
-          v-hasPermi="['teach:schedule:add']"
+          v-hasPermi="['teach:schedule:event:add']"
         >新增排课</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -71,7 +71,7 @@
           plain
           icon="Download"
           @click="handleExport"
-          v-hasPermi="['teach:schedule:export']"
+          v-hasPermi="['teach:schedule:event:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="fetchEvents"></right-toolbar>
@@ -260,7 +260,6 @@ import {
   addScheduleEvent,
   updateScheduleEvent,
   delScheduleEvent,
-  exportScheduleEvent,
   getCalendarEvents
 } from "@/api/teach/schedule"
 import { listTeacher } from "@/api/teach/teacher"
@@ -535,10 +534,9 @@ function handleDelete(row) {
 
 // 导出按钮操作
 function handleExport() {
-  proxy.$modal.confirm("是否确认导出所有排课数据?").then(async () => {
-    const response = await exportScheduleEvent(queryParams.value)
-    proxy.$download.saveAs(response, `schedule_${new Date().getTime()}.xlsx`)
-  })
+  proxy.$modal.confirm("是否确认导出所有排课数据?").then(() => {
+    proxy.download('teach/schedule/event/export', { ...queryParams.value }, `schedule_${new Date().getTime()}.xlsx`)
+  }).catch(() => {})
 }
 
 // 加载教师列表

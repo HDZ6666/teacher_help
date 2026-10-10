@@ -71,3 +71,8 @@ async def patch_teach_schedule_schema(conn):
         'event_id',
         "`event_id` INT NULL COMMENT '排课事件ID' AFTER `id`",
     )
+    await add_column_if_missing(
+        'teach_court_booking',
+        'lock_group_no',
+        "`lock_group_no` VARCHAR(50) NULL COMMENT '批量锁场批次号' AFTER `booking_type`",
+    )

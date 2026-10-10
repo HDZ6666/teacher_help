@@ -10,8 +10,8 @@
       <div class="course-header">
         <h2>{{ classInfo.className || '-' }} {{ classInfo.startTime || '' }}~{{ classInfo.endTime || '' }}</h2>
         <div class="action-buttons">
-          <el-button type="warning" plain @click="handleEditLesson">编辑</el-button>
-          <el-button plain @click="handleLearningPlan">布置学习计划</el-button>
+          <el-button type="warning" plain disabled title="编辑课次（改上课内容/教室等）后续接入；如点名有误，可在上课记录列表撤销本次点名后重新点名">编辑</el-button>
+          <el-button plain disabled title="学习计划后续接入">布置学习计划</el-button>
           <el-button type="success" plain @click="handleComment">课后点评</el-button>
         </div>
       </div>
@@ -93,8 +93,8 @@
       <el-tab-pane label="学员名单" name="students">
         <div class="table-toolbar">
           <div>
-            <el-button plain @click="handleAddTempStudent">添加临时学员</el-button>
-            <el-button plain @click="handleAddMakeupStudent">添加补课学员</el-button>
+            <el-button plain disabled title="临时学员/补课学员需在点名时加入，规则待产品确认后接入">添加临时学员</el-button>
+            <el-button plain disabled title="临时学员/补课学员需在点名时加入，规则待产品确认后接入">添加补课学员</el-button>
           </div>
           <div class="table-search">
             <el-checkbox v-model="onlyAbsent">只看未到学员</el-checkbox>
@@ -135,7 +135,7 @@
           </el-table-column>
           <el-table-column label="操作" align="center" width="110" fixed="right">
             <template #default="{ row }">
-              <el-button type="primary" link @click="handleModify(row)">修改</el-button>
+              <el-button type="primary" link disabled title="单个学员改点名涉及补扣/退课时规则，待产品确认；目前可撤销本次点名后重新点名">修改</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -214,31 +214,11 @@ function goBack() {
   router.back()
 }
 
-function handleEditLesson() {
-  proxy.$modal.msgInfo('编辑课次功能后续接入')
-}
-
-function handleLearningPlan() {
-  proxy.$modal.msgInfo('布置学习计划功能后续接入')
-}
-
 function handleComment() {
   router.push({
     name: 'CommentDetail',
     params: { id: route.params.id }
   })
-}
-
-function handleAddTempStudent() {
-  proxy.$modal.msgInfo('添加临时学员功能后续接入')
-}
-
-function handleAddMakeupStudent() {
-  proxy.$modal.msgInfo('添加补课学员功能后续接入')
-}
-
-function handleModify(row) {
-  proxy.$modal.msgInfo(`${row.studentName || ''} 的点名修改功能后续接入`)
 }
 
 onMounted(() => {

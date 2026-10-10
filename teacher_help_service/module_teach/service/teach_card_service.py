@@ -18,6 +18,7 @@ from module_teach.entity.vo.teach_card_vo import (
     TeachCardPageQueryModel,
     VoidTeachCardGrantModel,
 )
+from config.env import BusinessRuleConfig
 from exceptions.exception import ServiceException
 from utils.common_util import CamelCaseUtil
 
@@ -178,6 +179,7 @@ class TeachCardService:
             exist = await TeachCardDao.get_teach_card_by_no(query_db, page_object.card_no)
             if exist:
                 raise ServiceException(message='卡编号已存在')
+        cls.validate_card_template(page_object)
         try:
             card = await TeachCardDao.add_teach_card(query_db, cls.build_card_do(page_object, current_user_name))
             await cls.save_card_courses(query_db, card.id, page_object, current_user_name)
@@ -196,6 +198,7 @@ class TeachCardService:
             exist = await TeachCardDao.get_teach_card_by_no(query_db, page_object.card_no)
             if exist and exist.id != page_object.id:
                 raise ServiceException(message='卡编号已存在')
+        cls.validate_card_template(page_object)
         try:
             card.card_no = page_object.card_no or card.card_no
             card.card_name = page_object.card_name
@@ -334,10 +337,25 @@ class TeachCardService:
     ):
         page_result = await TeachCardDao.get_teach_card_grant_list(query_db, query_object, data_scope_sql, is_page)
         if hasattr(page_result, 'rows'):
-            page_result.rows = [cls.fill_grant_labels(row) for row in page_result.rows]
+            page_result.rows = await cls.attach_grant_card_info(query_db, page_result.rows)
         else:
-            page_result = [cls.fill_grant_labels(row) for row in page_result]
+            page_result = await cls.attach_grant_card_info(query_db, page_result)
         return page_result
+
+    @classmethod
+    async def attach_grant_card_info(cls, query_db: AsyncSession, grant_rows: list):
+        """
+        发放记录补充卡类型与折扣率，供 PC 端区分课程卡核销 / 场地折扣卡
+        """
+        card_ids = list({row.get('cardId') for row in grant_rows if row.get('cardId')})
+        card_map = {card.id: card for card in await TeachCardDao.get_cards_by_ids(query_db, card_ids)}
+        for row in grant_rows:
+            card = card_map.get(row.get('cardId'))
+            row['cardType'] = card.card_type if card else None
+            row['cardTypeName'] = cls.CARD_TYPE_LABELS.get(row['cardType'], row['cardType']) if card else None
+            row['discountRate'] = card.discount_rate if card else None
+            cls.fill_grant_labels(row)
+        return grant_rows
 
     @classmethod
     async def void_teach_card_grant_services(
@@ -384,15 +402,41 @@ class TeachCardService:
     @classmethod
     def resolve_pay_ratio(cls, discount_rate):
         """
-        场地折扣卡折扣率换算为实付比例：
-        0 < rate <= 1 视为比例（0.8 = 八折）；1 < rate <= 10 视为“几折”（8.5 = 八五折）；其他值视为配置错误
+        场地折扣卡折扣率换算为实付比例，口径由 CARD_DISCOUNT_RATE_MODE 控制（待产品确认，默认 auto）：
+        auto：0 < rate <= 1 视为比例（0.8 = 八折）；1 < rate <= 10 视为“几折”（8.5 = 八五折）
+        ratio：只接受 0 < rate <= 1；zhe：只接受 0 < rate <= 10 的“几折”
+        其他值视为配置错误
         """
         rate = cls.to_decimal(discount_rate, 0)
+        mode = BusinessRuleConfig.card_discount_rate_mode
+        if mode == 'ratio':
+            if Decimal('0') < rate <= Decimal('1'):
+                return rate
+            raise ServiceException(message='场地折扣卡折扣率配置不正确（应为 0~1 的比例，如 0.8 表示八折）')
+        if mode == 'zhe':
+            if Decimal('0') < rate <= Decimal('10'):
+                return rate / Decimal('10')
+            raise ServiceException(message='场地折扣卡折扣率配置不正确（应为 0~10 的折数，如 8 表示八折）')
         if Decimal('0') < rate <= Decimal('1'):
             return rate
         if Decimal('1') < rate <= Decimal('10'):
             return rate / Decimal('10')
         raise ServiceException(message='场地折扣卡折扣率配置不正确')
+
+    @classmethod
+    def validate_card_template(cls, page_object):
+        """
+        保存卡模板前的基础校验：卡类型合法；场地折扣卡的折扣率必须能按当前口径换算，避免到订场时才报错
+        """
+        card_type = page_object.card_type or 'course'
+        if card_type not in cls.CARD_TYPE_LABELS:
+            raise ServiceException(message='卡类型不正确')
+        if cls.to_int(page_object.initial_count, 0) < 0 or cls.to_int(page_object.valid_days, 0) < 0:
+            raise ServiceException(message='次数和有效天数不能小于0')
+        if cls.to_decimal(page_object.price, 0) < 0:
+            raise ServiceException(message='售价不能小于0')
+        if card_type == 'venue_discount':
+            cls.resolve_pay_ratio(page_object.discount_rate)
 
     @classmethod
     async def lock_usable_grant(
@@ -519,7 +563,7 @@ class TeachCardService:
         grants = await TeachCardDao.get_grants_by_student_id(query_db, student_id)
         rows = CamelCaseUtil.transform_result(grants)
         rows = rows if isinstance(rows, list) else [rows]
-        return [cls.fill_grant_labels(row) for row in rows]
+        return await cls.attach_grant_card_info(query_db, [row for row in rows if row])
 
     # ------------------------ 操作记录 ------------------------
     @classmethod

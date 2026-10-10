@@ -187,10 +187,10 @@ GET /teach/course/simple/list
 - 权限标识: teach:schedule:list
 
 ### 2. 添加按钮权限
-- teach:schedule:add - 新增排课
-- teach:schedule:edit - 编辑排课
-- teach:schedule:remove - 删除排课
-- teach:schedule:export - 导出排课
+- teach:schedule:event:add - 新增排课
+- teach:schedule:event:edit - 编辑排课
+- teach:schedule:event:remove - 删除排课
+- teach:schedule:event:export - 导出排课
 - teach:schedule:query - 查询排课
 
 ### 3. 后端实现要点

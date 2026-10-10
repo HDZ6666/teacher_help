@@ -11,6 +11,7 @@ from module_teach.entity.vo.teach_venue_vo import (
     AddTeachCourtModel,
     AddTeachVenueModel,
     CancelBookingModel,
+    CancelLockGroupModel,
     ChangeTeachVenueStatusModel,
     DeleteTeachCourtModel,
     DeleteTeachVenueModel,
@@ -19,6 +20,7 @@ from module_teach.entity.vo.teach_venue_vo import (
     LockCourtBookingModel,
     TeachBookingGridQueryModel,
     TeachBookingPageQueryModel,
+    TeachBookingQuoteQueryModel,
     TeachVenuePageQueryModel,
     VerifyBookingModel,
 )
@@ -219,6 +221,30 @@ async def lock_court(
     )
     logger.info(result.message)
     return ResponseUtil.success(msg=result.message, data=result.result)
+
+
+@teachVenueController.put('/booking/lock/cancel', dependencies=[Depends(CheckUserInterfaceAuth('teach:venue:edit'))])
+@Log(title='解除锁场', business_type=BusinessType.UPDATE)
+async def cancel_lock_group(
+    request: Request,
+    cancel_form: CancelLockGroupModel,
+    query_db: AsyncSession = Depends(get_db),
+    current_user: CurrentUserModel = Depends(LoginService.get_current_user),
+):
+    result = await TeachVenueService.cancel_lock_group_services(query_db, cancel_form, current_user.user.user_name)
+    logger.info(result.message)
+    return ResponseUtil.success(msg=result.message, data=result.result)
+
+
+@teachVenueController.get('/booking/quote', dependencies=[Depends(CheckUserInterfaceAuth('teach:venue:list'))])
+async def get_booking_quote(
+    request: Request,
+    quote_query: TeachBookingQuoteQueryModel = Depends(TeachBookingQuoteQueryModel.as_query),
+    query_db: AsyncSession = Depends(get_db),
+):
+    result = await TeachVenueService.get_booking_quote_services(query_db, quote_query)
+    logger.info('获取成功')
+    return ResponseUtil.success(data=result)
 
 
 @teachVenueController.put('/booking/verify', dependencies=[Depends(CheckUserInterfaceAuth('teach:venue:edit'))])

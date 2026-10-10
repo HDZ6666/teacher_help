@@ -107,6 +107,36 @@ class TeachScheduleEventService:
         return [cls.format_event_row(row) for row in event_list_result]
 
     @classmethod
+    def export_schedule_event_list_services(cls, event_rows: list):
+        """
+        导出课表（课次列表）为 Excel 二进制
+        """
+        from utils.excel_util import ExcelUtil
+
+        mapping_dict = {
+            'eventDate': '上课日期',
+            'timeRange': '上课时间',
+            'className': '班级',
+            'courseName': '课程',
+            'teacherName': '上课老师',
+            'classroom': '上课教室',
+            'lessonHours': '课时',
+            'statusName': '状态',
+            'cachedPlanned': '应到人数',
+            'cachedPresent': '出勤人数',
+            'cachedExcused': '请假人数',
+            'cachedAbsent': '缺勤人数',
+            'remark': '备注',
+        }
+        rows = []
+        for row in event_rows:
+            item = dict(row)
+            start, end = str(item.get('startTime') or ''), str(item.get('endTime') or '')
+            item['timeRange'] = f'{start.replace("T", " ")[11:16]}-{end.replace("T", " ")[11:16]}'
+            rows.append(item)
+        return ExcelUtil.export_list2excel(rows, mapping_dict)
+
+    @classmethod
     async def get_teach_schedule_event_detail_services(
         cls,
         request,

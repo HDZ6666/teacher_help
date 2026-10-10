@@ -313,3 +313,15 @@ class TeachStudentOrderModel(BaseModel):
     remark: Optional[str] = Field(default=None, description='备注')
     create_time: Optional[datetime] = Field(default=None, description='创建时间')
     items: List[TeachStudentOrderItemModel] = Field(default_factory=list, description='订单明细')
+
+
+class AssignTeachStudentStaffModel(BaseModel):
+    """
+    批量分配跟进人/学管师模型（userId 为空表示改为待分配）
+    """
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    student_ids: List[int] = Field(min_length=1, max_length=500, description='学员ID列表')
+    role: Literal['follower', 'advisor'] = Field(description='follower=跟进人 advisor=学管师')
+    user_id: Optional[int] = Field(default=None, description='员工 sys_user.user_id，为空表示待分配')
