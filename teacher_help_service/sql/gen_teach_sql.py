@@ -78,6 +78,12 @@ ACTION_LABELS = {
     'account': '报读课程变更（转课/清零/有效期/停复结课）',
     'promote': '批量升班',
     'graduate': '批量结业',
+    'reschedule': '调课',
+    'temp': '临时学员',
+    'batch': '按周重复排课',
+    'editDetail': '修改单个学员点名',
+    'makeupClass': '开补课班',
+    'permission': '老师权限配置',
 }
 
 # P0 之后新增的权限使用固定菜单ID（5900 起），避免插入到顺序编号中间导致已有按钮ID整体后移、
@@ -95,6 +101,12 @@ PINNED_BUTTON_IDS = {
     'teach:class:import': 5909,
     'teach:class:promote': 5910,
     'teach:class:graduate': 5911,
+    'teach:schedule:event:reschedule': 5912,
+    'teach:schedule:event:temp': 5913,
+    'teach:schedule:event:batch': 5914,
+    'teach:classRecord:editDetail': 5915,
+    'teach:classRecord:edit': 5916,
+    'teach:classRecord:makeupClass': 5917,
 }
 
 

@@ -51,6 +51,7 @@ class TeachStudentAccountService:
         'resume': '复课',
         'complete': '结课',
         'import': '导入',
+        'attendance_edit': '修改点名',
     }
     CHARGE_UNITS = {'class': '课时', 'lesson': '课时', 'month': '月', 'day': '天'}
     ATTENDANCE_LABELS = {1: '到课', 2: '迟到', 3: '请假', 4: '未到'}

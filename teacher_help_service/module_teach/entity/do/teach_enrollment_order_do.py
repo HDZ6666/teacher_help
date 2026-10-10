@@ -138,7 +138,7 @@ class TeachCourseAccountLog(Base):
         String(20),
         nullable=False,
         comment='操作类型(transfer_out=转出 transfer_in=转入 clear=课时清零 validity=改有效期 stop=停课 resume=复课 '
-        'complete=结课 import=导入)',
+        'complete=结课 import=导入 attendance_edit=修改点名)',
     )
     account_id = Column(Integer, nullable=False, index=True, comment='课程账户ID')
     student_id = Column(Integer, nullable=False, index=True, comment='学员ID')

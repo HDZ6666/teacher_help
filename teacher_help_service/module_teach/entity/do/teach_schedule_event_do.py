@@ -24,6 +24,14 @@ class TeachScheduleEvent(Base):
     lesson_hours = Column(DECIMAL(6, 2), nullable=True, default=1, comment='授课课时')
     content = Column(String(500), nullable=True, comment='上课内容')
     status = Column(String(1), nullable=False, default='0', comment='状态（0已安排 1进行中 2已完成 3取消）')
+    # P3：课次类型（normal=常规 makeup=补课班）
+    event_type = Column(
+        String(20),
+        nullable=False,
+        default='normal',
+        server_default='normal',
+        comment='课次类型（normal常规 makeup补课）',
+    )
     roster_frozen_at = Column(DateTime, nullable=True, comment='名单冻结时间')
     cached_planned = Column(Integer, nullable=False, default=0, comment='计划人数')
     cached_present = Column(Integer, nullable=False, default=0, comment='出勤人数')

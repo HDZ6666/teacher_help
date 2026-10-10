@@ -15,6 +15,10 @@ class TeachScheduleAttendance(Base):
     student_id = Column(Integer, nullable=False, comment='学生ID')
     status = Column(SmallInteger, nullable=False, default=0, comment='考勤状态（0未到 1出勤 2迟到 3请假 4缺勤）')
     is_countable = Column(SmallInteger, nullable=False, default=1, comment='是否计入出勤率分母（1是 0否）')
+    # P3：临时学员 / 补课学员（不在班级在读名单内，仅加入单个课次）
+    is_temp = Column(SmallInteger, nullable=False, default=0, server_default='0', comment='是否临时学员（0否 1是）')
+    course_account_id = Column(Integer, nullable=True, comment='临时学员扣课课程账户ID')
+    makeup_detail_id = Column(Integer, nullable=True, comment='补课来源点名明细ID（开补课班生成）')
     check_in_time = Column(DateTime, nullable=True, comment='签到时间')
     check_in_method = Column(String(1), nullable=True, comment='签到方式（Q二维码 M手动）')
     operator_id = Column(Integer, nullable=True, comment='操作人ID')
