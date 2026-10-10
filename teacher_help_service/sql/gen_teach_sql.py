@@ -74,6 +74,10 @@ ACTION_LABELS = {
     'revoke': '撤销点名',
     'makeup': '标记已补',
     'assign': '分配跟进人/学管师',
+    'follow': '跟进记录',
+    'account': '报读课程变更（转课/清零/有效期/停复结课）',
+    'promote': '批量升班',
+    'graduate': '批量结业',
 }
 
 # P0 之后新增的权限使用固定菜单ID（5900 起），避免插入到顺序编号中间导致已有按钮ID整体后移、
@@ -85,6 +89,12 @@ PINNED_BUTTON_IDS = {
     'teach:classRecord:export': 5903,
     'teach:classRecord:makeup': 5904,
     'teach:student:assign': 5905,
+    'teach:student:import': 5906,
+    'teach:student:follow': 5907,
+    'teach:student:account': 5908,
+    'teach:class:import': 5909,
+    'teach:class:promote': 5910,
+    'teach:class:graduate': 5911,
 }
 
 

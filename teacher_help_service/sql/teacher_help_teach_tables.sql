@@ -1,6 +1,6 @@
 -- ----------------------------
 -- 老师帮 教学域（teach_*）建表语句
--- 由 sql/gen_teach_sql.py 根据 SQLAlchemy 实体生成，生成日期 2026-10-09
+-- 由 sql/gen_teach_sql.py 根据 SQLAlchemy 实体生成，生成日期 2026-10-10
 -- 方言：MySQL 8.x；按外键依赖顺序排列；使用 IF NOT EXISTS，可在已有库上重复执行（不会修改已存在的表）
 -- 修改实体后请重新执行 python sql/gen_teach_sql.py 生成，不要手工编辑本文件
 -- ----------------------------
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS teach_base_users (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   UNIQUE (phone)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='基础用户表';
+)ENGINE=InnoDB COMMENT='基础用户表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_card 会员卡模板表
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS teach_card (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   UNIQUE (card_no)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='会员卡模板表';
+)ENGINE=InnoDB COMMENT='会员卡模板表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_card_course 会员卡适用课程表
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS teach_card_course (
   create_by VARCHAR(64) COMMENT '创建者',
   create_time DATETIME COMMENT '创建时间',
   PRIMARY KEY (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='会员卡适用课程表';
+)ENGINE=InnoDB COMMENT='会员卡适用课程表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_card_grant 会员卡发放记录表
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS teach_card_grant (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   UNIQUE (grant_no)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='会员卡发放记录表';
+)ENGINE=InnoDB COMMENT='会员卡发放记录表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_card_log 会员卡操作记录表
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS teach_card_log (
   create_time DATETIME COMMENT '创建时间',
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='会员卡操作记录表';
+)ENGINE=InnoDB COMMENT='会员卡操作记录表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_course 课程基础信息表
@@ -143,7 +143,36 @@ CREATE TABLE IF NOT EXISTS teach_course (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   UNIQUE (course_no)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='课程基础信息表';
+)ENGINE=InnoDB COMMENT='课程基础信息表' CHARSET=utf8mb4;
+
+-- ----------------------------
+-- teach_course_account_log 学员课程账户操作日志表（P3：转课/课时清零/改有效期/停课/复课/结课/导入）
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS teach_course_account_log (
+  id INTEGER NOT NULL COMMENT '主键ID' AUTO_INCREMENT,
+  batch_no VARCHAR(50) NOT NULL COMMENT '操作批次号',
+  op_type VARCHAR(20) NOT NULL COMMENT '操作类型(transfer_out=转出 transfer_in=转入 clear=课时清零 validity=改有效期 stop=停课 resume=复课 complete=结课 import=导入)',
+  account_id INTEGER NOT NULL COMMENT '课程账户ID',
+  student_id INTEGER NOT NULL COMMENT '学员ID',
+  student_name VARCHAR(50) COMMENT '学员姓名快照',
+  course_id INTEGER COMMENT '课程ID',
+  course_name VARCHAR(100) COMMENT '课程名称快照',
+  change_quantity INTEGER NOT NULL COMMENT '变动数量(减少为负)',
+  before_remaining INTEGER COMMENT '变动前剩余',
+  after_remaining INTEGER COMMENT '变动后剩余',
+  before_status VARCHAR(20) COMMENT '变动前状态',
+  after_status VARCHAR(20) COMMENT '变动后状态',
+  before_valid_start DATE COMMENT '变动前有效期开始',
+  before_valid_end DATE COMMENT '变动前有效期结束',
+  after_valid_start DATE COMMENT '变动后有效期开始',
+  after_valid_end DATE COMMENT '变动后有效期结束',
+  related_account_id INTEGER COMMENT '关联课程账户ID(转课对方账户)',
+  related_order_id INTEGER COMMENT '关联订单ID',
+  reason VARCHAR(200) COMMENT '原因/备注',
+  create_by VARCHAR(64) COMMENT '操作人',
+  create_time DATETIME COMMENT '操作时间',
+  PRIMARY KEY (id)
+)ENGINE=InnoDB COMMENT='学员课程账户操作日志表（P3：转课/课时清零/改有效期/停课/复课/结课/导入）' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_course_package 课程套餐基础信息表
@@ -163,7 +192,7 @@ CREATE TABLE IF NOT EXISTS teach_course_package (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   UNIQUE (package_no)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='课程套餐基础信息表';
+)ENGINE=InnoDB COMMENT='课程套餐基础信息表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_grades 教学年级字典表
@@ -181,7 +210,7 @@ CREATE TABLE IF NOT EXISTS teach_grades (
   update_time DATETIME COMMENT '更新时间',
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (grade_id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='教学年级字典表';
+)ENGINE=InnoDB COMMENT='教学年级字典表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_leave_application 请假申请表
@@ -217,7 +246,7 @@ CREATE TABLE IF NOT EXISTS teach_leave_application (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   UNIQUE (leave_no)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='请假申请表';
+)ENGINE=InnoDB COMMENT='请假申请表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_schedule_attendances 排课事件-考勤表
@@ -238,7 +267,7 @@ CREATE TABLE IF NOT EXISTS teach_schedule_attendances (
   update_by VARCHAR(64) COMMENT '更新者',
   update_time DATETIME NOT NULL COMMENT '更新时间',
   PRIMARY KEY (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='排课事件-考勤表';
+)ENGINE=InnoDB COMMENT='排课事件-考勤表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_schedule_events 排课事件表
@@ -272,7 +301,7 @@ CREATE TABLE IF NOT EXISTS teach_schedule_events (
   update_time DATETIME NOT NULL COMMENT '更新时间',
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='排课事件表';
+)ENGINE=InnoDB COMMENT='排课事件表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_student_comment 课后点评表
@@ -304,7 +333,29 @@ CREATE TABLE IF NOT EXISTS teach_student_comment (
   update_time DATETIME COMMENT '更新时间',
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='课后点评表';
+)ENGINE=InnoDB COMMENT='课后点评表' CHARSET=utf8mb4;
+
+-- ----------------------------
+-- teach_student_follow 学员跟进记录表（P3）
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS teach_student_follow (
+  id INTEGER NOT NULL COMMENT '主键ID' AUTO_INCREMENT,
+  student_id INTEGER NOT NULL COMMENT '学员ID',
+  student_name VARCHAR(50) COMMENT '学员姓名快照',
+  follow_type VARCHAR(20) NOT NULL COMMENT '跟进方式(phone=电话 wechat=微信 visit=面谈 other=其他)',
+  follow_stage VARCHAR(50) COMMENT '跟进阶段',
+  content TEXT NOT NULL COMMENT '跟进内容',
+  follow_time DATETIME NOT NULL COMMENT '跟进时间',
+  next_follow_date DATE COMMENT '下次跟进日期',
+  follow_user_id INTEGER COMMENT '跟进人(sys_user.user_id)',
+  follow_user_name VARCHAR(64) COMMENT '跟进人姓名快照',
+  del_flag SMALLINT COMMENT '删除标志(0=存在 1=删除)',
+  create_by VARCHAR(64) COMMENT '创建者',
+  create_time DATETIME COMMENT '创建时间',
+  update_by VARCHAR(64) COMMENT '更新者',
+  update_time DATETIME COMMENT '更新时间',
+  PRIMARY KEY (id)
+)ENGINE=InnoDB COMMENT='学员跟进记录表（P3）' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_subjects 教学科目字典表
@@ -323,7 +374,7 @@ CREATE TABLE IF NOT EXISTS teach_subjects (
   update_time DATETIME COMMENT '更新时间',
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (subject_id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='教学科目字典表';
+)ENGINE=InnoDB COMMENT='教学科目字典表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_teacher_grade 教师-年级关联表
@@ -332,7 +383,7 @@ CREATE TABLE IF NOT EXISTS teach_teacher_grade (
   teacher_id INTEGER NOT NULL COMMENT '教师ID',
   grade_id INTEGER NOT NULL COMMENT '年级ID',
   PRIMARY KEY (teacher_id, grade_id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='教师-年级关联表';
+)ENGINE=InnoDB COMMENT='教师-年级关联表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_teacher_subject 教师-科目关联表
@@ -341,7 +392,7 @@ CREATE TABLE IF NOT EXISTS teach_teacher_subject (
   teacher_id INTEGER NOT NULL COMMENT '教师ID',
   subject_id INTEGER NOT NULL COMMENT '科目ID',
   PRIMARY KEY (teacher_id, subject_id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='教师-科目关联表';
+)ENGINE=InnoDB COMMENT='教师-科目关联表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_venue 场馆信息表
@@ -361,7 +412,7 @@ CREATE TABLE IF NOT EXISTS teach_venue (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   UNIQUE (venue_no)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='场馆信息表';
+)ENGINE=InnoDB COMMENT='场馆信息表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_class 班级基础信息表
@@ -406,7 +457,7 @@ CREATE TABLE IF NOT EXISTS teach_class (
   PRIMARY KEY (id),
   UNIQUE (class_no),
   FOREIGN KEY(course_id) REFERENCES teach_course (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='班级基础信息表';
+)ENGINE=InnoDB COMMENT='班级基础信息表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_course_price 课程定价标准表
@@ -430,7 +481,7 @@ CREATE TABLE IF NOT EXISTS teach_course_price (
   update_time DATETIME COMMENT '更新时间',
   PRIMARY KEY (id),
   FOREIGN KEY(course_id) REFERENCES teach_course (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='课程定价标准表';
+)ENGINE=InnoDB COMMENT='课程定价标准表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_court 场地信息表
@@ -453,7 +504,7 @@ CREATE TABLE IF NOT EXISTS teach_court (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   FOREIGN KEY(venue_id) REFERENCES teach_venue (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='场地信息表';
+)ENGINE=InnoDB COMMENT='场地信息表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_package_item 课程套餐明细表
@@ -483,7 +534,7 @@ CREATE TABLE IF NOT EXISTS teach_package_item (
   update_time DATETIME COMMENT '更新时间',
   PRIMARY KEY (id),
   FOREIGN KEY(package_id) REFERENCES teach_course_package (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='课程套餐明细表';
+)ENGINE=InnoDB COMMENT='课程套餐明细表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_parents 家长信息表
@@ -511,7 +562,7 @@ CREATE TABLE IF NOT EXISTS teach_parents (
   PRIMARY KEY (id),
   UNIQUE (user_id),
   FOREIGN KEY(user_id) REFERENCES teach_base_users (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='家长信息表';
+)ENGINE=InnoDB COMMENT='家长信息表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_teachers 教师信息表
@@ -540,7 +591,7 @@ CREATE TABLE IF NOT EXISTS teach_teachers (
   PRIMARY KEY (id),
   UNIQUE (user_id),
   FOREIGN KEY(user_id) REFERENCES teach_base_users (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='教师信息表';
+)ENGINE=InnoDB COMMENT='教师信息表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_class_attendance 班级点名记录表
@@ -576,7 +627,7 @@ CREATE TABLE IF NOT EXISTS teach_class_attendance (
   PRIMARY KEY (id),
   CONSTRAINT uk_class_attendance_event UNIQUE (event_id),
   FOREIGN KEY(class_id) REFERENCES teach_class (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='班级点名记录表';
+)ENGINE=InnoDB COMMENT='班级点名记录表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_class_teacher 班级教师关联表
@@ -595,7 +646,7 @@ CREATE TABLE IF NOT EXISTS teach_class_teacher (
   PRIMARY KEY (id),
   FOREIGN KEY(class_id) REFERENCES teach_class (id),
   FOREIGN KEY(teacher_id) REFERENCES teach_teachers (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='班级教师关联表';
+)ENGINE=InnoDB COMMENT='班级教师关联表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_court_booking 场地预订单表
@@ -634,7 +685,7 @@ CREATE TABLE IF NOT EXISTS teach_court_booking (
   PRIMARY KEY (id),
   UNIQUE (booking_no),
   FOREIGN KEY(court_id) REFERENCES teach_court (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='场地预订单表';
+)ENGINE=InnoDB COMMENT='场地预订单表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_court_price_rule 场地分时价格规则表
@@ -651,7 +702,7 @@ CREATE TABLE IF NOT EXISTS teach_court_price_rule (
   create_time DATETIME COMMENT '创建时间',
   PRIMARY KEY (id),
   FOREIGN KEY(court_id) REFERENCES teach_court (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='场地分时价格规则表';
+)ENGINE=InnoDB COMMENT='场地分时价格规则表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_court_time 场地可约时段表
@@ -666,7 +717,7 @@ CREATE TABLE IF NOT EXISTS teach_court_time (
   create_time DATETIME COMMENT '创建时间',
   PRIMARY KEY (id),
   FOREIGN KEY(court_id) REFERENCES teach_court (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='场地可约时段表';
+)ENGINE=InnoDB COMMENT='场地可约时段表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_students 学生信息表
@@ -698,7 +749,7 @@ CREATE TABLE IF NOT EXISTS teach_students (
   remark VARCHAR(500) COMMENT '备注',
   PRIMARY KEY (id),
   FOREIGN KEY(parent_id) REFERENCES teach_parents (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='学生信息表';
+)ENGINE=InnoDB COMMENT='学生信息表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_class_attendance_detail 班级点名明细表
@@ -729,7 +780,7 @@ CREATE TABLE IF NOT EXISTS teach_class_attendance_detail (
   FOREIGN KEY(attendance_id) REFERENCES teach_class_attendance (id),
   FOREIGN KEY(class_id) REFERENCES teach_class (id),
   FOREIGN KEY(student_id) REFERENCES teach_students (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='班级点名明细表';
+)ENGINE=InnoDB COMMENT='班级点名明细表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_class_student 班级学员关联表
@@ -755,7 +806,7 @@ CREATE TABLE IF NOT EXISTS teach_class_student (
   PRIMARY KEY (id),
   FOREIGN KEY(class_id) REFERENCES teach_class (id),
   FOREIGN KEY(student_id) REFERENCES teach_students (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='班级学员关联表';
+)ENGINE=InnoDB COMMENT='班级学员关联表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_enrollment_order 学员报名/续费订单表
@@ -787,7 +838,7 @@ CREATE TABLE IF NOT EXISTS teach_enrollment_order (
   PRIMARY KEY (id),
   UNIQUE (order_no),
   FOREIGN KEY(student_id) REFERENCES teach_students (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='学员报名/续费订单表';
+)ENGINE=InnoDB COMMENT='学员报名/续费订单表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_enrollment_order_item 学员报名/续费订单明细表
@@ -828,7 +879,7 @@ CREATE TABLE IF NOT EXISTS teach_enrollment_order_item (
   PRIMARY KEY (id),
   FOREIGN KEY(order_id) REFERENCES teach_enrollment_order (id),
   FOREIGN KEY(student_id) REFERENCES teach_students (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='学员报名/续费订单明细表';
+)ENGINE=InnoDB COMMENT='学员报名/续费订单明细表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- teach_student_course_account 学员课程账户表
@@ -848,6 +899,7 @@ CREATE TABLE IF NOT EXISTS teach_student_course_account (
   refunded_quantity INTEGER NOT NULL COMMENT '已退数量',
   transferred_quantity INTEGER NOT NULL COMMENT '已转数量',
   remaining_quantity INTEGER NOT NULL COMMENT '剩余数量',
+  cleared_quantity INTEGER NOT NULL COMMENT '已清零数量' DEFAULT '0',
   leave_exempt_count INTEGER COMMENT '请假免扣次数',
   leave_used_count INTEGER COMMENT '已用请假免扣次数',
   valid_start_date DATE COMMENT '有效期开始日期',
@@ -855,7 +907,11 @@ CREATE TABLE IF NOT EXISTS teach_student_course_account (
   validity_type VARCHAR(32) COMMENT '有效期类型',
   class_id INTEGER COMMENT '班级ID',
   class_name VARCHAR(100) COMMENT '班级名称',
-  status VARCHAR(20) NOT NULL COMMENT '状态(active=有效 stopped=停课 completed=结课)',
+  status VARCHAR(20) NOT NULL COMMENT '状态(active=有效 stopped=停课 completed=结课 transferred=已转出)',
+  stop_date DATE COMMENT '停课日期',
+  planned_resume_date DATE COMMENT '计划复课日期(仅记录，需手动复课)',
+  stop_reason VARCHAR(100) COMMENT '停课原因',
+  complete_date DATE COMMENT '结课/转出日期',
   remark VARCHAR(500) COMMENT '备注',
   del_flag SMALLINT COMMENT '删除标志(0=存在 1=删除)',
   create_by VARCHAR(64) COMMENT '创建者',
@@ -866,7 +922,7 @@ CREATE TABLE IF NOT EXISTS teach_student_course_account (
   FOREIGN KEY(student_id) REFERENCES teach_students (id),
   FOREIGN KEY(order_id) REFERENCES teach_enrollment_order (id),
   FOREIGN KEY(order_item_id) REFERENCES teach_enrollment_order_item (id)
-)ENGINE=InnoDB CHARSET=utf8mb4 COMMENT='学员课程账户表';
+)ENGINE=InnoDB COMMENT='学员课程账户表' CHARSET=utf8mb4;
 
 -- ----------------------------
 -- 已有数据库补充唯一约束（create_all 不会给已存在的表加约束，需要手工执行一次）
