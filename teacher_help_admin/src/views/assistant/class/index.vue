@@ -42,7 +42,13 @@
             </el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="info" plain icon="Upload" disabled title="批量导入班级（Excel 模板）后续接入">导入班级</el-button>
+            <el-button type="info" plain icon="Upload" @click="classImportOpen = true" v-hasPermi="['teach:class:import']">导入班级</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="success" plain icon="Top" :disabled="!ids.length" @click="openPromote" v-hasPermi="['teach:class:promote']">批量升班</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="warning" plain icon="Finished" :disabled="!ids.length" @click="openGraduate" v-hasPermi="['teach:class:graduate']">批量结业</el-button>
           </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -197,6 +203,78 @@
         </div>
       </template>
     </el-drawer>
+
+    <excel-import-dialog
+      v-model="classImportOpen"
+      title="导入班级"
+      template-url="teach/class-batch/import/template"
+      template-name="班级导入模板.xlsx"
+      upload-url="/teach/class-batch/import"
+      :tips="['请先下载模板，按“填写说明”页填写；当前一个班级只能关联一门课程，班级名称不能与已有班级重复。']"
+      @success="getList"
+    />
+
+    <el-dialog title="批量升班" v-model="promoteOpen" width="1000px" append-to-body destroy-on-close>
+      <el-alert type="info" :closable="false" show-icon class="mb8">
+        <template #title>
+          <div>每个原班级创建一个新班级，原班级全部在读学员转入新班并从原班级移出；不复制原班级排课，请升班后在新班级重新排课。</div>
+          <div>新班级课程与原班级相同时沿用学员原课程账户；课程不同时绑定学员在新课程下的有效账户，没有的学员点名前需先报读。</div>
+        </template>
+      </el-alert>
+      <el-table :data="promoteItems" border size="small">
+        <el-table-column label="原班级" prop="sourceClassName" min-width="130" show-overflow-tooltip />
+        <el-table-column label="在读人数" prop="currentStudents" width="80" align="center" />
+        <el-table-column label="新班级名称" min-width="170">
+          <template #default="scope"><el-input v-model="scope.row.className" maxlength="100" /></template>
+        </el-table-column>
+        <el-table-column label="关联课程" min-width="170">
+          <template #default="scope">
+            <el-select v-model="scope.row.courseId" filterable style="width: 100%">
+              <el-option v-for="course in courseOptions" :key="course.id" :label="course.courseName" :value="course.id" />
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="班级老师" min-width="140">
+          <template #default="scope">
+            <el-select v-model="scope.row.teacherId" filterable clearable placeholder="沿用原班" style="width: 100%">
+              <el-option v-for="teacher in teacherOptions" :key="teacher.id" :label="teacher.teacherName" :value="teacher.id" />
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="开班日期" width="160">
+          <template #default="scope">
+            <el-date-picker v-model="scope.row.startDate" type="date" value-format="YYYY-MM-DD" style="width: 140px" />
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-checkbox v-model="promoteGraduateSource" style="margin-top: 12px">升班后将原班级标记为“已结课”</el-checkbox>
+      <template #footer>
+        <el-button @click="promoteOpen = false">取 消</el-button>
+        <el-button type="primary" :loading="batchLoading" @click="submitPromote">提 交</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog title="批量结业" v-model="graduateOpen" width="680px" append-to-body destroy-on-close>
+      <el-alert
+        type="warning"
+        :closable="false"
+        show-icon
+        class="mb8"
+        :title="`已选 ${graduateRows.length} 个班级。结业后班级在读学员将全部移出（课程账户与剩余课时不变），班级标记为已结课，不能再报名入班；已排未上的课次不会自动删除。`"
+      />
+      <el-table :data="graduateRows" border size="small">
+        <el-table-column label="班级名称" prop="className" min-width="150" />
+        <el-table-column label="关联课程" prop="courseName" min-width="140" />
+        <el-table-column label="班级老师" prop="teacherName" width="110" />
+        <el-table-column label="人数/容量" width="100">
+          <template #default="scope">{{ scope.row.currentStudents || 0 }}/{{ scope.row.maxStudents || '未设置' }}</template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <el-button @click="graduateOpen = false">取 消</el-button>
+        <el-button type="danger" :loading="batchLoading" @click="submitGraduate">确定结业</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -205,6 +283,8 @@ import { computed, defineComponent, getCurrentInstance, h, onMounted, reactive, 
 import { useRouter } from 'vue-router';
 import { addClass, changeClassRecharge, delClass, listClass, updateClass } from '@/api/assistant/class';
 import { listCourseOptions } from '@/api/assistant/course';
+import { graduateClasses, promoteClasses } from '@/api/assistant/classBatch';
+import ExcelImportDialog from '@/components/ExcelImportDialog/index.vue';
 import { listTeacher } from '@/api/teach/teacher';
 
 const ClassTable = defineComponent({
@@ -289,6 +369,14 @@ const submitLoading = ref(false);
 const open = ref(false);
 const drawerTitle = ref('');
 const ids = ref([]);
+const selectedClasses = ref([]);
+const classImportOpen = ref(false);
+const promoteOpen = ref(false);
+const promoteItems = ref([]);
+const promoteGraduateSource = ref(false);
+const graduateOpen = ref(false);
+const graduateRows = ref([]);
+const batchLoading = ref(false);
 const oneToOneIds = ref([]);
 const classList = ref([]);
 const oneToOneClassList = ref([]);
@@ -417,6 +505,63 @@ function resetOneToOneQuery() {
 
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
+  selectedClasses.value = selection;
+}
+
+function openPromote() {
+  promoteItems.value = selectedClasses.value.map(row => ({
+    sourceClassId: row.id,
+    sourceClassName: row.className,
+    currentStudents: row.currentStudents || 0,
+    className: `${row.className}（升班）`,
+    courseId: row.courseId,
+    teacherId: null,
+    startDate: null
+  }));
+  promoteGraduateSource.value = false;
+  promoteOpen.value = true;
+}
+
+async function submitPromote() {
+  if (promoteItems.value.some(item => !String(item.className || '').trim() || !item.courseId)) {
+    proxy.$modal.msgWarning('请填写新班级名称并选择关联课程');
+    return;
+  }
+  batchLoading.value = true;
+  try {
+    const res = await promoteClasses({
+      items: promoteItems.value.map(item => ({
+        sourceClassId: item.sourceClassId,
+        className: item.className.trim(),
+        courseId: item.courseId,
+        teacherId: item.teacherId || null,
+        startDate: item.startDate || null
+      })),
+      graduateSource: promoteGraduateSource.value
+    });
+    proxy.$modal.msgSuccess(res.msg || '升班成功');
+    promoteOpen.value = false;
+    getList();
+  } finally {
+    batchLoading.value = false;
+  }
+}
+
+function openGraduate() {
+  graduateRows.value = [...selectedClasses.value];
+  graduateOpen.value = true;
+}
+
+async function submitGraduate() {
+  batchLoading.value = true;
+  try {
+    const res = await graduateClasses({ classIds: graduateRows.value.map(row => row.id) });
+    proxy.$modal.msgSuccess(res.msg || '结业成功');
+    graduateOpen.value = false;
+    getList();
+  } finally {
+    batchLoading.value = false;
+  }
 }
 
 function handleOneToOneSelectionChange(selection) {

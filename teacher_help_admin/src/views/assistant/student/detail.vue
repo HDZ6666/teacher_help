@@ -174,30 +174,68 @@
             </el-table-column>
             <el-table-column label="状态" width="90">
               <template #default="scope">
-                <el-tag size="small" type="success">{{ scope.row.statusName || '有效' }}</el-tag>
+                <el-tag size="small" :type="accountStatusType(scope.row.status)">{{ scope.row.statusName || '有效' }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="180" fixed="right">
+            <el-table-column label="操作" width="260" fixed="right">
               <template #default="scope">
                 <el-button type="primary" link @click="handleRenew(scope.row)">续费</el-button>
-                <el-button type="primary" link disabled>转课</el-button>
-                <el-button type="primary" link disabled>退课</el-button>
-                <el-button type="primary" link disabled>结课</el-button>
+                <template v-if="scope.row.status === 'active'">
+                  <el-button type="primary" link @click="openAccountOp('transfer', scope.row)" v-hasPermi="['teach:student:account']">转课</el-button>
+                  <el-button type="primary" link @click="openAccountOp('stop', scope.row)" v-hasPermi="['teach:student:account']">停课</el-button>
+                </template>
+                <el-button v-if="scope.row.status === 'stopped'" type="primary" link @click="openAccountOp('resume', scope.row)" v-hasPermi="['teach:student:account']">复课</el-button>
+                <el-button v-if="['active', 'stopped'].includes(scope.row.status)" type="danger" link @click="openAccountOp('complete', scope.row)" v-hasPermi="['teach:student:account']">结课</el-button>
+                <el-button type="primary" link disabled title="退课退款需财务规则确认后接入">退课</el-button>
               </template>
             </el-table-column>
           </el-table>
+
+          <el-collapse class="account-log" @change="handleLogCollapse">
+            <el-collapse-item title="课程变更记录（转课/清零/有效期/停课/复课/结课/导入）" name="logs">
+              <el-table v-loading="logLoading" :data="accountLogs" border size="small">
+                <el-table-column label="时间" prop="createTime" width="160" />
+                <el-table-column label="操作" prop="opTypeName" width="90" />
+                <el-table-column label="课程" prop="courseName" min-width="130" show-overflow-tooltip />
+                <el-table-column label="数量变化" width="120">
+                  <template #default="scope">{{ scope.row.beforeRemaining ?? '-' }} → {{ scope.row.afterRemaining ?? '-' }}</template>
+                </el-table-column>
+                <el-table-column label="状态" width="120">
+                  <template #default="scope">{{ scope.row.beforeStatusName || '-' }} → {{ scope.row.afterStatusName || '-' }}</template>
+                </el-table-column>
+                <el-table-column label="有效期至" width="190">
+                  <template #default="scope">{{ scope.row.beforeValidEnd || '-' }} → {{ scope.row.afterValidEnd || '-' }}</template>
+                </el-table-column>
+                <el-table-column label="原因/备注" prop="reason" min-width="160" show-overflow-tooltip />
+                <el-table-column label="操作人" prop="createBy" width="90" />
+              </el-table>
+            </el-collapse-item>
+          </el-collapse>
         </el-tab-pane>
 
         <el-tab-pane label="充值账户" name="recharge">
-          <el-empty description="充值账户待财务闭环接入" />
+          <el-empty description="系统暂未提供储值/充值账户（无充值数据表），报名缴费请在“消费记录”查看" />
         </el-tab-pane>
 
         <el-tab-pane label="持有卡项" name="cards">
-          <el-empty description="持有卡项待会员卡模块接入" />
+          <el-table v-loading="tabLoading.cards" :data="cardList" border>
+            <el-table-column label="卡名称" prop="cardName" min-width="140" />
+            <el-table-column label="卡类型" prop="cardTypeName" width="110" />
+            <el-table-column label="发放/剩余次数" width="130">
+              <template #default="scope">{{ scope.row.grantCount ?? '-' }} / {{ scope.row.remainingCount ?? '-' }}</template>
+            </el-table-column>
+            <el-table-column label="有效期" min-width="190">
+              <template #default="scope">{{ formatDateRange(scope.row.validStartDate, scope.row.validEndDate) }}</template>
+            </el-table-column>
+            <el-table-column label="状态" width="90">
+              <template #default="scope">{{ GRANT_STATUS[scope.row.grantStatus] || '-' }}</template>
+            </el-table-column>
+            <el-table-column label="发放时间" prop="grantTime" width="170" />
+          </el-table>
         </el-tab-pane>
 
-        <el-tab-pane label="跟进管理" name="follow">
-          <el-empty description="跟进管理待学员跟进闭环接入" />
+        <el-tab-pane label="跟进管理" name="follow" lazy>
+          <follow-panel :student-id="studentId" />
         </el-tab-pane>
 
         <el-tab-pane label="消费记录" name="consume">
@@ -262,8 +300,8 @@
             </el-table-column>
             <el-table-column label="创建时间" prop="createTime" min-width="170" />
             <el-table-column label="操作" width="100" fixed="right">
-              <template #default>
-                <el-button type="primary" link disabled>打印收据</el-button>
+              <template #default="scope">
+                <el-button type="primary" link @click="receiptRef.open(scope.row.id)">查看收据</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -296,30 +334,74 @@
         </el-tab-pane>
 
         <el-tab-pane label="上课记录" name="attendance">
-          <el-empty description="上课记录待课表/点名闭环接入" />
+          <el-table v-loading="tabLoading.lessons" :data="pages.lessons.rows" border>
+            <el-table-column label="上课日期" prop="classDate" width="110" />
+            <el-table-column label="时间" width="120">
+              <template #default="scope">{{ scope.row.startTime }}-{{ scope.row.endTime }}</template>
+            </el-table-column>
+            <el-table-column label="班级" prop="className" min-width="130" show-overflow-tooltip />
+            <el-table-column label="课程" prop="courseName" min-width="130" show-overflow-tooltip />
+            <el-table-column label="老师" prop="teacherName" width="100" />
+            <el-table-column label="到课状态" prop="statusName" width="90" />
+            <el-table-column label="扣课" prop="deductQuantity" width="70" />
+            <el-table-column label="扣后剩余" prop="afterRemaining" width="90" />
+            <el-table-column label="补课" width="70">
+              <template #default="scope">{{ scope.row.makeupFlag === 1 ? '已补' : '-' }}</template>
+            </el-table-column>
+          </el-table>
+          <pagination v-show="pages.lessons.total > 0" :total="pages.lessons.total" v-model:page="pages.lessons.pageNum" v-model:limit="pages.lessons.pageSize" @pagination="loadTab('lessons')" />
         </el-tab-pane>
 
         <el-tab-pane label="考勤记录" name="checkin">
-          <el-empty description="考勤记录待考勤闭环接入" />
+          <el-table v-loading="tabLoading.checkins" :data="pages.checkins.rows" border>
+            <el-table-column label="课次日期" prop="eventDate" width="110" />
+            <el-table-column label="上课时间" min-width="200">
+              <template #default="scope">{{ scope.row.startTime }} ~ {{ scope.row.endTime }}</template>
+            </el-table-column>
+            <el-table-column label="班级" prop="className" min-width="130" show-overflow-tooltip />
+            <el-table-column label="课程" prop="courseName" min-width="130" show-overflow-tooltip />
+            <el-table-column label="考勤" prop="statusName" width="80" />
+            <el-table-column label="签到时间" prop="checkInTime" width="170" />
+            <el-table-column label="签到方式" prop="checkInMethod" width="90" />
+            <el-table-column label="备注" prop="notes" min-width="120" show-overflow-tooltip />
+          </el-table>
+          <pagination v-show="pages.checkins.total > 0" :total="pages.checkins.total" v-model:page="pages.checkins.pageNum" v-model:limit="pages.checkins.pageSize" @pagination="loadTab('checkins')" />
         </el-tab-pane>
 
         <el-tab-pane label="成长档案" name="growth">
-          <el-empty description="成长档案待后续接入" />
+          <el-table v-loading="tabLoading.comments" :data="pages.comments.rows" border>
+            <el-table-column label="上课日期" prop="classDate" width="110" />
+            <el-table-column label="课程" prop="courseName" min-width="120" show-overflow-tooltip />
+            <el-table-column label="老师" prop="teacherName" width="100" />
+            <el-table-column label="课堂表现" prop="performanceScore" width="90" />
+            <el-table-column label="作业" prop="homeworkScore" width="70" />
+            <el-table-column label="点评内容" prop="commentContent" min-width="260" show-overflow-tooltip />
+            <el-table-column label="改进建议" prop="suggestions" min-width="160" show-overflow-tooltip />
+          </el-table>
+          <pagination v-show="pages.comments.total > 0" :total="pages.comments.total" v-model:page="pages.comments.pageNum" v-model:limit="pages.comments.pageSize" @pagination="loadTab('comments')" />
         </el-tab-pane>
 
         <el-tab-pane label="学习报告" name="report">
-          <el-empty description="学习报告待后续接入" />
+          <el-empty description="学习报告需产品确认报告口径（统计维度/生成周期）后接入，课后点评见“成长档案”" />
         </el-tab-pane>
       </el-tabs>
     </el-card>
+
+    <course-account-ops ref="accountOpsRef" @done="handleAccountOpDone" />
+    <receipt-dialog ref="receiptRef" />
   </div>
 </template>
 
 <script setup name="StudentDetail">
-import { computed, getCurrentInstance, onMounted, ref } from 'vue';
+import { computed, getCurrentInstance, onMounted, reactive, ref } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getStudent, getStudentCourses, getStudentOrders } from '@/api/teach/student';
+import { listCourseAccountLog, listStudentCheckins, listStudentComments, listStudentLessons } from '@/api/teach/studentAccount';
+import { listStudentCards } from '@/api/teach/card';
+import CourseAccountOps from './components/CourseAccountOps.vue';
+import ReceiptDialog from './components/ReceiptDialog.vue';
+import FollowPanel from './components/FollowPanel.vue';
 
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -334,6 +416,20 @@ const orderLoading = ref(false);
 const studentInfo = ref({});
 const courseList = ref([]);
 const orderList = ref([]);
+const accountOpsRef = ref();
+const receiptRef = ref();
+const accountLogs = ref([]);
+const logLoading = ref(false);
+const logOpened = ref(false);
+const cardList = ref([]);
+const GRANT_STATUS = { 1: '有效', 2: '过期', 3: '用完', 4: '作废' };
+const tabLoading = reactive({ cards: false, lessons: false, checkins: false, comments: false });
+const pages = reactive({
+  lessons: { rows: [], total: 0, pageNum: 1, pageSize: 10 },
+  checkins: { rows: [], total: 0, pageNum: 1, pageSize: 10 },
+  comments: { rows: [], total: 0, pageNum: 1, pageSize: 10 }
+});
+const TAB_LOADERS = { lessons: listStudentLessons, checkins: listStudentCheckins, comments: listStudentComments };
 
 const remainingQuantityTotal = computed(() => {
   return courseList.value.reduce((total, course) => total + Number(course.remainingQuantity || 0), 0);
@@ -416,6 +512,68 @@ function handleTabChange(tab) {
     loadStudentCourses();
   } else if (tab === 'consume') {
     loadStudentOrders();
+  } else if (tab === 'cards') {
+    loadCards();
+  } else if (tab === 'attendance') {
+    loadTab('lessons');
+  } else if (tab === 'checkin') {
+    loadTab('checkins');
+  } else if (tab === 'growth') {
+    loadTab('comments');
+  }
+}
+
+function accountStatusType(status) {
+  return { active: 'success', stopped: 'warning', completed: 'info', transferred: 'info' }[status] || 'info';
+}
+
+function openAccountOp(action, row) {
+  accountOpsRef.value.open(action, [{ ...row, studentName: studentInfo.value.studentName }]);
+}
+
+function handleAccountOpDone() {
+  loadStudentCourses();
+  if (logOpened.value) {
+    loadAccountLogs();
+  }
+}
+
+function handleLogCollapse(names) {
+  if (names.includes('logs')) {
+    logOpened.value = true;
+    loadAccountLogs();
+  }
+}
+
+async function loadAccountLogs() {
+  logLoading.value = true;
+  try {
+    const res = await listCourseAccountLog({ studentId });
+    accountLogs.value = res.data || [];
+  } finally {
+    logLoading.value = false;
+  }
+}
+
+async function loadCards() {
+  tabLoading.cards = true;
+  try {
+    const res = await listStudentCards(studentId);
+    cardList.value = res.data || [];
+  } finally {
+    tabLoading.cards = false;
+  }
+}
+
+async function loadTab(key) {
+  tabLoading[key] = true;
+  try {
+    const page = pages[key];
+    const res = await TAB_LOADERS[key](studentId, { pageNum: page.pageNum, pageSize: page.pageSize });
+    page.rows = res.rows || [];
+    page.total = res.total || 0;
+  } finally {
+    tabLoading[key] = false;
   }
 }
 
@@ -529,6 +687,10 @@ onMounted(async () => {
 
   .muted-text {
     color: #909399;
+  }
+
+  .account-log {
+    margin-top: 16px;
   }
 }
 </style>
